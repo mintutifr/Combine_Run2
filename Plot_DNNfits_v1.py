@@ -19,11 +19,11 @@ def propagate_rate_uncertainity(hist, uncert):
         if hist.GetBinContent(i) != 0:
             hist.SetBinError(i, hist.GetBinContent(i) * uncert * 0.01)
 
-def getcons(mass):
-        fitfile = R.TFile.Open("fitDiagnostics_M"+mass+"_DNNfit_mu_UL2017.root")
+def getcons(File):
+        fitfile = File 
         roofitResults = fitfile.Get("fit_s")
 
-        cons_top_sig = (roofitResults.floatParsFinal()).find("cons_EWK_bkg")
+        cons_top_sig = (roofitResults.floatParsFinal()).find("r")
         print "cons_top_sig : ",cons_top_sig.getVal()," Error : ",cons_top_sig.getError()
 
         cons_top_bkg = (roofitResults.floatParsFinal()).find("cons_top_bkg")
@@ -31,9 +31,22 @@ def getcons(mass):
 
 	cons_EWK_bkg = (roofitResults.floatParsFinal()).find("cons_EWK_bkg")
         print "cons_EWK_bkg : ",cons_EWK_bkg.getVal()," Error : ",cons_EWK_bkg.getError()
-	
-	return cons_top_sig.getVal(),cons_top_bkg.getVal(),cons_top_bkg.getVal()
 
+        cons_QCD_bkg = (roofitResults.floatParsFinal()).find("cons_QCD_bkg")
+        print "cons_QCD_bkg : ",cons_QCD_bkg.getVal()," Error : ",cons_QCD_bkg.getError()
+	
+	cons_N_Er = {"cons_val":{"top_sig": cons_top_sig.getVal(),
+                      "top_bkg": cons_top_bkg.getVal(),
+                      "EWK_bkg": cons_EWK_bkg.getVal(),
+                      "QCD_bkg": cons_QCD_bkg.getVal()
+                      },
+               "cons_Error":{"top_sig": cons_top_sig.getError(),
+                            "top_bkg": cons_top_bkg.getError(),
+                            "EWK_bkg": cons_EWK_bkg.getError(), 
+                            "QCD_bkg": cons_QCD_bkg.getError(),
+                         }
+                }
+        return cons_N_Er
 def getprefit_hist(mass,lep):
 	hists = []
         Filename = R.TFile("/home/mikumar/t3store3/workarea/Nanoaod_tools/CMSSW_10_2_28/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_DNNFit_Input_t_ch_CAsi_histograms_"+dataYear+"_"+lep+".root","Read")
@@ -84,47 +97,65 @@ def getthefit(mass,lep):
         Data_prefit.Print()
 
 
-	fitfile = R.TFile.Open("fitDiagnostics_M1725_DNNfit_"+lep+"_"+dataYear+".root") 
+	fitfile = R.TFile.Open("fitDiagnostics_M1725_DNNfit_"+dataYear+".root") 
 	fit = fitfile.Get(lep+"jets_CMS_th1x_fit_s")
 	#fit.Print()
 
 	Data_postfit_roohist = fit.findObject("h_"+lep+"jets")
 
-	SigFitHist = fitfile.Get("shapes_fit_s/"+lep+"jets/top_sig_1725"); #SigFitHist = Rebase_Xaxies_scale(SigFitHist)
-	TopBkgFitHist = fitfile.Get("shapes_fit_s/"+lep+"jets/top_bkg_1725"); #TopBkgFitHist = Rebase_Xaxies_scale(TopBkgFitHist)
-        EWKBkgFitHist = fitfile.Get("shapes_fit_s/"+lep+"jets/EWK_bkg"); #EWKBkgFitHist = Rebase_Xaxies_scale(EWKBkgFitHist)
-        QCDBkgFitHist = fitfile.Get("shapes_fit_s/"+lep+"jets/QCD_DD"); #QCDBkgFitHist = Rebase_Xaxies_scale(QCDBkgFitHist)
+	TopSigFitHist_Mc = fitfile.Get("shapes_fit_s/"+lep+"jets/top_sig_1725") 
+	TopBkgFitHist_Mc = fitfile.Get("shapes_fit_s/"+lep+"jets/top_bkg_1725") 
+        EWKBkgFitHist_Mc = fitfile.Get("shapes_fit_s/"+lep+"jets/EWK_bkg")
+        QCDBkgFitHist_Mc = fitfile.Get("shapes_fit_s/"+lep+"jets/QCD_DD")
 
-        propagate_rate_uncertainity(SigFitHist,15.0); SigFitHist = Rebase_Xaxies_scale(SigFitHist,SigFitHist)
-        propagate_rate_uncertainity(TopBkgFitHist,6.0); TopBkgFitHist = Rebase_Xaxies_scale(TopBkgFitHist,TopBkgFitHist)
-        propagate_rate_uncertainity(EWKBkgFitHist,10.0); EWKBkgFitHist = Rebase_Xaxies_scale(EWKBkgFitHist,EWKBkgFitHist)
-        propagate_rate_uncertainity(QCDBkgFitHist,50.0); QCDBkgFitHist = Rebase_Xaxies_scale(QCDBkgFitHist,QCDBkgFitHist)     
+        constaints_from_fit = getcons(fitfile)
+        print(constaints_from_fit)
+        propagate_rate_uncertainity(TopSigFitHist_Mc,constaints_from_fit['cons_Error']['top_sig']*100); TopSigFitHist_Mc = Rebase_Xaxies_scale(TopSigFitHist_Mc,TopSigFitHist_Mc)
+        propagate_rate_uncertainity(TopBkgFitHist_Mc,constaints_from_fit['cons_Error']['top_bkg']*100); TopBkgFitHist_Mc = Rebase_Xaxies_scale(TopBkgFitHist_Mc,TopBkgFitHist_Mc)
+        propagate_rate_uncertainity(EWKBkgFitHist_Mc,constaints_from_fit['cons_Error']['EWK_bkg']*100); EWKBkgFitHist_Mc = Rebase_Xaxies_scale(EWKBkgFitHist_Mc,EWKBkgFitHist_Mc)
+        propagate_rate_uncertainity(QCDBkgFitHist_Mc,constaints_from_fit['cons_Error']['QCD_bkg']*100); QCDBkgFitHist_Mc = Rebase_Xaxies_scale(QCDBkgFitHist_Mc,QCDBkgFitHist_Mc)     
  
-        ResultFitHist_unct_prop = SigFitHist.Clone(); SigFitHist.Print();print(SigFitHist.Integral(1,7));print(SigFitHist.Integral(8,10))
-        ResultFitHist_unct_prop.Add(TopBkgFitHist);   TopBkgFitHist.Print();print(TopBkgFitHist.Integral(1,7));print(TopBkgFitHist.Integral(8,10))
-        ResultFitHist_unct_prop.Add(EWKBkgFitHist);   EWKBkgFitHist.Print();print(EWKBkgFitHist.Integral(1,7));print(EWKBkgFitHist.Integral(8,10))
-        ResultFitHist_unct_prop.Add(QCDBkgFitHist);   QCDBkgFitHist.Print();print(QCDBkgFitHist.Integral(1,7));print(QCDBkgFitHist.Integral(8,10))
+        ResultFitHist_Mc_unct_prop = TopSigFitHist_Mc.Clone(); TopSigFitHist_Mc.Print();print(TopSigFitHist_Mc.Integral())
+        ResultFitHist_Mc_unct_prop.Add(TopBkgFitHist_Mc);   TopBkgFitHist_Mc.Print();print(TopBkgFitHist_Mc.Integral())
+        ResultFitHist_Mc_unct_prop.Add(EWKBkgFitHist_Mc);   EWKBkgFitHist_Mc.Print();print(EWKBkgFitHist_Mc.Integral())
+        ResultFitHist_Mc_unct_prop.Add(QCDBkgFitHist_Mc);   QCDBkgFitHist_Mc.Print();print(QCDBkgFitHist_Mc.Integral())
 
-        QCDBkgFitHist.SetFillColor(R.kGray)
-        QCDBkgFitHist.SetLineColor(R.kGray)
-        EWKBkgFitHist.SetFillColor(R.kGreen+2)
-        EWKBkgFitHist.SetLineColor(R.kGreen+2)
-        TopBkgFitHist.SetFillColor(R.kOrange-1)
-        TopBkgFitHist.SetLineColor(R.kOrange-1)
-        SigFitHist.SetFillColor(R.kRed)
-        SigFitHist.SetLineColor(R.kRed)
+        DNN_postfit_Norm = {lep :{
+                                dataYear:{
+                                        "top_sig": TopSigFitHist_Mc.Integral(),
+                                        "top_bkg": TopBkgFitHist_Mc.Integral(),
+                                        "EWK_bkg": EWKBkgFitHist_Mc.Integral(),
+                                        "QCD_bkg": QCDBkgFitHist_Mc.Integral()
+                                        }
+                                }
+                           }
+        print(DNN_postfit_Norm)
+         
+        QCDBkgFitHist_Mc.SetFillColor(R.kGray)
+        QCDBkgFitHist_Mc.SetLineColor(R.kGray)
+        EWKBkgFitHist_Mc.SetFillColor(R.kGreen+2)
+        EWKBkgFitHist_Mc.SetLineColor(R.kGreen+2)
+        TopBkgFitHist_Mc.SetFillColor(R.kOrange-1)
+        TopBkgFitHist_Mc.SetLineColor(R.kOrange-1)
+        TopSigFitHist_Mc.SetFillColor(R.kRed)
+        TopSigFitHist_Mc.SetLineColor(R.kRed)
 
         hs = R.THStack("hs","");
-        hs.Add(QCDBkgFitHist)
-        hs.Add(EWKBkgFitHist)
-        hs.Add(TopBkgFitHist)
-        hs.Add(SigFitHist)
+        hs.Add(QCDBkgFitHist_Mc)
+        hs.Add(EWKBkgFitHist_Mc)
+        hs.Add(TopBkgFitHist_Mc)
+        hs.Add(TopSigFitHist_Mc)
         
-	ResultFitHist = fitfile.Get("shapes_fit_s/"+lep+"jets/total"); 
-        ResultFitHist=Rebase_Xaxies_scale(ResultFitHist,ResultFitHist_unct_prop)
-        del ResultFitHist_unct_prop
-        ResultFitHist.SetLineColor(R.kBlue)
-        ResultFitHist.SetLineWidth(2)
+        MC_error_band = QCDBkgFitHist_Mc.Clone(); MC_error_band.Add(EWKBkgFitHist_Mc)
+        MC_error_band.Add(TopBkgFitHist_Mc); MC_error_band.Add(TopSigFitHist_Mc)       
+        MC_error_band.SetFillColor(rt.kGray+3)
+        MC_error_band.SetFillStyle(3018)
+ 
+	ResultFitHist_total = fitfile.Get("shapes_fit_s/"+lep+"jets/total"); 
+        ResultFitHist_total=Rebase_Xaxies_scale(ResultFitHist_total,ResultFitHist_Mc_unct_prop)
+        del ResultFitHist_Mc_unct_prop
+        ResultFitHist_total.SetLineColor(R.kBlue)
+        ResultFitHist_total.SetLineWidth(2)
 
 	legend = R.TLegend(0.60193646, 0.5048435, 0.8093552, 0.79026143)
 	legend.SetBorderSize(1)
@@ -136,12 +167,16 @@ def getthefit(mass,lep):
 	legend.SetFillStyle(1001)
 	#legend.SetHeader("beNDC", "C")
 	legend.AddEntry(Data_prefit, "Data", "ple1")
-	legend.AddEntry(ResultFitHist, "Fit.", "l")
-	legend.AddEntry(SigFitHist, "corr. top", "f")
-	legend.AddEntry(TopBkgFitHist, "top bkg", "f")
-        legend.AddEntry(EWKBkgFitHist, "EWK bkg", "f")
-        legend.AddEntry(QCDBkgFitHist, "QCD bkg", "f")
+	legend.AddEntry(ResultFitHist_total, "Fit.", "l")
+	legend.AddEntry(TopSigFitHist_Mc, "corr. top", "f")
+	legend.AddEntry(TopBkgFitHist_Mc, "top bkg", "f")
+        legend.AddEntry(EWKBkgFitHist_Mc, "EWK bkg", "f")
+        legend.AddEntry(QCDBkgFitHist_Mc, "QCD bkg", "f")
 
+        del TopSigFitHist_Mc
+        del TopBkgFitHist_Mc
+        del EWKBkgFitHist_Mc
+        del QCDBkgFitHist_Mc        
 	
 	can = R.TCanvas("can","can",600,600)
         R.gStyle.SetOptStat(0)
@@ -158,22 +193,20 @@ def getthefit(mass,lep):
 	#pad1.SetRightMargin(0.143)
 	pad1.Draw()
 	pad1.cd()
-	pad1.cd()
 	frame = R.gPad.DrawFrame(Data_postfit_roohist.GetXaxis().GetXmin(), 0.0,Data_postfit_roohist.GetXaxis().GetXmax(),Data_postfit_roohist.GetYaxis().GetXmax()*1.15,';Events')
 
 	#frame.GetXaxis().SetTitle('#varepsilon_{Sig} (%)')
-	frame.GetYaxis().SetTitle('Events / (0.1)')
-	frame.GetYaxis().SetTitleSize(0.04)
-        
+	#frame.GetYaxis().SetTitle('Events / (0.1)')
+	#frame.GetYaxis().SetTitleSize(0.04)
+       
+        frame.Draw()
+        hs.GetYaxis().SetTitle('Events / (0.1)')
+        hs.GetYaxis().SetTitleSize(0.04)
         hs.Draw("hist")
         Data_prefit.Draw("P;same")
-	ResultFitHist.Draw("same;hist")
+	ResultFitHist_total.Draw("same;hist")
+        MC_error_band.Draw("E2;same")
 	legend.Draw("same")
-	"""cmstext = Get_CMSPreliminary(0.46, 0.86, 0.51, 0.88)
-        cmstext.Draw()
-        finalstate = Get_FinalStateTag(0.34,0.81,0.47,0.83,lep)
-        finalstate.Draw()
-	can.Update()"""
 
         CMSpreliminary = getCMSpre_tag(0.46, 0.86, 0.51, 0.88)
         CMSpreliminary.Draw("same")
@@ -196,10 +229,9 @@ def getthefit(mass,lep):
 	pad2.cd()
 
 	R.gROOT.cd()
-        Data_postfit = ResultFitHist.Clone()
  
 
-	#h_ratio = R.TGraphAsymmErrors(Data_postfit, Data_postfit, 'pois')
+	#h_ratio = R.TGraphAsymmErrors(ResultFitHist_total, ResultFitHist_total, 'pois')
         #print h_ratio.GetN()
 
         nbin = Data_prefit.GetXaxis().GetNbins()
@@ -210,14 +242,14 @@ def getthefit(mass,lep):
         h_ratio = R.TH1F('h_ratio', '', len(BINS)-1,np.array(BINS))
 	for iBin in range(1,nbin+1):
                 error_prefit = Data_prefit.GetBinError(iBin)
-                error_postfit = Data_postfit.GetBinError(iBin)
+                error_postfit = ResultFitHist_total.GetBinError(iBin)
                 cont_prefit = Data_prefit.GetBinContent(iBin)
-                cont_postfit = Data_postfit.GetBinContent(iBin)
-                #h_ratio.SetBinContent(i,(Data_prefit.GetBinContent(i)-Data_postfit.GetBinContent(i))/math.sqrt(error_prefit*error_prefit+error_postfit*error_postfit))
+                cont_postfit = ResultFitHist_total.GetBinContent(iBin)
+                #h_ratio.SetBinContent(i,(Data_prefit.GetBinContent(i)-ResultFitHist_total.GetBinContent(i))/math.sqrt(error_prefit*error_prefit+error_postfit*error_postfit))
                 sigma_pull = R.TMath.Sqrt( R.TMath.Abs(error_prefit*error_prefit - error_postfit*error_postfit ))
                 pull= ( cont_postfit-cont_prefit) / sigma_pull
                 pull_err = ( error_prefit - error_postfit )/ sigma_pull
-                print(error_prefit, error_postfit, sigma_pull)
+                #print(error_prefit, error_postfit, sigma_pull)
                 h_ratio.SetBinContent(iBin, pull)
                 h_ratio.SetBinError(iBin, pull_err)
                 #print(pull,pull_err)
@@ -226,7 +258,7 @@ def getthefit(mass,lep):
         h_ratio.SetFillColor(R.kBlue+3)
         h_ratio.SetFillStyle(3001)
          
-        h_ratio.GetYaxis().SetTitle("#frac{Fit-MC}{#Delta}") 
+        h_ratio.GetYaxis().SetTitle("#frac{Data-Fit}{#Delta}") 
         #band.GetXaxis().SetTitle(Data.GetXaxis().GetTitle())
         h_ratio.GetXaxis().SetTitle("DNN Score (Corr. Assign Signal)")
         h_ratio.GetYaxis().CenterTitle(1) 
@@ -247,9 +279,9 @@ def getthefit(mass,lep):
 	h_ratio.Draw("hist")
 	can.Update()
 
-        """Ratio_hist= R.TGraphAsymmErrors(Data_postfit, Data_postfit,"pois")
+        """Ratio_hist= R.TGraphAsymmErrors(ResultFitHist_total, ResultFitHist_total,"pois")
         axis = Ratio_hist.GetXaxis()
-        axis.SetLimits(Data_postfit.GetXaxis().GetXmin(),Data_postfit.GetXaxis().GetXmax())
+        axis.SetLimits(ResultFitHist_total.GetXaxis().GetXmin(),ResultFitHist_total.GetXaxis().GetXmax())
         Ratio_hist.SetMarkerColor(1)
         Ratio_hist.SetMarkerStyle(20)
         Ratio_hist.SetMarkerSize(0.89)
@@ -284,7 +316,7 @@ def getthefit(mass,lep):
 
 
 	raw_input()
-	if(mass!=None):can.Print("../Plots/new/Final_combine_DNNfit_Control_"+mass+"_"+dataYear+"_"+lep+".png")
+	can.Print("Plots/Final_combine_DNNfit_Control_data_"+dataYear+"_"+lep+".png")
 def getparams(mass):
 	fitfile = R.TFile.Open("fitDiagnostics_M"+mass+".root")
 	roofitResults = fitfile.Get("fit_s")
@@ -296,8 +328,8 @@ def getparams(mass):
 	print "Sigma : ",Sigma.getVal()," Error : ",Sigma.getError()
 
 if __name__ == "__main__":
-	getthefit(mass,"el")
 	getthefit(mass,"mu")
+	getthefit(mass,"el")
 	#getparams(mass)
 	#getcons(mass)
 	#prefit_hist = getprefit_hist(mass,"mu")
