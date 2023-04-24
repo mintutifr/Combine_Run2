@@ -22,7 +22,7 @@ def replacemachine(fileName, sourceText, replaceText):
 
 for lep in ["mu","el"]:
         Datacard = "datacard_DNN_hist_"+lep+"_"+year+".txt"
-        update_rootfile = "shapes * "+lep+"jets /home/mikumar/t3store3/workarea/Nanoaod_tools/CMSSW_10_2_28/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_DNNFit_Input_t_ch_CAsi_histograms_"+year+"_"+lep+".root "+lep+"jets/$PROCESS "+lep+"jets/$PROCESS_$SYSTEMATIC"+"\n"
+        update_rootfile = "shapes * "+lep+"jets /home/mikumar/t3store3/workarea/Nanoaod_tools/CMSSW_10_2_28/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_DNNFit_Input_t_ch_CAsi_histograms_"+year+"_"+lep+"_Nomi.root "+lep+"jets/$PROCESS "+lep+"jets/$PROCESS_$SYSTEMATIC"+"\n"
         print "\tshape are used from Root File: ",update_rootfile
 
         replacemachine(Datacard,'shapes', update_rootfile)
@@ -36,11 +36,11 @@ cmd_Runtext2workspace = "text2workspace.py Combine_datacard_DNN_"+year+".txt -m 
 print "\n",cmd_Runtext2workspace
 os.system(cmd_Runtext2workspace)
 
-cmd_RunCombine = "combine -M FitDiagnostics workspace_DNN_"+year+".root --rMin -2 --rMax 2 -n _M1725_DNNfit_"+year+" --plots --saveShapes"
+cmd_RunCombine = "combine -M FitDiagnostics workspace_DNN_"+year+".root --rMin -2 --rMax 2 -n _M1725_DNNfit_"+year+" --saveShapes " #--plots
 print "\n",cmd_RunCombine
 os.system(cmd_RunCombine)
 
-cmd_diffNuisances = "python diffNuisances.py fitDiagnostics_M1725_DNNfit_"+year+".root -a -g higgsCombine_M1725_DNNfit_"+year+".FitDiagnostics.mH120.root"
+cmd_diffNuisances = "python diffNuisances.py fitDiagnostics_M1725_DNNfit_"+year+".root -a -g higgsCombine_M1725_DNNfit_"+year+".FitDiagnostics_nuisance.mH120.root"
 print "\n",cmd_diffNuisances
 os.system(cmd_diffNuisances)
 
