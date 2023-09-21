@@ -12,7 +12,7 @@ def getregion_tag(region="2J1T",x1=2, y1=0.91, x2=3, y2=205):
         cntrl.AddText(region)
         return cntrl
 
-def getCMSpre_tag(x1=0.385, y1=0.86, x2=0.495, y2=0.88):
+def getCMSPre_tag(x1=0.385, y1=0.86, x2=0.495, y2=0.88):
         cntrl = rt.TPaveText(x1,y1,x2,y2,"brNDC")
         cntrl.SetFillStyle(0)
         cntrl.SetBorderSize(0)
@@ -23,6 +23,17 @@ def getCMSpre_tag(x1=0.385, y1=0.86, x2=0.495, y2=0.88):
         cntrl.AddText("#bf{CMS} #it{Preliminary}")
         return cntrl
 
+def getCMSInt_tag(x1=0.385, y1=0.86, x2=0.495, y2=0.88):
+        cntrl = rt.TPaveText(x1,y1,x2,y2,"brNDC")
+        cntrl.SetFillStyle(0)
+        cntrl.SetBorderSize(0)
+        cntrl.SetMargin(0)
+        cntrl.SetTextFont(42)
+        cntrl.SetTextSize(0.05)
+        cntrl.SetTextAlign(33)
+        cntrl.AddText("#bf{CMS} #it{Internal}")
+        return cntrl
+    
 def leptonjet_tag(lep="mu",x1=0.25, y1=0.82, x2=0.28, y2=0.84):
         cntrl = rt.TPaveText(x1,y1,x2,y2,"brNDC")
         cntrl.SetFillStyle(0)

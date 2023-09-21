@@ -9,11 +9,17 @@ parser.add_argument('-w', '--width', dest='width_sample', default=[None], type=s
 parser.add_argument('-y', '--year', dest='Year', default=['2016'], type=str, nargs=1, help="Year of Data collection ['2016', 'UL2017', 'UL2018']")
 args = parser.parse_args()
 
+Combine_year_tag={
+                'UL2016preVFP' :  "_ULpre16",
+                'UL2016postVFP' : "_ULpost16",
+                'UL2017' : "_UL17",
+                'UL2018' : "_UL18"}
 
 mass  = args.mass_sample[0]
 width = args.width_sample[0]
 year = args.Year[0]
 mass_point, mass_points, width_point, width_points = ([] for i in range(4)) 
+tag = Combine_year_tag[year]
 
 if(mass!=None):
 	mass_point = []#,"data"]
@@ -25,17 +31,17 @@ if(width != None):
         width_points = ['x1','x0p2','x0p5','x4','x8']
 
 for Mass in mass_point:
-        scp_file = "scp /home/mikumar/t3store3/workarea/Nanoaod_tools/CMSSW_10_2_28/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Create_Workspace.py ."
-        os.system(scp_file)
+        #scp_file = "scp /home/mikumar/t3store3/workarea/Nanoaod_tools/CMSSW_10_2_28/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Create_Workspace.py ."
+        #os.system(scp_file)
 	cmd_createWorkspace = "python Create_Workspace.py -m "+Mass+" -y  "+year
 	print cmd_createWorkspace
 	os.system(cmd_createWorkspace)
 
-	cmd_Runtext2workspace = "text2workspace.py datacard_top_shape_comb_para.txt -o workspace_top_Mass_"+Mass+"_shape_comb_para.root"
+	cmd_Runtext2workspace = "text2workspace.py datacard_top_shape_comb_para"+tag+".txt -o workspace_top_Mass_"+Mass+"_shape_comb_para"+tag+".root"
 	print "\n",cmd_Runtext2workspace
 	os.system(cmd_Runtext2workspace)
 
-        cmd_RunCombine = "combine -M FitDiagnostics workspace_top_Mass_"+Mass+"_shape_comb_para.root -n _M"+Mass+"  --freezeParameters r --redefineSignalPOIs sigmaG,mean --setParameters mean=5.1,r=1,sigmaG=0.15  --X-rtd ADDNLL_CBNLL=0  -t -1 --plots --saveShapes"
+        cmd_RunCombine = "combine -M FitDiagnostics workspace_top_Mass_"+Mass+"_shape_comb_para"+tag+".root -n _M"+Mass+"  --freezeParameters r --redefineSignalPOIs sigmaG,mean --setParameters mean=5.1,r=1,sigmaG=0.15  --X-rtd ADDNLL_CBNLL=0  -t -1 --plots --saveShapes"
 	
 	#cmd_RunCombine = "combine -M MultiDimFit workspace_top_Mass_"+Mass+"_shape_comb_para.root -n _M"+Mass+"  --freezeParameters r --redefineSignalPOIs sigmaG,mean --setParameters mean=5.1,r=1,sigmaG=0.15  --X-rtd ADDNLL_CBNLL=0  -t 10000 --saveToys --X-rtd TMCSO_AdaptivePseudoAsimov=0 --X-rtd TMCSO_PseudoAsimov=0"
 	#--trackParameters mean,sigmaG --trackErrors mean,sigmaG "
