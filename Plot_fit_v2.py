@@ -45,24 +45,27 @@ def getcons(mass,width):
 
 def getprefit_hist(mass,width,lep):
     hists = []
-    Filename = rt.TFile("/home/mikumar/t3store3/workarea/Nanoaod_tools/CMSSW_10_2_28/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_"+lep+".root","Read")
-        
+    Filename = "/home/mikumar/t3store/workarea/Nanoaod_tools/CMSSW_10_2_28/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_"+lep+"_gteq0p7.root"
+    File = rt.TFile(Filename,"Read")
+    gt_or_lt_tag=''
+    if('gteq' in Filename):gt_or_lt_tag = '_gt'
+    if('lt' in Filename):gt_or_lt_tag = '_lt'   
         #Data Vs Mc Condition
     rt.gROOT.cd()
     #Get the file and director where historgrams are stored for muon final state
-    Dir = Filename.GetDirectory(lep+"jets")
+    Dir = File.GetDirectory(lep+"jets")
     #Get Mc histograms for muon final state
     if(mass!=None):
-        top_sig = Dir.Get("top_sig_"+mass+tag)
-        top_bkg = Dir.Get("top_bkg_"+mass+tag)
-        EWK_bkg = Dir.Get("EWK_bkg"+tag)
-        QCD = Dir.Get("QCD_DD"+tag)
+        top_sig = Dir.Get("top_sig_"+mass+tag+gt_or_lt_tag) 
+        top_bkg = Dir.Get("top_bkg_"+mass+tag+gt_or_lt_tag)
+        EWK_bkg = Dir.Get("EWK_bkg"+tag+gt_or_lt_tag)
+        QCD = Dir.Get("QCD_DD"+tag+gt_or_lt_tag)
         Data = Dir.Get("data_obs")
     if(width!=None):
-        top_sig = Dir.Get("top_sig_Nomix1"+tag)#+width)
-        top_bkg = Dir.Get("top_bkg_Nomi"+width+tag)
-        EWK_bkg = Dir.Get("EWK_bkg"+tag)
-        QCD = Dir.Get("QCD_DD"+tag)
+        top_sig = Dir.Get("top_sig_Nomix1"+tag+gt_or_lt_tag)#+width)
+        top_bkg = Dir.Get("top_bkg_Nomi"+width+tag+gt_or_lt_tag)
+        EWK_bkg = Dir.Get("EWK_bkg"+tag+gt_or_lt_tag)
+        QCD = Dir.Get("QCD_DD"+tag+gt_or_lt_tag)
         Data = Dir.Get("data_obs")
     h1 = top_sig.Clone()
     h2 = top_bkg.Clone()
@@ -118,7 +121,7 @@ def getthefit(mass,width,lep):
     legend.SetFillColor(0)
     legend.SetFillStyle(1001)
     #legend.SetHeader("beNDC", "C")
-    legend.AddEntry(Data_prefit, "Data", "ple1")
+    legend.AddEntry(Data_prefit, "Total MC", "ple1")
     legend.AddEntry(ResultPDF, "Fit.", "l")
     legend.AddEntry(SigPDF, "corr. top", "l")
     legend.AddEntry(BkgPDF, "Incorr. top + EWK", "l")
@@ -139,14 +142,15 @@ def getthefit(mass,width,lep):
     pad1.Draw()
     pad1.cd()
     pad1.cd()
-    frame = rt.gPad.DrawFrame(Data_postfit_roohist.GetXaxis().GetXmin(), 0.0,Data_postfit_roohist.GetXaxis().GetXmax(),Data_postfit_roohist.GetYaxis().GetXmax()*1.15,';Events')
+    frame = rt.gPad.DrawFrame(Data_postfit_roohist.GetXaxis().GetXmin(), 0.0,Data_postfit_roohist.GetXaxis().GetXmax(),Data_postfit_roohist.GetYaxis().GetXmax()*1.15,';Events')#,rt.RooFit.Title(" "))
 
-    
+    frame.SetTitle(".")
     frame.GetYaxis().SetTitle('Events / (0.099)')
     frame.GetYaxis().SetTitleSize(0.04)
 
+    Data_prefit.SetTitle("")
     Data_prefit.Draw("P")
-    Data_postfit_roohist.Draw("same;P")
+    #Data_postfit_roohist.Draw("same;P")
     ResultPDF_error.Draw("same")
     ResultPDF.Draw("same")
     SigPDF.Draw("same")
@@ -188,7 +192,7 @@ def getthefit(mass,width,lep):
         #Data_postfit.Print()
 
     pad1.cd()
-    Data_postfit.Draw("same")
+    #Data_postfit.Draw("same")
     pad2.cd()
     #Data_prefit = fitfile.Get("shapes_prefit/"+lep+"jets/total")	These histograms has wronf infromation or have infrokmation about someting else
     #print("Data_prefit Int from fitdiagonistic = ",Data_prefit.Integral())
