@@ -101,6 +101,19 @@ def getthefit(mass,width,lep):
 
     if(mass!=None):fitfile = rt.TFile.Open("fitDiagnostics_M"+mass+".root")
     else : fitfile = rt.TFile.Open("fitDiagnostics_width"+width+".root")
+    print(lep+"jets"+tag+"_logM_fit_s")
+    fit = fitfile.Get(lep+"jets"+tag+"_logM_fit_s")
+    fit.Print()
+
+    Data_postfit_roohist = fit.findObject("h_"+lep+"jets"+tag)
+    #Data_postfit_roohist.SetFillCOlor(R.kRed)
+    ResultPDF = fit.findObject("pdf_bin"+lep+"jets"+tag+"_Norm[logM]")
+    ResultPDF_error = fit.findObject("pdf_bin"+lep+"jets"+tag+"_Norm[logM]_errorband")
+    SigPDF = fit.findObject("pdf_bin"+lep+"jets"+tag+"_Norm[logM]_Comp[shapeSig*]")
+    BkgPDF = fit.findObject("pdf_bin"+lep+"jets"+tag+"_Norm[logM]_Comp[shapeBkg*]")
+    
+    """if(mass!=None):fitfile = rt.TFile.Open("fitDiagnostics_M"+mass+".root")
+    else : fitfile = rt.TFile.Open("fitDiagnostics_width"+width+".root")
     fit = fitfile.Get(lep+"jets_logM_fit_s")
     #fit.Print()
 
@@ -109,10 +122,10 @@ def getthefit(mass,width,lep):
     ResultPDF = fit.findObject("pdf_bin"+lep+"jets_Norm[logM]")
     ResultPDF_error = fit.findObject("pdf_bin"+lep+"jets_Norm[logM]_errorband")
     SigPDF = fit.findObject("pdf_bin"+lep+"jets_Norm[logM]_Comp[shapeSig*]")
-    BkgPDF = fit.findObject("pdf_bin"+lep+"jets_Norm[logM]_Comp[shapeBkg*]")
+    BkgPDF = fit.findObject("pdf_bin"+lep+"jets_Norm[logM]_Comp[shapeBkg*]")"""
 
         
-    legend = rt.TLegend(0.60193646, 0.5548435, 0.8093552, 0.79026143)
+    legend = rt.TLegend(0.58, 0.55, 0.78, 0.79)
     legend.SetBorderSize(1)
     legend.SetTextSize(0.045)
     legend.SetLineColor(0)
@@ -156,10 +169,13 @@ def getthefit(mass,width,lep):
     SigPDF.Draw("same")
     BkgPDF.Draw("same")
     legend.Draw("same")
-    cmstext = getCMSPre_tag(0.36, 0.86, 0.41, 0.88)
-    cmstext.Draw()
+    yeartag = year_tag(dataYear,0.82,0.92,0.90,0.95)
+    cmstext = getCMSInt_tag(0.33, 0.86, 0.38, 0.88)
     finalstate = leptonjet_tag(lep,0.24,0.81,0.37,0.83)
+    
+    cmstext.Draw()
     finalstate.Draw()
+    yeartag.Draw()
     can.Update()
 
     can.cd()
@@ -173,7 +189,8 @@ def getthefit(mass,width,lep):
     pad2.cd()
 
     rt.gROOT.cd()
-    Data_postfit_fitdignostics = fitfile.Get("shapes_fit_s/"+lep+"jets/total") # this is done because if we use it dictrly in trgraph Ass error is shows error
+    Data_postfit_fitdignostics = fitfile.Get("shapes_fit_s/"+lep+"jets"+tag+"/total") # this is done because if we use it dictrly in trgraph Ass error is shows error
+    #Data_postfit_fitdignostics = fitfile.Get("shapes_fit_s/"+lep+"jets/total")
     print("Data_postfit info from fitdigonistic ")
     Data_postfit_fitdignostics.Print()
 
@@ -181,10 +198,12 @@ def getthefit(mass,width,lep):
     ledge = Data_prefit.GetXaxis().GetXmin()
     uedge = Data_prefit.GetXaxis().GetXmax()
     Data_postfit = rt.TH1F('Data_postfit', '', nbin, ledge, uedge)
-
+    print("prefit-postfit = res")
+    
     for bin in range(1,nbin+1):
         #print(Data_postfit_roohist.GetBinContent(bin))
         print("%s-%s = %s"%(Data_postfit_fitdignostics.GetBinContent(bin)*Data_postfit.GetBinWidth(bin),Data_prefit.GetBinContent(bin),(Data_postfit_fitdignostics.GetBinContent(bin)*Data_postfit.GetBinWidth(bin))-Data_prefit.GetBinContent(bin)))
+        
         Data_postfit.SetBinContent(bin,Data_postfit_fitdignostics.GetBinContent(bin)*Data_postfit.GetBinWidth(bin)) 
         Data_postfit.SetBinError(bin,Data_postfit_fitdignostics.GetBinError(bin))
 
@@ -202,6 +221,8 @@ def getthefit(mass,width,lep):
     #print h_ratio.GetN()
 
     h_ratio = rt.TH1F('h_ratio', '', nbin, ledge, uedge)
+    
+    print("pull, : , pull_err,  : ,sigma_pull,  : ,  prefit - postfit")
     for iBin in range(1,nbin+1):
         error_prefit = Data_prefit.GetBinError(iBin)
         error_postfit = Data_postfit.GetBinError(iBin)
@@ -233,7 +254,7 @@ def getthefit(mass,width,lep):
 
     h_ratio.Draw('hist')
     can.Update()
-    raw_input()
+    #raw_input()
     if(mass!=None):can.Print("Plots/Final_combine_fit_Control_"+mass+"_"+dataYear+"_"+lep+".png")
     if(width!=None):can.Print("Plots/Final_combine_fit_Control_Nomi"+width+"_"+dataYear+"_"+lep+".png")
 def getparams(mass,width):
