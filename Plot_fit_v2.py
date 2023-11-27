@@ -6,7 +6,7 @@ from Hist_style import *
 
 parser = arg.ArgumentParser(description='Create workspace for higgs combine')
 parser.add_argument('-m', '--mass', dest='mass_sample', default=[None], type=str, nargs=1, help="MC top mass sample ['data','1695', '1715', '1725', '1735', '1755']")
-parser.add_argument('-w', '--width', dest='width_sample', default=[None], type=str, nargs=1, help="MC top width sample ['data','x0p2','x0p5','x4','x8']")
+parser.add_argument('-w', '--width', dest='width_sample', default=[None], type=str, nargs=1, help="MC top width sample ['data','190','170','150','130','090','075']")
 #parser.add_argument('-d', '--isdata', dest='isRealData', default=[False], type=bool, nargs=1, help="run over real data ['True', 'False']")
 parser.add_argument('-y', '--year', dest='Year', default=['2016'], type=str, nargs=1, help="Year of Data collection ['2016', 'UL2017', 'UL2018']")
 args = parser.parse_args()
@@ -29,7 +29,7 @@ def propagate_rate_uncertainity(hist, uncert):
 
 def getcons(mass,width):
         if(mass!=None): fitfile = rt.TFile.Open("fitDiagnostics_M"+mass+".root")
-        else : fitfile = rt.TFile.Open("fitDiagnostics_width"+width+".root")
+        else : fitfile = rt.TFile.Open("fitDiagnostics_W"+width+".root")
         roofitResults = fitfile.Get("fit_s")
 
         cons_top_sig = (roofitResults.floatParsFinal()).find("cons_EWK_bkg")
@@ -46,7 +46,9 @@ def getcons(mass,width):
 def getprefit_hist(mass,width,lep):
     hists = []
     Filename = "/home/mikumar/t3store/workarea/Nanoaod_tools/CMSSW_10_2_28/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_"+lep+"_gteq0p7.root"
+    Filename_cont = "/home/mikumar/t3store/workarea/Nanoaod_tools/CMSSW_10_2_28/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_"+lep+"_gteq0p7.root"
     File = rt.TFile(Filename,"Read")
+    File_cont = rt.TFile(Filename_cont,"Read")
     gt_or_lt_tag=''
     if('gteq' in Filename):gt_or_lt_tag = '_gt'
     if('lt' in Filename):gt_or_lt_tag = '_lt'   
@@ -54,19 +56,21 @@ def getprefit_hist(mass,width,lep):
     rt.gROOT.cd()
     #Get the file and director where historgrams are stored for muon final state
     Dir = File.GetDirectory(lep+"jets")
+    Dir_cont = File_cont.GetDirectory(lep+"jets")
     #Get Mc histograms for muon final state
     if(mass!=None):
         top_sig = Dir.Get("top_sig_"+mass+tag+gt_or_lt_tag) 
-        top_bkg = Dir.Get("top_bkg_"+mass+tag+gt_or_lt_tag)
-        EWK_bkg = Dir.Get("EWK_bkg"+tag+gt_or_lt_tag)
-        QCD = Dir.Get("QCD_DD"+tag+gt_or_lt_tag)
-        Data = Dir.Get("data_obs")
     if(width!=None):
-        top_sig = Dir.Get("top_sig_Nomix1"+tag+gt_or_lt_tag)#+width)
-        top_bkg = Dir.Get("top_bkg_Nomi"+width+tag+gt_or_lt_tag)
-        EWK_bkg = Dir.Get("EWK_bkg"+tag+gt_or_lt_tag)
-        QCD = Dir.Get("QCD_DD"+tag+gt_or_lt_tag)
-        Data = Dir.Get("data_obs")
+        top_sig = Dir.Get("top_sig_"+width+tag+gt_or_lt_tag)#+width)
+        
+    top_bkg = Dir.Get("top_bkg_1725"+tag+gt_or_lt_tag)
+    EWK_bkg = Dir.Get("EWK_bkg"+tag+gt_or_lt_tag)
+    EWK_bkg_cont = Dir_cont.Get("EWK_bkg"+tag+gt_or_lt_tag)
+    EWK_bkg_cont.Scale(EWK_bkg.Integral()/EWK_bkg_cont.Integral())
+    EWK_bkg = EWK_bkg_cont
+    QCD = Dir.Get("QCD_DD"+tag+gt_or_lt_tag)
+    Data = Dir.Get("data_obs")
+   
     h1 = top_sig.Clone()
     h2 = top_bkg.Clone()
     h3 = EWK_bkg.Clone()
@@ -86,10 +90,10 @@ def getthefit(mass,width,lep):
 
     prefit_hists = getprefit_hist(mass,width,lep) #return top_sig,topbkg,EWK_bkg
     rt.gROOT.cd()
-    """Data_prefit = prefit_hists[0].Clone()  
+    Data_prefit = prefit_hists[0].Clone()  
     Data_prefit.Add(prefit_hists[1])
-    Data_prefit.Add(prefit_hists[2])"""
-    Data_prefit= prefit_hists[4].Clone()
+    Data_prefit.Add(prefit_hists[2])
+    #Data_prefit= prefit_hists[4].Clone()
     Data_prefit.SetName("Data_prefit")
     print(Data_prefit.Print())
     Data_prefit.SetLineColor(rt.kBlack)
@@ -100,7 +104,7 @@ def getthefit(mass,width,lep):
 
 
     if(mass!=None):fitfile = rt.TFile.Open("fitDiagnostics_M"+mass+".root")
-    else : fitfile = rt.TFile.Open("fitDiagnostics_width"+width+".root")
+    else : fitfile = rt.TFile.Open("fitDiagnostics_W"+width+".root")
     print(lep+"jets"+tag+"_logM_fit_s")
     fit = fitfile.Get(lep+"jets"+tag+"_logM_fit_s")
     fit.Print()
@@ -134,7 +138,7 @@ def getthefit(mass,width,lep):
     legend.SetFillColor(0)
     legend.SetFillStyle(1001)
     #legend.SetHeader("beNDC", "C")
-    legend.AddEntry(Data_prefit, "Total MC", "ple1")
+    legend.AddEntry(Data_prefit, "QCD Substr. MC", "ple1")
     legend.AddEntry(ResultPDF, "Fit.", "l")
     legend.AddEntry(SigPDF, "corr. top", "l")
     legend.AddEntry(BkgPDF, "Incorr. top + EWK", "l")
@@ -202,7 +206,7 @@ def getthefit(mass,width,lep):
     
     for bin in range(1,nbin+1):
         #print(Data_postfit_roohist.GetBinContent(bin))
-        print("%s-%s = %s"%(Data_postfit_fitdignostics.GetBinContent(bin)*Data_postfit.GetBinWidth(bin),Data_prefit.GetBinContent(bin),(Data_postfit_fitdignostics.GetBinContent(bin)*Data_postfit.GetBinWidth(bin))-Data_prefit.GetBinContent(bin)))
+        #print("%s-%s = %s"%(Data_postfit_fitdignostics.GetBinContent(bin)*Data_postfit.GetBinWidth(bin),Data_prefit.GetBinContent(bin),(Data_postfit_fitdignostics.GetBinContent(bin)*Data_postfit.GetBinWidth(bin))-Data_prefit.GetBinContent(bin)))
         
         Data_postfit.SetBinContent(bin,Data_postfit_fitdignostics.GetBinContent(bin)*Data_postfit.GetBinWidth(bin)) 
         Data_postfit.SetBinError(bin,Data_postfit_fitdignostics.GetBinError(bin))
@@ -222,7 +226,7 @@ def getthefit(mass,width,lep):
 
     h_ratio = rt.TH1F('h_ratio', '', nbin, ledge, uedge)
     
-    print("pull, : , pull_err,  : ,sigma_pull,  : ,  prefit - postfit")
+    #print("pull, : , pull_err,  : ,sigma_pull,  : ,  prefit - postfit")
     for iBin in range(1,nbin+1):
         error_prefit = Data_prefit.GetBinError(iBin)
         error_postfit = Data_postfit.GetBinError(iBin)
@@ -232,7 +236,7 @@ def getthefit(mass,width,lep):
         sigma_pull = rt.TMath.Sqrt( error_prefit*error_prefit - error_postfit*error_postfit )
         pull= ( cont_prefit - cont_postfit )/ sigma_pull
         pull_err = ( error_prefit - error_postfit )/ sigma_pull
-        print(pull," : ", pull_err, " : ",sigma_pull, " : ",  cont_prefit - cont_postfit)
+        #print(pull," : ", pull_err, " : ",sigma_pull, " : ",  cont_prefit - cont_postfit)
         h_ratio.SetBinContent(iBin, pull)
         h_ratio.SetBinError(iBin, pull_err)
         #Add QCD_DD for the syst band	
@@ -255,11 +259,15 @@ def getthefit(mass,width,lep):
     h_ratio.Draw('hist')
     can.Update()
     #raw_input()
-    if(mass!=None):can.Print("Plots/Final_combine_fit_Control_"+mass+"_"+dataYear+"_"+lep+".png")
-    if(width!=None):can.Print("Plots/Final_combine_fit_Control_Nomi"+width+"_"+dataYear+"_"+lep+".png")
+    if(mass!=None):
+        can.Print("Plots/Final_combine_fit_Control_"+mass+"_"+dataYear+"_"+lep+".png")
+        can.Print("Plots/Final_combine_fit_Control_"+mass+"_"+dataYear+"_"+lep+".pdf")
+    if(width!=None):
+        can.Print("Plots/Final_combine_fit_Control_"+width+"_"+dataYear+"_"+lep+".png")
+        can.Print("Plots/Final_combine_fit_Control_"+width+"_"+dataYear+"_"+lep+".pdf")
 def getparams(mass,width):
     if(mass!=None): fitfile = rt.TFile.Open("fitDiagnostics_M"+mass+".root")
-    else : fitfile = rt.TFile.Open("fitDiagnostics_width"+width+".root")
+    else : fitfile = rt.TFile.Open("fitDiagnostics_W"+width+".root")
     roofitResults = fitfile.Get("fit_s")
 
     mean = (roofitResults.floatParsFinal()).find("mean")

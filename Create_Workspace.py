@@ -4,8 +4,8 @@ from Hist_style import *
 import argparse as arg
 #from TOY_local_fit import Toy_Mc 
 parser = arg.ArgumentParser(description='Create workspace for higgs combine')
-parser.add_argument('-m', '--mass', dest='mass_sample', default=[None], type=str, nargs=1, help="MC top mass sample ['data','1695', '1715', '1725', '1735', '1755']")
-parser.add_argument('-w', '--width', dest='width_sample', default=[None], type=str, nargs=1, help="MC top width sample ['data','x0p2','x0p5','x4','x8']")
+parser.add_argument('-m', '--mass', dest='mass_sample', default=[None], type=str, nargs=1, help="MC top mass sample [data , 1695, 1715, 1735, 1755]")
+parser.add_argument('-w', '--width', dest='width_sample', default=[None], type=str, nargs=1, help="MC top width sample ['data','190', '170', '150','130','090','075']")
 #parser.add_argument('-d', '--isdata', dest='isRealData', default=[False], type=bool, nargs=1, help="run over real data ['True', 'False']")
 parser.add_argument('-y', '--year', dest='Year', default=['UL2017'], type=str, nargs=1, help="Year of Data collection [ UL2016preVFP  UL2016postVFP  UL2017  UL2018 ]")
 parser.add_argument('-f', '--localfit', dest='local_fit', default=[None], type=str, nargs=1, help="Local fit run for  ['sig','top_bkg','ewk_bkg','final', 'final_mu', 'final_el']")
@@ -89,13 +89,13 @@ if __name__ == "__main__":
     #Get Mc histograms for muon final state
     if(mass!= None):
         top_sig_mu = dir_mu.Get("top_sig_"+mass+tag+gt_or_lt_tag)
-        top_bkg_mu = dir_mu.Get("top_bkg_"+mass+tag+gt_or_lt_tag)
+        top_bkg_mu = dir_mu.Get("top_bkg_1725"+tag+gt_or_lt_tag)
         EWK_bkg_mu = dir_mu.Get("EWK_bkg"+tag+gt_or_lt_tag)
         EWK_bkg_mu_cont = dir_mu_cont.Get("EWK_bkg"+tag+"_gt")
         QCD_DD = dir_mu.Get("QCD_DD"+tag+gt_or_lt_tag)
     if(width!= None):
-        top_sig_mu = dir_mu.Get("top_sig_Nomix1"+tag+gt_or_lt_tag)
-        top_bkg_mu = dir_mu.Get("top_bkg_Nomi"+width+tag+gt_or_lt_tag)
+        top_sig_mu = dir_mu.Get("top_sig_"+width+tag+gt_or_lt_tag)
+        top_bkg_mu = dir_mu.Get("top_bkg_1725"+tag+gt_or_lt_tag)
         EWK_bkg_mu = dir_mu.Get("EWK_bkg"+tag+gt_or_lt_tag)
         EWK_bkg_mu_cont = dir_mu_cont.Get("EWK_bkg"+tag+"_gt")
         QCD_DD = dir_mu.Get("QCD_DD"+tag+gt_or_lt_tag)
@@ -107,7 +107,7 @@ if __name__ == "__main__":
     if(RealData==False):
         #Add all Mc histogram to creat full MC hisogram for muon final state
         histData_mu=top_sig_mu.Clone()
-        histData_mu.Add(top_bkg_mu)
+        histData_mu.Add(top_bkg_mu)  # for a cross check i have commented this line. i uncommented it before pushing the code. so !!warning!!
         EWK_bkg_mu_cont.Scale(EWK_bkg_mu.Integral()/EWK_bkg_mu_cont.Integral())
         EWK_bkg_mu=EWK_bkg_mu_cont #replace the sig region template with control region template
         histData_mu.Add(EWK_bkg_mu)
@@ -125,16 +125,13 @@ if __name__ == "__main__":
     #Get Mc histograms for electron final state
     if(mass!= None):
         top_sig_el = dir_el.Get("top_sig_"+mass+tag+gt_or_lt_tag)
-        top_bkg_el = dir_el.Get("top_bkg_"+mass+tag+gt_or_lt_tag)
-        EWK_bkg_el = dir_el.Get("EWK_bkg"+tag+gt_or_lt_tag)
-        EWK_bkg_el_cont = dir_el_cont.Get("EWK_bkg"+tag+"_gt")
-        QCD_DD = dir_mu.Get("QCD_DD"+tag+gt_or_lt_tag)
     if(width!= None):
-        top_sig_el = dir_el.Get("top_sig_Nomix1"+tag+gt_or_lt_tag)
-        top_bkg_el = dir_el.Get("top_bkg_Nomi"+width+tag+gt_or_lt_tag)
-        EWK_bkg_el = dir_el.Get("EWK_bkg"+tag+gt_or_lt_tag)
-        EWK_bkg_el_cont = dir_el_cont.Get("EWK_bkg"+tag+"_gt")
-        QCD_DD = dir_mu.Get("QCD_DD"+tag+gt_or_lt_tag)
+        top_sig_el = dir_el.Get("top_sig_"+width+tag+gt_or_lt_tag)
+
+    top_bkg_el = dir_el.Get("top_bkg_1725"+tag+gt_or_lt_tag)
+    EWK_bkg_el = dir_el.Get("EWK_bkg"+tag+gt_or_lt_tag)
+    EWK_bkg_el_cont = dir_el_cont.Get("EWK_bkg"+tag+"_gt")
+    QCD_DD = dir_mu.Get("QCD_DD"+tag+gt_or_lt_tag)
 
     print( "top_sig_el Integral : ",top_sig_el.Integral() )
     print( " top_bkg_el Integral : ",top_bkg_el.Integral() )
@@ -143,7 +140,7 @@ if __name__ == "__main__":
     if(RealData==False):
         #Add all Mc histogram to creat full MC hisogram for electron final state
         histData_el = top_sig_el.Clone()
-        histData_el.Add(top_bkg_el)
+        histData_el.Add(top_bkg_el) # for a cross check i have commented this line. i uncommented it before pushing the code. so !!warning!!
         EWK_bkg_el_cont.Scale(EWK_bkg_el.Integral()/EWK_bkg_el_cont.Integral())
         EWK_bkg_el=EWK_bkg_el_cont #replace the sig region template with control region template
         histData_el.Add(EWK_bkg_el)
@@ -168,25 +165,29 @@ if __name__ == "__main__":
     # Declare observable mean and data
     
     mean = R.RooRealVar("mean","mean",5.1,4.5,5.5)
-    sigmaG = R.RooRealVar("sigmaG","sigmaG",0.15098,0.01,1)#0.186
+    sigmaG = R.RooRealVar("sigmaG","sigmaG",0.15098,0.01,5)#0.186
+    sigmaG2Frac_mu = R.RooRealVar("sigmaG2Frac_mu","sigmaG2Frac_mu",0.1,0.0,5.0) #Best Fit Value
+    sigmaG2Frac_el = R.RooRealVar("sigmaG2Frac_el","sigmaG2Frac_el",0.1,0.0,5.0) #Best Fit Value
+    sigmaG2_mu = R.RooFormulaVar("sigmaG2_mu","sigmaG2_mu","@0/@1",R.RooArgList(sigmaG, R.RooFit.RooConst(0.858)))# R.RooFit.RooConst(0.860)))#R.RooFit.RooConst(0.860)))
+    sigmaG2_el = R.RooFormulaVar("sigmaG2_el","sigmaG2_el","@0/@1",R.RooArgList(sigmaG, R.RooFit.RooConst(0.845))) # R.RooFit.RooConst(0.852)))# R.RooFit.RooConst(0.852)))
     #signal Bifrac gaussian pdf
-    gauss_mu = R.RooBifurGauss("gauss_mu","gauss_mu",logM,mean,sigmaG,R.RooFit.RooConst(0.1430)) #only core sigma flaoted frac fixed
+    """gauss_mu = R.RooBifurGauss("gauss_mu","gauss_mu",logM,mean,sigmaG,R.RooFit.RooConst(0.1430)) #only core sigma flaoted frac fixed
     gauss_el = R.RooBifurGauss("gauss_el","gauss_el",logM,mean, sigmaG,R.RooFit.RooConst(0.1394)) #only core sigma flaoted
 
     #Landau pdf
     lnd_mu = R.RooLandau("lnd_mu","lnd_mu",logM,R.RooFit.RooConst(5.4),R.RooFit.RooConst(0.0689)) # sigma fixed
     lnd_el = R.RooLandau("lnd_el","lnd_el",logM,R.RooFit.RooConst(5.456871),R.RooFit.RooConst(0.08981)) # sigma fixed
     sig_pdf_mu = R.RooAddPdf("sig_pdf_mu","Gaussian+Landau",R.RooArgList(gauss_mu,lnd_mu),R.RooArgList(R.RooFit.RooConst(0.9186)),True)
-    sig_pdf_el = R.RooAddPdf("sig_pdf_el","Gaussian+Landau",R.RooArgList(gauss_el,lnd_el),R.RooArgList(R.RooFit.RooConst(0.9298)),True)
+    sig_pdf_el = R.RooAddPdf("sig_pdf_el","Gaussian+Landau",R.RooArgList(gauss_el,lnd_el),R.RooArgList(R.RooFit.RooConst(0.9298)),True)"""
 
 
-    sigmaG2 = R.RooRealVar("sigmaG2","sigmaG2",0.125,0.01,1)
+   
     #redefine the sig pdf
     #sig_pdf_mu = R.RooGaussian("sig_pdf_mu","gauss_mu",logM,mean,sigmaG)
     #sig_pdf_el = R.RooGaussian("sig_pdf_el","gauss_el",logM,mean,sigmaG)
 
-    sig_pdf_mu = R.RooBifurGauss("sig_pdf_mu","gauss_mu",logM,mean,sigmaG,R.RooFit.RooConst(0.147))#sigmaG2)#R.RooFit.RooConst(0.141887))
-    sig_pdf_el = R.RooBifurGauss("sig_pdf_el","gauss_el",logM,mean,sigmaG,R.RooFit.RooConst(0.140))#sigmaG2)#R.RooFit.RooConst(0.138264))
+    sig_pdf_mu = R.RooBifurGauss("sig_pdf_mu","gauss_mu",logM,mean,sigmaG,sigmaG2_mu)#R.RooFit.RooConst(0.147))#sigmaG2)#R.RooFit.RooConst(0.141887))
+    sig_pdf_el = R.RooBifurGauss("sig_pdf_el","gauss_el",logM,mean,sigmaG,sigmaG2_el)#R.RooFit.RooConst(0.140))#sigmaG2)#R.RooFit.RooConst(0.138264))
 
     #Top background pdf CristalBall Shape
     alpha = R.RooRealVar("alpha","alpha",-0.6642,-12.0,12.0)
@@ -199,12 +200,17 @@ if __name__ == "__main__":
     #topbkg_pdf_mu = R.RooCBShape("topbkg_pdf_mu","Crystal Ball PDF",logM,R.RooFit.RooConst(5.119),mean,sigmaG,alpha,num)#R.RooFit.RooConst(0.171),R.RooFit.RooConst(-1.679),R.RooFit.RooConst(142.0))#mean,sigmaG,alpha,num)#R.RooFit.RooConst(-1.5047),R.RooFit.RooConst(100.0)) # sigma float
     #topbkg_pdf_el = R.RooCBShape("topbkg_pdf_el","Crystal Ball PDF",logM,mean,sigmaG,alpha,num)#R.RooFit.RooConst(5.113),R.RooFit.RooConst(0.172),R.RooFit.RooConst(-1.607),R.RooFit.RooConst(19.0))#mean,sigmaG,alpha,num2)#R.RooFit.RooConst(-1.5164),R.RooFit.RooConst(125)) # sigma float
 
-    sigmaL_topbkg = R.RooRealVar("sigmaL_topbkg","sigmaL_topbkg",0.15098,0.01,1)
+    sigmaL_topbkg_mu = R.RooFit.RooConst(0.167)
+    #sigmaL_topbkg_mu = R.RooRealVar("sigmaL_topbkg_mu","sigmaL_topbkg_mu",0.15098,0.01,1)
+    sigmaL_topbkg_el = R.RooFit.RooConst(0.167)
+    #sigmaL_topbkg_el = R.RooRealVar("sigmaL_topbkg_el","sigmaL_topbkg_el",0.15098,0.01,1)
+    mean_top_bkg_mu = R.RooRealVar("mean_top_bkg_mu","mean_top_bkg_mu",5.1,4.5,5.5)
+    
     sigmaFrac = R.RooRealVar("sigmaFrac","sigmaFrac",0.1,0.0,1.0) #Best Fit Value
-    sigmaR_mu = R.RooFormulaVar("sigmaR_mu","sigmaR_mu","@0/@1",R.RooArgList(sigmaL_topbkg, R.RooFit.RooConst(0.90)))
-    sigmaR_el = R.RooFormulaVar("sigmaR_el","sigmaR_el","@0/@1",R.RooArgList(sigmaL_topbkg, R.RooFit.RooConst(0.87)))
-    topbkg_pdf_mu = R.RooBifurGauss("sig_pdf_mu","gauss_mu",logM,R.RooFit.RooConst(5.108),sigmaL_topbkg,sigmaR_mu)
-    topbkg_pdf_el = R.RooBifurGauss("sig_pdf_el","gauss_el",logM,R.RooFit.RooConst(5.100),sigmaL_topbkg,sigmaR_el)
+    sigmaR_mu = R.RooFormulaVar("sigmaR_mu","sigmaR_mu","@0/@1",R.RooArgList(sigmaL_topbkg_mu,R.RooFit.RooConst(0.91)))#sigmaFrac))#R.RooFit.RooConst(0.90)))
+    sigmaR_el = R.RooFormulaVar("sigmaR_el","sigmaR_el","@0/@1",R.RooArgList(sigmaL_topbkg_el,R.RooFit.RooConst(0.88)))#sigmaFrac))#R.RooFit.RooConst(0.87)))
+    topbkg_pdf_mu = R.RooBifurGauss("topbkg_pdf_mu","gauss_mu",logM,R.RooFit.RooConst(5.111),sigmaL_topbkg_mu,sigmaR_mu)#mean_top_bkg,sigmaL_topbkg_mu,sigmaR_mu)
+    topbkg_pdf_el = R.RooBifurGauss("topbkg_pdf_el","gauss_el",logM,R.RooFit.RooConst(5.101),sigmaL_topbkg_el,sigmaR_el)#logM,mean_top_bkg,sigmaL_topbkg_el,sigmaR_el)#R.RooFit.RooConst(5.100),sigmaL_topbkg_el,sigmaR_el)
 
     #topbkg_pdf_mu = R.RooBifurGauss("topbkg_pdf_mu","gauss_mu",logM,mean,sigmaL_topbkg,sigmaR)
     #topbkg_pdf_el = R.RooBifurGauss("topbkg_pdf_el","gauss_el",logM,mean,sigmaL_topbkg,sigmaR)
@@ -212,9 +218,9 @@ if __name__ == "__main__":
     #EWK bakground pdf Novosibirsk
     peak = R.RooRealVar("peak","peak",5.,1.,10.0)
     width_Novo = R.RooRealVar("width_Novo","width_Novo",0.1,0.0,1.0)
-    tail = R.RooRealVar("tail","tail",-0.25,-5.,1.0) 
-    EWKbkg_pdf_mu = R.RooNovosibirsk("EWKbkg_pdf_mu","Novosibirsk PDF",logM,R.RooFit.RooConst(5.082),R.RooFit.RooConst(0.195),R.RooFit.RooConst(0.120))#R.RooFit.RooConst(0.195),R.RooFit.RooConst(0.120))#peak,width_Novo,tail)#R.RooFit.RooConst(5.024),R.RooFit.RooConst(0.1632),R.RooFit.RooConst(-0.2566))
-    EWKbkg_pdf_el = R.RooNovosibirsk("EWKbkg_pdf_el","Novosibirsk PDF",logM,R.RooFit.RooConst(5.068),R.RooFit.RooConst(0.195),R.RooFit.RooConst(-0.138))#R.RooFit.RooConst(0.195),R.RooFit.RooConst(-0.138))#peak,width_Novo,tail)#R.RooFit.RooConst(5.1048),R.RooFit.RooConst(0.126),R.RooFit.RooConst(-0.1839))
+    tail_mu = R.RooRealVar("tail_mu","tail_mu",-0.25,-5.,1.0) 
+    EWKbkg_pdf_mu = R.RooNovosibirsk("EWKbkg_pdf_mu","Novosibirsk PDF",logM,R.RooFit.RooConst(5.08),R.RooFit.RooConst(0.1941),R.RooFit.RooConst(-0.1336))#
+    EWKbkg_pdf_el = R.RooNovosibirsk("EWKbkg_pdf_el","Novosibirsk PDF",logM,R.RooFit.RooConst(5.068),R.RooFit.RooConst(0.1921),R.RooFit.RooConst(-0.1349))#
 
     #alphaL = R.RooRealVar("alphaL","alphaL",-0.6642,-12.0,12.0)
     #alphaR = R.RooRealVar("alphaR","alphaR",-0.6642,-12.0,12.0)
@@ -420,7 +426,11 @@ if __name__ == "__main__":
         can_mu_topbkg.Update()
         #raw_input()
         #write canvas in png image
-        can_mu_topbkg.Print("Plots/Topbkg_only_local_fit"+mass+tag+gt_or_lt_tag+"_fix_par.png")
+        
+        if(mass!=None):
+            can_mu_topbkg.Print("Plots/Topbkg_only_local_fit"+mass+tag+gt_or_lt_tag+"_fix_par.png")
+        if(width!=None):
+            can_mu_topbkg.Print("Plots/Topbkg_only_local_fit"+width+tag+gt_or_lt_tag+"_fix_par.png")
 
         
         
@@ -490,8 +500,10 @@ if __name__ == "__main__":
         can_mu_ewkbkg.Update()
         #raw_input()
         #write canvas in png image
-        can_mu_ewkbkg.Print("Plots/EWKbkg_only_local_fit_"+mass+tag+gt_or_lt_tag+"_fix_par.png")
-
+        if(mass!=None):
+            can_mu_ewkbkg.Print("Plots/EWKbkg_only_local_fit_"+mass+tag+gt_or_lt_tag+"_fix_par.png")
+        if(width!=None):
+            can_mu_ewkbkg.Print("Plots/EWKbkg_only_local_fit_"+width+tag+gt_or_lt_tag+"_fix_par.png")
         
         
         

@@ -57,5 +57,5 @@ def year_tag(dataYear="UL2016preVFP",x1=0.948, y1=0.8555, x2=0.95, y2=0.84):
         if(dataYear=="UL2016preVFP" or dataYear=="ULpreVFP2016"): cntrl.AddText("19.5 fb^{-1} (13 TeV, 2016preVFP)")
         if(dataYear=="UL2016postVFP" or dataYear=="ULpostVFP2016"): cntrl.AddText("16.8 fb^{-1} (13 TeV, 2016postVFP)")
         if(dataYear=="UL2017"): cntrl.AddText("41.5 fb^{-1} (13 TeV, 2017)")
-        if(dataYear=="UL2018"): cntrl.AddText("59.2 fb^{-1} (13 TeV, 2018)")
+        if(dataYear=="UL2018"): cntrl.AddText("(13 TeV, 2018)") #59.2 fb^{-1} 
         return cntrl
