@@ -46,7 +46,7 @@ def getcons(mass,width):
 def getprefit_hist(mass,width,lep):
     hists = []
     Filename = "/home/mikumar/t3store/workarea/Nanoaod_tools/CMSSW_10_2_28/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_"+lep+"_gteq0p7.root"
-    Filename_cont = "/home/mikumar/t3store/workarea/Nanoaod_tools/CMSSW_10_2_28/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_"+lep+"_gteq0p7.root"
+    Filename_cont = "/home/mikumar/t3store/workarea/Nanoaod_tools/CMSSW_10_2_28/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_"+lep+"_gteq0p3.root"
     File = rt.TFile(Filename,"Read")
     File_cont = rt.TFile(Filename_cont,"Read")
     gt_or_lt_tag=''
@@ -67,7 +67,7 @@ def getprefit_hist(mass,width,lep):
     EWK_bkg = Dir.Get("EWK_bkg"+tag+gt_or_lt_tag)
     EWK_bkg_cont = Dir_cont.Get("EWK_bkg"+tag+gt_or_lt_tag)
     EWK_bkg_cont.Scale(EWK_bkg.Integral()/EWK_bkg_cont.Integral())
-    EWK_bkg = EWK_bkg_cont
+    EWK_bkg = EWK_bkg_cont.Clone()
     QCD = Dir.Get("QCD_DD"+tag+gt_or_lt_tag)
     Data = Dir.Get("data_obs")
    
@@ -86,14 +86,58 @@ def getprefit_hist(mass,width,lep):
     #raw_input()
     return hists
 
-def getthefit(mass,width,lep):
+def Match_hist_from_Tgraph_asy_Error(Hist_input,Hist_fitgia):
+    print("bins = ",Hist_input.GetNbinsX())
+    for Bin in range(1,Hist_input.GetNbinsX()+1):
+        print(Bin,Hist_input.GetBinContent(Bin),Hist_fitgia.GetBinContent(Bin)*Hist_input.GetBinWidth(1))
+        
 
+def Get_hist_from_Tgraph_asy_Error(Tgraph,Hist):
+    newHist = Hist.Clone()
+    print("================================")
+    newHist.Print()
+    newHist.Reset()
+    print("bins = ",Hist.GetNbinsX())
+    for Bin in range(1,Hist.GetNbinsX()+1):
+        #print(Bin,Tgraph.Eval(Hist.GetBinCenter(Bin))*Hist.GetBinWidth(1),Hist.GetBinContent(Bin),Tgraph.GetErrorY(Bin)*Hist.GetBinWidth(1),Hist.GetBinError(Bin))
+        newHist.SetBinContent(Bin,int(Tgraph.Eval(Hist.GetBinCenter(Bin))*Hist.GetBinWidth(1)))
+        newHist.SetBinError(Bin,Tgraph.GetErrorY(Bin)*Hist.GetBinWidth(1))
+        #print("================================")
+        #newHist.Print()
+    return newHist
+
+def getthefit(mass,width,lep):
+    if(mass!=None):fitfile = rt.TFile.Open("fitDiagnostics_M"+mass+".root")
+    else : fitfile = rt.TFile.Open("fitDiagnostics_W"+width+".root")
+    print(lep+"jets"+tag+"_logM_fit_s")
+    fit = fitfile.Get(lep+"jets"+tag+"_logM_fit_s")
+    fit.Print()
     prefit_hists = getprefit_hist(mass,width,lep) #return top_sig,topbkg,EWK_bkg
     rt.gROOT.cd()
-    Data_prefit = prefit_hists[0].Clone()  
-    Data_prefit.Add(prefit_hists[1])
-    Data_prefit.Add(prefit_hists[2])
-    #Data_prefit= prefit_hists[4].Clone()
+    Data_prefit_from_input_file = prefit_hists[0].Clone()  
+    Data_prefit_from_input_file.Add(prefit_hists[1])
+    Data_prefit_from_input_file.Add(prefit_hists[2])
+    
+    Data_prefit_from_input_file_saved_as_data = prefit_hists[4].Clone()  
+    
+    prefit_total = fitfile.Get("shapes_prefit/"+lep+"jets"+tag+"/total")
+    prefit_total.Print()
+    
+    prefit_data_TError = fitfile.Get("shapes_prefit/"+lep+"jets"+tag+"/data")#.GetHistogram()
+    #prefit_data_TError.Print()
+    
+    prefit_signal = fitfile.Get("shapes_prefit/"+lep+"jets"+tag+"/top_sig")#.GetHistogram()
+    
+    nbin = prefit_total.GetXaxis().GetNbins()
+    ledge = prefit_total.GetXaxis().GetXmin()
+    uedge = prefit_total.GetXaxis().GetXmax()
+    
+    Data_prefit = rt.TH1D('Data_refit_hist', '', nbin, ledge, uedge)
+    Data_prefit = Get_hist_from_Tgraph_asy_Error(prefit_data_TError,Data_prefit_from_input_file)
+    Match_hist_from_Tgraph_asy_Error(prefit_hists[0],prefit_signal)
+    print("================================")
+    Data_prefit.Print()
+    #Data_prefit=Data_prefit_from_input_file
     Data_prefit.SetName("Data_prefit")
     print(Data_prefit.Print())
     Data_prefit.SetLineColor(rt.kBlack)
@@ -101,14 +145,8 @@ def getthefit(mass,width,lep):
 
     print("Data_prefit info from from Combine input files ")
     Data_prefit.Print()
-
-
-    if(mass!=None):fitfile = rt.TFile.Open("fitDiagnostics_M"+mass+".root")
-    else : fitfile = rt.TFile.Open("fitDiagnostics_W"+width+".root")
-    print(lep+"jets"+tag+"_logM_fit_s")
-    fit = fitfile.Get(lep+"jets"+tag+"_logM_fit_s")
-    fit.Print()
-
+  
+    
     Data_postfit_roohist = fit.findObject("h_"+lep+"jets"+tag)
     #Data_postfit_roohist.SetFillCOlor(R.kRed)
     ResultPDF = fit.findObject("pdf_bin"+lep+"jets"+tag+"_Norm[logM]")
@@ -167,6 +205,8 @@ def getthefit(mass,width,lep):
 
     Data_prefit.SetTitle("")
     Data_prefit.Draw("P")
+    #prefit_data_hist.Draw("P")
+    
     #Data_postfit_roohist.Draw("same;P")
     ResultPDF_error.Draw("same")
     ResultPDF.Draw("same")
@@ -214,7 +254,7 @@ def getthefit(mass,width,lep):
         #print("Data_postfit Info from fitdigonistic after multiply with bin width ")
         #Data_postfit.Print()
 
-    pad1.cd()
+    #pad1.cd()
     #Data_postfit.Draw("same")
     pad2.cd()
     #Data_prefit = fitfile.Get("shapes_prefit/"+lep+"jets/total")	These histograms has wronf infromation or have infrokmation about someting else
@@ -233,13 +273,13 @@ def getthefit(mass,width,lep):
         cont_prefit = Data_prefit.GetBinContent(iBin)
         cont_postfit = Data_postfit.GetBinContent(iBin)
         #h_ratio.SetBinContent(i,(Data_prefit.GetBinContent(i)-Data_postfit.GetBinContent(i))/math.sqrt(error_prefit*error_prefit+error_postfit*error_postfit))
-        sigma_pull = rt.TMath.Sqrt( error_prefit*error_prefit - error_postfit*error_postfit )
+        sigma_pull = rt.TMath.Sqrt( abs(error_prefit*error_prefit - error_postfit*error_postfit) )
         pull= ( cont_prefit - cont_postfit )/ sigma_pull
-        pull_err = ( error_prefit - error_postfit )/ sigma_pull
+        pull_err = ( error_postfit-error_prefit )/ sigma_pull
         #print(pull," : ", pull_err, " : ",sigma_pull, " : ",  cont_prefit - cont_postfit)
         h_ratio.SetBinContent(iBin, pull)
         h_ratio.SetBinError(iBin, pull_err)
-        #Add QCD_DD for the syst band	
+        #Add QCD_DD for the syst band"""
 
     h_ratio.SetFillColor(rt.kGray+3)
     h_ratio.SetFillStyle(3001)

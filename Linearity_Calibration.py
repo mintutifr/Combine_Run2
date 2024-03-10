@@ -50,8 +50,12 @@ def text():
 def get_linearity_plot(M_true, M_fit, Ey1, Size, variable="S", BDTCUT="0p8"):
     Num_points = Size
     print("size of the array:", Num_points)
-    
-    masspoint = R.TGraphErrors(Num_points, np.array(M_true), np.array(M_fit), np.zeros(Num_points), np.array(Ey1))
+    if variable == "M":    constant_array = np.full((len(M_true)), 172.5)  
+    elif variable == "S":  constant_array = np.full((len(M_true)), 1.31)
+    print(constant_array)
+    print(np.array(M_true))
+    M_true_ori_shift = np.subtract(np.array(M_true),constant_array)
+    masspoint = R.TGraphErrors(Num_points, M_true_ori_shift, np.array(M_fit), np.zeros(Num_points), np.array(Ey1))
     masspoint.SetMarkerStyle(20)
     masspoint.SetLineWidth(2)
     
@@ -67,7 +71,7 @@ def get_linearity_plot(M_true, M_fit, Ey1, Size, variable="S", BDTCUT="0p8"):
     pad1.cd()
     pad1.SetLeftMargin(0.12)
     
-    masspoint.Fit("f1", "C", "", M_true[0] - 0.5, M_true[Num_points - 1] + 0.5)
+    masspoint.Fit("f1", "C", "", M_true_ori_shift[0] - 0.5, M_true_ori_shift[Num_points - 1] + 0.5)
     
     grint = R.TGraphErrors(Num_points)
     grint.SetTitle("")
@@ -80,17 +84,18 @@ def get_linearity_plot(M_true, M_fit, Ey1, Size, variable="S", BDTCUT="0p8"):
     grint.SetLineColor(R.kRed)
     
     if variable == "M":
-        grint.GetXaxis().SetTitle("m_{True} (GeV)")
+        grint.GetXaxis().SetTitle("m_{True}-172.5 (GeV)")
         grint.GetYaxis().SetTitle("m_{Fit} (GeV)")
         grint.GetYaxis().SetTitleOffset(1.4)
         grint.SetMaximum(M_fit[Num_points - 1] + 1)
         grint.SetMinimum(M_fit[0] - 2)
     elif variable == "S":
-        grint.GetXaxis().SetTitle("#Gamma (GeV)")
+        grint.GetXaxis().SetTitle("#Gamma_{t}-1.31 (GeV)")
         grint.GetYaxis().SetTitle("#sigma_{Fit} (GeV)")
         grint.GetYaxis().SetTitleOffset(1.7)
-        grint.SetMaximum(M_fit[Num_points - 1] + 0.3)
-        grint.SetMinimum(M_fit[0] - 0.3)
+        grint.SetMaximum(M_fit[0] + 1)
+        grint.SetMinimum(M_fit[Num_points - 1] - 1.5)
+        print(M_fit[0],M_fit[Num_points - 1])
     
     grint.Draw("ap")
     masspoint.Draw("psame")
@@ -170,7 +175,7 @@ def get_calibrated_width(h1,mass,sigmaG,m,c): #linear for now
     lnsigma = math.sqrt(math.exp(2*mass+sigmaG*sigmaG)*(math.exp(sigmaG*sigmaG)-1))
     cali_error = h1.GetBinError(h1.FindBin(lnsigma))
     resolution = lnsigma*m+c
-    print(lnsigma*lnsigma-resolution*resolution)
+    #print(lnsigma*lnsigma-resolution*resolution)
     width_calibrated = math.sqrt(lnsigma*lnsigma-resolution*resolution)
     return [width_calibrated,cali_error]
 
@@ -310,17 +315,18 @@ if __name__ == '__main__':
     Nomi_width = 1.322
     Width_true = [0.75, 0.9, 1.31, 1.5, 1.7, 1.9]
     
-    M_fit_2018_AltMass_DNN_gt0p8 = [162.336,163.752,164.281,164.698,165.472]
-    Error_M_fit_2018_AltMass_DNN_gt0p8 = [0.236, 0.243, 0.245, 0.248, 0.257]
-    detaM_2018_AltMass_DNN_gt0p8 = [7.164,7.748,8.219,8.802,10.028]
-    Error_detaM_2018_AltMass_DNN_gt0p8 = []
+    M_fit_2018_AltMass_DNN_gt0p7 = [162.336,163.752,164.281,164.698,165.472]
+    Error_M_fit_2018_AltMass_DNN_gt0p7 = [0.236, 0.243, 0.245, 0.248, 0.257]
+    detaM_2018_AltMass_DNN_gt0p7 = [7.164,7.748,8.219,8.802,10.028]
+    Error_detaM_2018_AltMass_DNN_gt0p7 = []
 
-    gamma_fit_2018_AltWidth_DNN_gt0p8 = [0.11410,0.11424,0.11463,0.11466,0.11477,0.11471]
-    Error_gamma_fit_2018_AltWidth_DNN_gt0p8 = [0.00111,0.00111,0.00111,0.00115,0.00111,0.00114]
-    S_fit_2018_AltWidth_DNN_gt0p8 = [18.799, 18.823, 18.893,  18.898, 18.918, 18.908]
-    Error_S_fit_2018_AltWidth_DNN_gt0p8 = [0.196, 0.196, 0.197,  0.203, 0.195, 0.202]
-    Reso_2018_AltWidth_DNN_gt0p8 = [18.784, 18.801, 18.848, 18.839, 18.841, 18.812]
-    Error_Reso_2018_AltWidth_DNN_gt0p8 = [0.196, 0.196, 0.196,  0.202, 0.195, 0.201]
+    gamma_fit_2018_AltWidth_DNN_gt0p7 = [0.11410,0.11424,0.11463,0.11466,0.11477,0.11471]
+    Error_gamma_fit_2018_AltWidth_DNN_gt0p7 = [0.00111,0.00111,0.00111,0.00115,0.00111,0.00114]
+    S_fit_2018_AltWidth_DNN_gt0p7 = [18.799, 18.823, 18.893,  18.898, 18.918, 18.908]
+    deltaS_fit_2018_AltWidth_DNN_gt0p7 = [18.049,17.923,17.583,17.575,17.398,17.218,17.008]
+    Error_S_fit_2018_AltWidth_DNN_gt0p7 = [0.196, 0.196, 0.197,  0.203, 0.195, 0.202]
+    Reso_2018_AltWidth_DNN_gt0p7 = [18.784, 18.801, 18.848, 18.839, 18.841, 18.812]
+    Error_Reso_2018_AltWidth_DNN_gt0p7 = [0.196, 0.196, 0.196,  0.202, 0.195, 0.201]
     
     # remove top bkg from histogram results
  
@@ -339,18 +345,33 @@ if __name__ == '__main__':
     print(get_calibrated_width(hband_width,mass,sigmaG,0.3879,11.22))"""
     
     
-    get_linearity_plot(M_true, M_fit_2018_AltMass_DNN_gt0p8, Error_M_fit_2018_AltMass_DNN_gt0p8,len(M_true), variable="M", BDTCUT="gt0p7_UL2018")
-    hband_mass = get_calib_hist(M_fit_2018_AltMass_DNN_gt0p8, detaM_2018_AltMass_DNN_gt0p8, Error_M_fit_2018_AltMass_DNN_gt0p8,len(M_fit_2018_AltMass_DNN_gt0p8), "M", "gt0p7_UL2018", "pol1")
+    get_linearity_plot(M_true, M_fit_2018_AltMass_DNN_gt0p7, Error_M_fit_2018_AltMass_DNN_gt0p7,len(M_true), variable="M", BDTCUT="gt0p7_UL2018")
+    hband_mass = get_calib_hist(M_fit_2018_AltMass_DNN_gt0p7, detaM_2018_AltMass_DNN_gt0p7, Error_M_fit_2018_AltMass_DNN_gt0p7,len(M_fit_2018_AltMass_DNN_gt0p7), "M", "gt0p7_UL2018", "pol1")
     
     
 
-    get_linearity_plot(Width_true, S_fit_2018_AltWidth_DNN_gt0p8, Error_S_fit_2018_AltWidth_DNN_gt0p8,len(Width_true), variable="S", BDTCUT="gt0p7_UL2018")
-    hband_width = get_calib_hist(S_fit_2018_AltWidth_DNN_gt0p8, Reso_2018_AltWidth_DNN_gt0p8, Error_Reso_2018_AltWidth_DNN_gt0p8, len(S_fit_2018_AltWidth_DNN_gt0p8),"S", "gt0p7_UL2018", "pol1")
+    get_linearity_plot(Width_true, S_fit_2018_AltWidth_DNN_gt0p7, Error_S_fit_2018_AltWidth_DNN_gt0p7,len(Width_true), variable="S", BDTCUT="gt0p7_UL2018")
+    hband_width = get_calib_hist(S_fit_2018_AltWidth_DNN_gt0p7, Reso_2018_AltWidth_DNN_gt0p7, Error_Reso_2018_AltWidth_DNN_gt0p7, len(S_fit_2018_AltWidth_DNN_gt0p7),"S", "gt0p7_UL2018", "pol1")
 
 
-    mass = 5.095
+    """mass = 5.095
     sigmaG = 0.11463
     print(get_calibrated_mass(hband_mass,mass,sigmaG,0.8633,-133.3))
     print(get_calibrated_width(hband_width,mass,sigmaG,0.4335,10.64))
     
+    systs = ["PSWeight_ISR_Up", "PSWeight_ISR_Down", "PSWeight_FSR_Up", "PSWeight_FSR_Down","hdamp_Up", "hdamp_Down"]
+    masses = [5.09500,5.09502,5.09545,5.09438,5.09504,5.09498]
+    sigmaGs = [0.11466,0.11458,0.11473,0.11447,0.11461,0.11464]
+    for i,sys in enumerate(systs):
+        print("\n===="+sys+"====")
+        print("M = ",get_calibrated_mass(hband_mass,masses[i],sigmaGs[i],0.8633,-133.3)[0])
+        print("W = ",get_calibrated_width(hband_width,masses[i],sigmaGs[i],0.4335,10.64)[0])
 
+        
+    print("PEs")
+    mass = 5.107
+    error_mass = 0.001594
+    sigmaG = 0.1351
+    error_sigmaG = 0.00172
+    print("M = ",get_calibrated_mass(hband_mass,mass,sigmaG,0.8633,-133.3)[0],get_calibrated_mass(hband_mass,mass+error_mass,sigmaG,0.8633,-133.3)[0],get_calibrated_mass(hband_mass,mass-error_mass,sigmaG,0.8633,-133.3)[0])
+    print("Sigma = ",get_calibrated_width(hband_width,mass,sigmaG,0.4335,10.64)[0], get_calibrated_width(hband_width,mass,sigmaG+error_sigmaG,0.4335,10.64)[0], get_calibrated_width(hband_width,mass,sigmaG-error_sigmaG,0.4335,10.64)[0])"""

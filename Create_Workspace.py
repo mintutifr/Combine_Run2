@@ -9,6 +9,7 @@ parser.add_argument('-w', '--width', dest='width_sample', default=[None], type=s
 #parser.add_argument('-d', '--isdata', dest='isRealData', default=[False], type=bool, nargs=1, help="run over real data ['True', 'False']")
 parser.add_argument('-y', '--year', dest='Year', default=['UL2017'], type=str, nargs=1, help="Year of Data collection [ UL2016preVFP  UL2016postVFP  UL2017  UL2018 ]")
 parser.add_argument('-f', '--localfit', dest='local_fit', default=[None], type=str, nargs=1, help="Local fit run for  ['sig','top_bkg','ewk_bkg','final', 'final_mu', 'final_el']")
+parser.add_argument('-s', '--sys', dest='sys', default=[''], type=str, nargs=1, help='systematic sample replace the sig and background  ["PSWeight_ISR_Up", "PSWeight_ISR_Down", "PSWeight_FSR_Up", "PSWeight_FSR_Down","hdamp_Up", "hdamp_Down"]')
 args = parser.parse_args()
 
         
@@ -16,6 +17,7 @@ mass  = args.mass_sample[0]
 width = args.width_sample[0]
 dataYear = args.Year[0]
 local_fit = args.local_fit[0]
+sys = args.sys[0]
 date   = datetime.datetime.now()
 
 if(mass=='data' or width =='data'):
@@ -68,10 +70,10 @@ if __name__ == "__main__":
     #create RooDataHist
     #------------------------------------------------i
     #read the file to get the hustogrms
-    Filename_mu = "/home/mikumar/t3store/workarea/Nanoaod_tools/CMSSW_10_2_28/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_mu_gteq0p7.root"
-    Filename_el = "/home/mikumar/t3store/workarea/Nanoaod_tools/CMSSW_10_2_28/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_el_gteq0p7.root"
-    Filename_mu_cont = "/home/mikumar/t3store/workarea/Nanoaod_tools/CMSSW_10_2_28/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_mu_gteq0p3.root"
-    Filename_el_cont = "/home/mikumar/t3store/workarea/Nanoaod_tools/CMSSW_10_2_28/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_el_gteq0p3.root"
+    Filename_mu = "/home/mikumar/t3store/workarea/Nanoaod_tools/CMSSW_10_2_28/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_mu_gteq0p7_withoutDNNfit.root"
+    Filename_el = "/home/mikumar/t3store/workarea/Nanoaod_tools/CMSSW_10_2_28/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_el_gteq0p7_withoutDNNfit.root"
+    Filename_mu_cont = "/home/mikumar/t3store/workarea/Nanoaod_tools/CMSSW_10_2_28/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_mu_gteq0p3_withoutDNNfit.root"
+    Filename_el_cont = "/home/mikumar/t3store/workarea/Nanoaod_tools/CMSSW_10_2_28/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_el_gteq0p3_withoutDNNfit.root"
 
     File_mu = R.TFile(Filename_mu,"Read")
     File_el = R.TFile(Filename_el,"Read")
@@ -80,25 +82,22 @@ if __name__ == "__main__":
     #Data Vs Mc Condition
 
     gt_or_lt_tag = ''
-    if('gteq' in Filename_mu):gt_or_lt_tag = '_gt'
-    if('lt' in Filename_mu):gt_or_lt_tag = '_lt'
+    if('gteq' in Filename_mu):gt_or_lt_tag = gt_or_lt_tag+'_gt'
+    if('lt' in Filename_mu):gt_or_lt_tag = gt_or_lt_tag+'_lt'
 
     #Get the file and director where historgrams are stored for muon final state
     dir_mu = File_mu.GetDirectory("mujets")
     dir_mu_cont = File_mu_cont.GetDirectory("mujets")
     #Get Mc histograms for muon final state
     if(mass!= None):
-        top_sig_mu = dir_mu.Get("top_sig_"+mass+tag+gt_or_lt_tag)
-        top_bkg_mu = dir_mu.Get("top_bkg_1725"+tag+gt_or_lt_tag)
-        EWK_bkg_mu = dir_mu.Get("EWK_bkg"+tag+gt_or_lt_tag)
-        EWK_bkg_mu_cont = dir_mu_cont.Get("EWK_bkg"+tag+"_gt")
-        QCD_DD = dir_mu.Get("QCD_DD"+tag+gt_or_lt_tag)
+        top_sig_mu = dir_mu.Get("top_sig_"+mass+tag+gt_or_lt_tag+sys)
     if(width!= None):
-        top_sig_mu = dir_mu.Get("top_sig_"+width+tag+gt_or_lt_tag)
-        top_bkg_mu = dir_mu.Get("top_bkg_1725"+tag+gt_or_lt_tag)
-        EWK_bkg_mu = dir_mu.Get("EWK_bkg"+tag+gt_or_lt_tag)
-        EWK_bkg_mu_cont = dir_mu_cont.Get("EWK_bkg"+tag+"_gt")
-        QCD_DD = dir_mu.Get("QCD_DD"+tag+gt_or_lt_tag)
+        top_sig_mu = dir_mu.Get("top_sig_"+width+tag+gt_or_lt_tag+sys)
+        
+    top_bkg_mu = dir_mu.Get("top_bkg_1725"+tag+gt_or_lt_tag+sys)
+    EWK_bkg_mu = dir_mu.Get("EWK_bkg"+tag+gt_or_lt_tag)
+    EWK_bkg_mu_cont = dir_mu_cont.Get("EWK_bkg"+tag+"_gt")
+    QCD_DD = dir_mu.Get("QCD_DD"+tag+gt_or_lt_tag)
 
     print( "top_sig_mu Integral : ",top_sig_mu.Integral() )
     print( " top_bkg_mu Integral : ",top_bkg_mu.Integral())
@@ -124,11 +123,11 @@ if __name__ == "__main__":
     dir_el_cont = File_el_cont.GetDirectory("eljets")
     #Get Mc histograms for electron final state
     if(mass!= None):
-        top_sig_el = dir_el.Get("top_sig_"+mass+tag+gt_or_lt_tag)
+        top_sig_el = dir_el.Get("top_sig_"+mass+tag+gt_or_lt_tag+sys)
     if(width!= None):
-        top_sig_el = dir_el.Get("top_sig_"+width+tag+gt_or_lt_tag)
+        top_sig_el = dir_el.Get("top_sig_"+width+tag+gt_or_lt_tag+sys)
 
-    top_bkg_el = dir_el.Get("top_bkg_1725"+tag+gt_or_lt_tag)
+    top_bkg_el = dir_el.Get("top_bkg_1725"+tag+gt_or_lt_tag+sys)
     EWK_bkg_el = dir_el.Get("EWK_bkg"+tag+gt_or_lt_tag)
     EWK_bkg_el_cont = dir_el_cont.Get("EWK_bkg"+tag+"_gt")
     QCD_DD = dir_mu.Get("QCD_DD"+tag+gt_or_lt_tag)
@@ -186,8 +185,8 @@ if __name__ == "__main__":
     #sig_pdf_mu = R.RooGaussian("sig_pdf_mu","gauss_mu",logM,mean,sigmaG)
     #sig_pdf_el = R.RooGaussian("sig_pdf_el","gauss_el",logM,mean,sigmaG)
 
-    sig_pdf_mu = R.RooBifurGauss("sig_pdf_mu","gauss_mu",logM,mean,sigmaG,sigmaG2_mu)#R.RooFit.RooConst(0.147))#sigmaG2)#R.RooFit.RooConst(0.141887))
-    sig_pdf_el = R.RooBifurGauss("sig_pdf_el","gauss_el",logM,mean,sigmaG,sigmaG2_el)#R.RooFit.RooConst(0.140))#sigmaG2)#R.RooFit.RooConst(0.138264))
+    sig_pdf_mu = R.RooBifurGauss("sig_pdf_mu","gauss_mu",logM,mean,sigmaG2_mu,sigmaG)#R.RooFit.RooConst(0.147))#sigmaG2)#R.RooFit.RooConst(0.141887))
+    sig_pdf_el = R.RooBifurGauss("sig_pdf_el","gauss_el",logM,mean,sigmaG2_el,sigmaG)#R.RooFit.RooConst(0.140))#sigmaG2)#R.RooFit.RooConst(0.138264))
 
     #Top background pdf CristalBall Shape
     alpha = R.RooRealVar("alpha","alpha",-0.6642,-12.0,12.0)
@@ -206,30 +205,25 @@ if __name__ == "__main__":
     #sigmaL_topbkg_el = R.RooRealVar("sigmaL_topbkg_el","sigmaL_topbkg_el",0.15098,0.01,1)
     mean_top_bkg_mu = R.RooRealVar("mean_top_bkg_mu","mean_top_bkg_mu",5.1,4.5,5.5)
     
-    sigmaFrac = R.RooRealVar("sigmaFrac","sigmaFrac",0.1,0.0,1.0) #Best Fit Value
+    sigmaFrac_el = R.RooRealVar("sigmaFrac_el","sigmaFrac_el",0.1,0.0,5.0) #Best Fit Value
+    sigmaFrac_mu = R.RooRealVar("sigmaFrac_mu","sigmaFrac_mu",0.1,0.0,5.0)
     sigmaR_mu = R.RooFormulaVar("sigmaR_mu","sigmaR_mu","@0/@1",R.RooArgList(sigmaL_topbkg_mu,R.RooFit.RooConst(0.91)))#sigmaFrac))#R.RooFit.RooConst(0.90)))
     sigmaR_el = R.RooFormulaVar("sigmaR_el","sigmaR_el","@0/@1",R.RooArgList(sigmaL_topbkg_el,R.RooFit.RooConst(0.88)))#sigmaFrac))#R.RooFit.RooConst(0.87)))
     topbkg_pdf_mu = R.RooBifurGauss("topbkg_pdf_mu","gauss_mu",logM,R.RooFit.RooConst(5.111),sigmaL_topbkg_mu,sigmaR_mu)#mean_top_bkg,sigmaL_topbkg_mu,sigmaR_mu)
     topbkg_pdf_el = R.RooBifurGauss("topbkg_pdf_el","gauss_el",logM,R.RooFit.RooConst(5.101),sigmaL_topbkg_el,sigmaR_el)#logM,mean_top_bkg,sigmaL_topbkg_el,sigmaR_el)#R.RooFit.RooConst(5.100),sigmaL_topbkg_el,sigmaR_el)
-
-    #topbkg_pdf_mu = R.RooBifurGauss("topbkg_pdf_mu","gauss_mu",logM,mean,sigmaL_topbkg,sigmaR)
-    #topbkg_pdf_el = R.RooBifurGauss("topbkg_pdf_el","gauss_el",logM,mean,sigmaL_topbkg,sigmaR)
+    
+    
+    #topbkg_pdf_mu = R.RooBifurGauss("topbkg_pdf_mu","gauss_mu",logM,mean,sigmaG2_mu,sigmaG)
+    #topbkg_pdf_el = R.RooBifurGauss("topbkg_pdf_el","gauss_el",logM,mean,sigmaG2_el,sigmaG)
 
     #EWK bakground pdf Novosibirsk
     peak = R.RooRealVar("peak","peak",5.,1.,10.0)
-    width_Novo = R.RooRealVar("width_Novo","width_Novo",0.1,0.0,1.0)
+    width_Novo_el = R.RooRealVar("width_Novo_el","width_Novo_el",0.1,0.0,5.0)
+    width_Novo_mu = R.RooRealVar("width_Novo_mu","width_Novo_mu",0.1,0.0,5.0)
     tail_mu = R.RooRealVar("tail_mu","tail_mu",-0.25,-5.,1.0) 
-    EWKbkg_pdf_mu = R.RooNovosibirsk("EWKbkg_pdf_mu","Novosibirsk PDF",logM,R.RooFit.RooConst(5.08),R.RooFit.RooConst(0.1941),R.RooFit.RooConst(-0.1336))#
-    EWKbkg_pdf_el = R.RooNovosibirsk("EWKbkg_pdf_el","Novosibirsk PDF",logM,R.RooFit.RooConst(5.068),R.RooFit.RooConst(0.1921),R.RooFit.RooConst(-0.1349))#
-
-    #alphaL = R.RooRealVar("alphaL","alphaL",-0.6642,-12.0,12.0)
-    #alphaR = R.RooRealVar("alphaR","alphaR",-0.6642,-12.0,12.0)
-    #nL = R.RooRealVar("nL","nL",100.0,1.,500.0)
-    #nR = R.RooRealVar("nR","nR",100.0,1.,500.0)
-    #sigmaL = R.RooRealVar("sigmaL","sigmaL",0.15098,0.01,1)
-    #sigmaR = R.RooRealVar("sigmaR","sigmaR",0.15098,0.01,1)
-    #EWKbkg_pdf_mu = R.RooCrystalBall ("EWKbkg_pdf_mu","DSCB PDF",logM,sigmaL, sigmaR, alphaL, nL, alphaR, nR)
-    #EWKbkg_pdf_el = R.RooCrystalBall ("EWKbkg_pdf_el","DSCB PDF",logM,sigmaL, sigmaR, alphaL, nL, alphaR, nR)
+    EWKbkg_pdf_mu = R.RooNovosibirsk("EWKbkg_pdf_mu","Novosibirsk PDF",logM,R.RooFit.RooConst(5.08),R.RooFit.RooConst(0.1941),R.RooFit.RooConst(-0.1336))
+    EWKbkg_pdf_el = R.RooNovosibirsk("EWKbkg_pdf_el","Novosibirsk PDF",logM,R.RooFit.RooConst(5.068),R.RooFit.RooConst(0.1921),R.RooFit.RooConst(-0.1349))
+    
 
     #yields of signal and the background
     nSig_mu = top_sig_mu.Integral() 
@@ -265,7 +259,6 @@ if __name__ == "__main__":
         getattr(w, 'import')(sig_pdf_mu_norm)
         getattr(w, 'import')(topbkg_pdf_mu_norm)
         getattr(w, 'import')(EWKbkg_pdf_mu_norm)
-
         getattr(w, 'import')(data_el)
         getattr(w, 'import')(sig_pdf_el)
         getattr(w, 'import')(topbkg_pdf_el)

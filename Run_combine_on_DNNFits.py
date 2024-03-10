@@ -25,7 +25,7 @@ Combine_year_tag={
                 'UL2017' : "_UL17",
                 'UL2018' : "_UL18"} 
 
-for lep in ["mu","el"]:
+"""for lep in ["mu","el"]:
         if(year=="Run2"):
                 for yeardummy in ["UL2016preVFP" , "UL2016postVFP", "UL2017","UL2018"]:
                         update_rootfile = "shapes * "+lep+"jets /home/mikumar/t3store/workarea/Nanoaod_tools/CMSSW_10_2_28/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_DNNFit_Input_t_ch_CAsi_histograms_"+yeardummy+"_"+lep+".root "+lep+"jets/$PROCESS "+lep+"jets/$PROCESS_$SYSTEMATIC"+"\n"
@@ -39,8 +39,8 @@ for lep in ["mu","el"]:
         else:
                 update_rootfile = "shapes * "+lep+"jets /home/mikumar/t3store/workarea/Nanoaod_tools/CMSSW_10_2_28/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_DNNFit_Input_t_ch_CAsi_histograms_"+year+"_"+lep+".root "+lep+"jets/$PROCESS "+lep+"jets/$PROCESS_$SYSTEMATIC"+"\n"
                 print "\tshape are used from Root File: ",update_rootfile
-                replacemachine("datacard_DNN_hist_"+lep+"_"+year+".txt",'shapes', update_rootfile)
-                cmd_adddatacards = "combineCards.py mujets"+Combine_year_tag[year]+"=datacard_DNN_hist_mu_"+year+".txt eljets"+Combine_year_tag[year]+"=datacard_DNN_hist_el_"+year+".txt > Combine_datacard_DNN_"+year+".txt"
+                replacemachine("DataCards/datacard_DNN_hist_"+lep+"_"+year+".txt",'shapes', update_rootfile)
+                cmd_adddatacards = "combineCards.py mujets"+Combine_year_tag[year]+"=DataCards/datacard_DNN_hist_mu_"+year+".txt eljets"+Combine_year_tag[year]+"=DataCards/datacard_DNN_hist_el_"+year+".txt > Combine_datacard_DNN_"+year+".txt"
                 print "\n",cmd_adddatacards
                 os.system(cmd_adddatacards)
 
@@ -63,9 +63,9 @@ os.system(cmd_Impact_doInitialFit)
 
 cmd_Impact_doFit = "combineTool.py -M Impacts -d workspace_DNN_"+year+".root -m 172.5 --robustFit 1 --doFits -n M1725_DNNfit_"+year   #nuisance parameter with the --doFits options
 print "\n",cmd_Impact_doFit
-os.system(cmd_Impact_doFit)
+os.system(cmd_Impact_doFit)"""
 
-cmd_Impact_json = "combineTool.py -M Impacts -d workspace_DNN_"+year+".root -m 172.5 -o impacts_DNN_"+year+".json  -n M1725_DNNfit_"+year
+cmd_Impact_json = "combineTool.py -M Impacts -d workspace_DNN_"+year+".root -m 172.5 -o impacts_DNN_"+year+".json  -n M1725_DNNfit_"+year#+ "  --named r, bWeight_lf, bWeight_hf , bWeight_cferr1, bWeight_cferr2, bWeight_lfstats1, bWeight_lfstats2, bWeight_hfstats1, bWeight_hfstats2, bWeight_jes"
 print "\n",cmd_Impact_json
 os.system(cmd_Impact_json)
 
