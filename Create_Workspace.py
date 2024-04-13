@@ -1,4 +1,5 @@
 import ROOT as R
+from ROOT import RooFit 
 import sys, datetime
 from Hist_style import *
 import argparse as arg
@@ -185,8 +186,8 @@ if __name__ == "__main__":
     #sig_pdf_mu = R.RooGaussian("sig_pdf_mu","gauss_mu",logM,mean,sigmaG)
     #sig_pdf_el = R.RooGaussian("sig_pdf_el","gauss_el",logM,mean,sigmaG)
 
-    sig_pdf_mu = R.RooBifurGauss("sig_pdf_mu","gauss_mu",logM,mean,sigmaG2_mu,sigmaG)#R.RooFit.RooConst(0.147))#sigmaG2)#R.RooFit.RooConst(0.141887))
-    sig_pdf_el = R.RooBifurGauss("sig_pdf_el","gauss_el",logM,mean,sigmaG2_el,sigmaG)#R.RooFit.RooConst(0.140))#sigmaG2)#R.RooFit.RooConst(0.138264))
+    sig_pdf_mu = R.RooBifurGauss("sig_pdf_mu","gauss_mu",logM,mean,sigmaG,sigmaG2_mu)#R.RooFit.RooConst(0.147))#sigmaG2)#R.RooFit.RooConst(0.141887))
+    sig_pdf_el = R.RooBifurGauss("sig_pdf_el","gauss_el",logM,mean,sigmaG,sigmaG2_el)#R.RooFit.RooConst(0.140))#sigmaG2)#R.RooFit.RooConst(0.138264))
 
     #Top background pdf CristalBall Shape
     alpha = R.RooRealVar("alpha","alpha",-0.6642,-12.0,12.0)
@@ -230,22 +231,22 @@ if __name__ == "__main__":
     nTop_mu = top_bkg_mu.Integral()
     nEWK_mu = EWK_bkg_mu.Integral()   
     print("\nEvent Yield mu+jets\n=============================================")
-    print( "Nsig: ",nSig_mu,"\tNTop: ",nTop_mu,"\tNEwk: ",nEWK_mu,"\n")
+    print( "Nsig_norm: ",nSig_mu,"\tNTop_norm: ",nTop_mu,"\tNEwk_norm: ",nEWK_mu,'\n')
 
     sig_pdf_mu_norm = R.RooRealVar("sig_pdf_mu_norm","sig_pdf_mu_norm",nSig_mu)
-    topbkg_pdf_mu_norm = R.RooRealVar("topbkg_pdf_mu_norm","topbkg_pdf_mu_norm",nTop_mu)
-    EWKbkg_pdf_mu_norm = R.RooRealVar("EWKbkg_pdf_mu_norm","EWKbkg_pdf_mu_norm",nEWK_mu)
+    topbkg_pdf_mu_norm = R.RooRealVar("topbkg_pdf_mu_norm","topbkg_pdf_mu_norm",nTop_mu)#,0,10*nTop_mu)
+    EWKbkg_pdf_mu_norm = R.RooRealVar("EWKbkg_pdf_mu_norm","EWKbkg_pdf_mu_norm",nEWK_mu)#,0,10*nEWK_mu)
 
     #yields of signal and the background
     nSig_el = top_sig_el.Integral()
     nTop_el = top_bkg_el.Integral()
     nEWK_el = EWK_bkg_el.Integral()   
-    print("Event Yield mu+jets\n=============================================")
-    print( "Nsig: ",nSig_el, "\tNTop: ",nTop_el,"\tNEwk: ",nEWK_el,"\n")
+    print("Event Yield el+jets\n=============================================")
+    print( "Nsig_norm: ",nSig_el, "\tNTop_norm: ",nTop_el,"\tNEwk_norm: ",nEWK_el,"\n")
 
     sig_pdf_el_norm = R.RooRealVar("sig_pdf_el_norm","sig_pdf_el_norm",nSig_el)
-    topbkg_pdf_el_norm = R.RooRealVar("topbkg_pdf_el_norm","topbkg_pdf_el_norm",nTop_el)
-    EWKbkg_pdf_el_norm = R.RooRealVar("EWKbkg_pdf_el_norm","EWKbkg_pdf_el_norm",nEWK_el)
+    topbkg_pdf_el_norm = R.RooRealVar("topbkg_pdf_el_norm","topbkg_pdf_el_norm",nTop_el)#,0,10*nTop_el)
+    EWKbkg_pdf_el_norm = R.RooRealVar("EWKbkg_pdf_el_norm","EWKbkg_pdf_el_norm",nEWK_el)#,0,10*nEWK_el)
 
     if(local_fit == None):
         #Create a new empty workspace
@@ -516,6 +517,26 @@ if __name__ == "__main__":
         leg.SetFillStyle(0)
         leg.SetFillColor(0)
 
+        #create dummy histogram to show color in legend
+        h1 = R.TH1F("h1","h1",2,0,2)
+        h1.SetLineColor(R.kBlue)
+        h1.SetLineWidth(2)
+        h2 = R.TH1F("h2","h2",2,0,2)
+        h2.SetLineColor(R.kRed)
+        h2.SetLineWidth(2)
+        h3 = R.TH1F("h3","h3",2,0,2)
+        h3.SetLineColor(R.kOrange-2)
+        h3.SetLineWidth(2)
+        h4 = R.TH1F("h4","h4",2,0,2)
+        h4.SetLineColor(R.kGreen-2)
+        h4.SetLineWidth(2)
+
+        leg.AddEntry("data","Combined MC","ple1")
+        leg.AddEntry(h1,"Final Model","l")
+        leg.AddEntry(h2,"Signal PDF","l")
+        leg.AddEntry(h3,"TOP-bkg PDF","l")
+        leg.AddEntry(h4,"EWK-bkg PDF","l")
+            
         data_mu.Print("v");	
 
         #Create an empty plot frame 
@@ -556,7 +577,7 @@ if __name__ == "__main__":
         #define final model
         model_mu = R.RooAddPdf("model_mu","Total Model mu",R.RooArgList(sig_pdf_mu,topbkg_pdf_mu,EWKbkg_pdf_mu),R.RooArgList(Nsig_mu,Ntop_mu,Newk_mu))
         model_mu_Final= R.RooProdPdf("model_mu_Final","Total Model mu with constraints",R.RooArgList(model_mu,tch_constraint, top_constraint, ewk_constraint))
-
+        print(topbkg_pdf_el.getNorm(),"  =====================================")
         model_el = R.RooAddPdf("model_el","Total Model el",R.RooArgList(sig_pdf_el,topbkg_pdf_el,EWKbkg_pdf_el),R.RooArgList(Nsig_el,Ntop_el,Newk_el))
         model_el_Final = R.RooProdPdf("model_el_Final","Total Model el with constraints",R.RooArgList(model_el,tch_constraint, top_constraint, ewk_constraint))
 
@@ -570,13 +591,6 @@ if __name__ == "__main__":
         if(local_fit == "final_mu"):
             #fit to the data
             res = model_mu_Final.fitTo(data_mu,R.RooFit.Constrain(R.RooArgSet(sf_tch,sf_top,sf_ewk)),R.RooFit.Extended(R.kTRUE),R.RooFit.NumCPU(4,0),R.RooFit.Save(),R.RooFit.SumW2Error(R.kTRUE))
-            #model_mu_Final.paramOn(Frame,R.RooFit.Layout(0.55, 0.85, 0.85))
-            #R.RooFit.FillColor(R.kRed),
-            #R.RooFit.Label("Global Fit parameters:"),
-            #R.RooFit.Layout(0.1, 0.4, 0.9),
-            #R.RooFit.Format("NEU", R.RooFit.AutoPrecision(1)),
-            #R.RooFit.ShowConstants())
-            #Frame.SetTextSize(0.12)
             res.Print()
 
 
@@ -593,42 +607,18 @@ if __name__ == "__main__":
             topbkg_pdf_mu.plotOn(Frame,R.RooFit.Normalization( (Ntop_mu.getVal()),R.RooAbsReal.NumEvent), R.RooFit.Name("top_mu"), R.RooFit.DrawOption("L"), R.RooFit.LineColor(R.kOrange-2), R.RooFit.LineStyle(1), R.RooFit.LineWidth(2),R.RooFit.VLines())
             EWKbkg_pdf_mu.plotOn(Frame,R.RooFit.Normalization(Newk_mu.getVal(),R.RooAbsReal.NumEvent), R.RooFit.Name("ewk_mu"), R.RooFit.DrawOption("L"), R.RooFit.LineColor(R.kGreen-2), R.RooFit.LineStyle(1), R.RooFit.LineWidth(2),R.RooFit.VLines()) 
 
-            #create dummy histogram to show color in legend
-            h1 = R.TH1F("h1","h1",2,0,2)
-            h1.SetLineColor(R.kBlue)
-            h1.SetLineWidth(2)
-            h2 = R.TH1F("h2","h2",2,0,2)
-            h2.SetLineColor(R.kRed)
-            h2.SetLineWidth(2)
-            h3 = R.TH1F("h3","h3",2,0,2)
-            h3.SetLineColor(R.kOrange-2)
-            h3.SetLineWidth(2)
-            h4 = R.TH1F("h4","h4",2,0,2)
-            h4.SetLineColor(R.kGreen-2)
-            h4.SetLineWidth(2)
-
-            #add legend
-            leg.AddEntry("data_mu","Combined MC","ple1")
-            leg.AddEntry(h1,"Final Model","l")
-            leg.AddEntry(h2,"Signal PDF","l")
-            leg.AddEntry(h3,"TOP-bkg PDF","l")
-            leg.AddEntry(h4,"EWK-bkg PDF","l")
-
+            
             pad1 = R.TPad('pad1', 'pad1', 0.0, 0.195259, 1.0, 0.990683)
             pad1.SetBottomMargin(0.089)
             pad1.SetTicky()
             pad1.SetTickx()
-            #pad1.GetGridy().SetMaximum(Data.GetMaximum() * 1.2)
-            #pad1.SetRightMargin(0.143)
+            
             pad1.Draw()
-            pad1.cd()		
+            pad1.cd()
 
             #Draw data on frame
             hist_dummy = data_mu.createHistogram("dummy",logM, R.RooFit.Binning(15)) 
             print("Integral just before ploting : ",hist_dummy.Integral())	
-            #data_mu.plotOn(Frame)
-            #Draw frame on canvas
-            #Frame.getAttText().SetTextSize(0.025)
             Frame.Draw()
             #Draw Legend
 
@@ -737,13 +727,6 @@ if __name__ == "__main__":
         if(local_fit == "final_el"):
             #fit to the data
             res = model_el_Final.fitTo(data_el,R.RooFit.Constrain(R.RooArgSet(sf_tch,sf_top,sf_ewk)),R.RooFit.Extended(R.kTRUE),R.RooFit.NumCPU(4,0),R.RooFit.Save(),R.RooFit.SumW2Error(R.kTRUE))
-            #model_el_Final.paramOn(Frame,R.RooFit.Layout(0.55, 0.85, 0.85))
-            #R.RooFit.FillColor(R.kRed),
-            #R.RooFit.Label("Global Fit parameters:"),
-            #R.RooFit.Layout(0.1, 0.4, 0.9),
-            #R.RooFit.Format("NEU", R.RooFit.AutoPrecision(1)),
-            #R.RooFit.ShowConstants())
-
             res.Print()
 
 
@@ -756,36 +739,9 @@ if __name__ == "__main__":
             topbkg_pdf_el.plotOn(Frame,R.RooFit.Normalization( (Ntop_el.getVal()),R.RooAbsReal.NumEvent ), R.RooFit.Name("top_el"), R.RooFit.DrawOption("L"), R.RooFit.LineColor(R.kOrange-2), R.RooFit.LineStyle(1), R.RooFit.LineWidth(2),R.RooFit.VLines())
             EWKbkg_pdf_el.plotOn(Frame,R.RooFit.Normalization(Newk_el.getVal(),R.RooAbsReal.NumEvent ), R.RooFit.Name("ewk_el"), R.RooFit.DrawOption("L"), R.RooFit.LineColor(R.kGreen-2), R.RooFit.LineStyle(1), R.RooFit.LineWidth(2),R.RooFit.VLines()); 
 
-            #create dummy histogram to show color in legend
-            h1 = R.TH1F("h1","h1",2,0,2)
-            h1.SetLineColor(R.kBlue)
-            h1.SetLineWidth(2)
-            h2 = R.TH1F("h2","h2",2,0,2)
-            h2.SetLineColor(R.kRed)
-            h2.SetLineWidth(2)
-            h3 = R.TH1F("h3","h3",2,0,2)
-            h3.SetLineColor(R.kOrange-2)
-            h3.SetLineWidth(2)
-            h4 = R.TH1F("h4","h4",2,0,2)
-            h4.SetLineColor(R.kGreen-2)
-            h4.SetLineWidth(2)
-
-            #add legend
-            leg.AddEntry("data_el","Combined MC","ple1")
-            leg.AddEntry(h1,"Final Model","l")
-            leg.AddEntry(h2,"Signal PDF","l")
-            leg.AddEntry(h3,"TOP-bkg PDF","l")
-            leg.AddEntry(h4,"EWK-bkg PDF","l")
-
-            #Draw data on frame	
-            #data_el.plotOn(Frame)
-            #Draw frame on canvas 
-            #Frame.Draw()
-            #Draw Legend
-            #leg.Draw("SAME")
+            
             can.Update()
-            #can.GetListOfPrimitives().FindObject("gaus_paramBox").SetAttTextPS (0, 0, R.Red,11 , 17)
-            #can.GetListOfPrimitives().FindObject("gaus_paramBox").SetTextSize(10)
+            
             pad1 = R.TPad('pad1', 'pad1', 0.0, 0.195259, 1.0, 0.990683)
             pad1.SetBottomMargin(0.089)
             pad1.SetTicky()
@@ -793,11 +749,9 @@ if __name__ == "__main__":
             #pad1.GetGridy().SetMaximum(Data.GetMaximum() * 1.2)
             #pad1.SetRightMargin(0.143)
             pad1.Draw()
-            pad1.cd()		
+            pad1.cd()
 
-            #Draw data on frame	
-            #data_el.plotOn(Frame)
-            #Draw frame on canvas 
+            
             Frame.Draw()
             #Draw Legend
             leg.Draw("SAME")
@@ -904,6 +858,52 @@ if __name__ == "__main__":
         
 #########----------------------------------------------------###############------------------###########
         if(local_fit == "final"):
-            model_mu_Final= R.RooProdPdf("model_mu_Final","Total Model mu with constraints",R.RooArgSet(model_mu,tch_constraint, top_constraint, ewk_constraint))
-            model_el_Final = R.RooProdPdf("model_el_Final","Total Model el with constraints",R.RooArgSet(model_el,tch_constraint, top_constraint, ewk_constraint))
+            sample = R.RooCategory("sample", "sample")
+            sample.defineType("mu")
+            sample.defineType("el")
+            
+            simPdf=R.RooSimultaneous("simPdf", "simultaneous pdf", sample)
+            #simPdf.addPdf(model_mu_Final,"mu")
+            #simPdf.addPdf(model_el_Final,"el")
+            simPdf.addPdf(model_mu,"mu")
+            simPdf.addPdf(model_el,"el")
+            
+            combData = R.RooDataHist("combData", "combined data", R.RooArgList(logM), RooFit.Index(sample), R.RooFit.Import("mu", data_mu),R.RooFit.Import("el", data_el))
 
+            fitResult=simPdf.fitTo(combData, R.RooFit.Extended(R.kTRUE), R.RooFit.NumCPU(4), R.RooFit.Save(R.kTRUE), R.RooFit.SumW2Error(R.kTRUE))
+            fitResult.Print("v")
+            print(fitResult.status())
+            
+            #   // P  L  O   T  I  N  G  ------------------------
+            #   // ----------------------------------------------
+            # Plot model on frame
+
+            can=rt.TCanvas("Canvas","Canvas")
+            can.Divide(2,1)
+            can.cd(1)
+            R.TGaxis.SetMaxDigits(3)
+            Frame_mu = logM.frame(R.RooFit.Title(" "))
+            data_mu.plotOn(Frame_mu,R.RooFit.Name("Data_mu"),R.RooFit.LineColor(rt.kBlack))
+            model_mu_Final.plotOn(Frame_mu, R.RooFit.Name("Data_mu"), R.RooFit.LineColor(rt.kBlue), R.RooFit.LineStyle(1), R.RooFit.LineWidth(3),R.RooFit.Normalization(Ntop_mu.getVal()+Newk_mu.getVal()+ Nsig_mu.getVal(),R.RooAbsReal.NumEvent ))
+            sig_pdf_mu.plotOn(Frame_mu,R.RooFit.Normalization( (Nsig_mu.getVal()),R.RooAbsReal.NumEvent  ), R.RooFit.Name("sig_mu"), R.RooFit.DrawOption("L"), R.RooFit.LineColor(R.kRed), R.RooFit.LineStyle(1), R.RooFit.LineWidth(2),R.RooFit.VLines())
+            topbkg_pdf_mu.plotOn(Frame_mu,R.RooFit.Normalization( (Ntop_mu.getVal()),R.RooAbsReal.NumEvent ), R.RooFit.Name("top_mu"), R.RooFit.DrawOption("L"), R.RooFit.LineColor(R.kOrange-2), R.RooFit.LineStyle(1), R.RooFit.LineWidth(2),R.RooFit.VLines())
+            EWKbkg_pdf_mu.plotOn(Frame_mu,R.RooFit.Normalization(Newk_mu.getVal(),R.RooAbsReal.NumEvent ), R.RooFit.Name("ewk_mu"), R.RooFit.DrawOption("L"), R.RooFit.LineColor(R.kGreen-2), R.RooFit.LineStyle(1), R.RooFit.LineWidth(2),R.RooFit.VLines()); 
+            Frame_mu.Draw()
+            
+            #plotOn(Frame,R.RooFit.Normalization( (Nsig_el.getVal()),R.RooAbsReal.NumEvent  ), R.RooFit.Name("sig_el"), R.RooFit.DrawOption("L"), R.RooFit.LineColor(R.kRed), R.RooFit.LineStyle(1), R.RooFit.LineWidth(2),R.RooFit.VLines())
+            
+            can.cd(2)
+            R.TGaxis.SetMaxDigits(3)
+            Frame_el = logM.frame(R.RooFit.Title(" "))
+            data_el.plotOn(Frame_el,R.RooFit.Name("Data_el"),R.RooFit.LineColor(rt.kBlack))
+            model_el_Final.plotOn(Frame_el,R.RooFit.Name("Data_el"), R.RooFit.LineColor(rt.kBlue), R.RooFit.LineStyle(1), R.RooFit.LineWidth(3),R.RooFit.Normalization(Ntop_el.getVal()+Newk_el.getVal()+ Nsig_el.getVal(),R.RooAbsReal.NumEvent ))
+            sig_pdf_el.plotOn(Frame_el,R.RooFit.Normalization( (Nsig_el.getVal()),R.RooAbsReal.NumEvent  ), R.RooFit.Name("sig_el"), R.RooFit.DrawOption("L"), R.RooFit.LineColor(R.kRed), R.RooFit.LineStyle(1), R.RooFit.LineWidth(2),R.RooFit.VLines())
+            topbkg_pdf_el.plotOn(Frame_el,R.RooFit.Normalization( (Ntop_el.getVal()),R.RooAbsReal.NumEvent ), R.RooFit.Name("top_el"), R.RooFit.DrawOption("L"), R.RooFit.LineColor(R.kOrange-2), R.RooFit.LineStyle(1), R.RooFit.LineWidth(2),R.RooFit.VLines())
+            EWKbkg_pdf_el.plotOn(Frame_el,R.RooFit.Normalization(Newk_el.getVal(),R.RooAbsReal.NumEvent ), R.RooFit.Name("ewk_el"), R.RooFit.DrawOption("L"), R.RooFit.LineColor(R.kGreen-2), R.RooFit.LineStyle(1), R.RooFit.LineWidth(2),R.RooFit.VLines()); 
+            Frame_el.Draw() 
+            
+            leg.Draw()
+            if(mass!=None):can.Print("Plots/final_model_comb_"+mass+tag+gt_or_lt_tag+".png")
+            if(width!=None):can.Print("Plots/final_model_comb_"+width+tag+gt_or_lt_tag+".png")
+  
+            
