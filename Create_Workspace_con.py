@@ -71,10 +71,10 @@ if __name__ == "__main__":
     #create RooDataHist
     #------------------------------------------------i
     #read the file to get the hustogrms
-    Filename_mu = "/home/mikumar/t3store/workarea/Nanoaod_tools/CMSSW_10_2_28/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_mu_gteq0p7_withDNNfit_rebin.root"
-    Filename_el = "/home/mikumar/t3store/workarea/Nanoaod_tools/CMSSW_10_2_28/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_el_gteq0p7_withDNNfit_rebin.root"
-    Filename_mu_cont = "/home/mikumar/t3store/workarea/Nanoaod_tools/CMSSW_10_2_28/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_mu_gteq0p3_withDNNfit_rebin.root"
-    Filename_el_cont = "/home/mikumar/t3store/workarea/Nanoaod_tools/CMSSW_10_2_28/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_el_gteq0p3_withDNNfit_rebin.root"
+    Filename_mu = "/home/mikumar/t3store/workarea/Nanoaod_tools/CMSSW_10_2_28/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_mu_lt0p7gteq0p5_withoutDNNfit_rebin.root"
+    Filename_el = "/home/mikumar/t3store/workarea/Nanoaod_tools/CMSSW_10_2_28/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_el_lt0p7gteq0p5_withoutDNNfit_rebin.root"
+    Filename_mu_cont = "/home/mikumar/t3store/workarea/Nanoaod_tools/CMSSW_10_2_28/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_mu_gteq0p3_withoutDNNfit_rebin.root"
+    Filename_el_cont = "/home/mikumar/t3store/workarea/Nanoaod_tools/CMSSW_10_2_28/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_el_gteq0p3_withoutDNNfit_rebin.root"
 
     File_mu = R.TFile(Filename_mu,"Read")
     File_el = R.TFile(Filename_el,"Read")
@@ -91,6 +91,7 @@ if __name__ == "__main__":
     dir_mu_cont = File_mu_cont.GetDirectory("mujets")
     #Get Mc histograms for muon final state
     if(mass!= None):
+        print("top_sig_"+mass+tag+gt_or_lt_tag+sys)
         top_sig_mu = dir_mu.Get("top_sig_"+mass+tag+gt_or_lt_tag+sys)
     if(width!= None):
         top_sig_mu = dir_mu.Get("top_sig_"+width+tag+gt_or_lt_tag+sys)
@@ -168,8 +169,10 @@ if __name__ == "__main__":
     sigmaG = R.RooRealVar("sigmaG","sigmaG",0.15098,0.01,5)#0.186
     sigmaG2Frac_mu = R.RooRealVar("sigmaG2Frac_mu","sigmaG2Frac_mu",0.1,0.0,5.0) #Best Fit Value
     sigmaG2Frac_el = R.RooRealVar("sigmaG2Frac_el","sigmaG2Frac_el",0.1,0.0,5.0) #Best Fit Value
-    sigmaG2_mu = R.RooFormulaVar("sigmaG2_mu","sigmaG2_mu","@0/@1",R.RooArgList(sigmaG,	sigmaG2Frac_mu))#R.RooFit.RooConst(0.935)))#R.RooFit.RooConst(0.935)))
-    sigmaG2_el = R.RooFormulaVar("sigmaG2_el","sigmaG2_el","@0/@1",R.RooArgList(sigmaG,sigmaG2Frac_el))#R.RooFit.RooConst(0.917)))#sigmaG2Frac_el))#R.RooFit.RooConst(0.917)))
+    sigmaG2_mu = R.RooFormulaVar("sigmaG2_mu","sigmaG2_mu","@0/@1",R.RooArgList(sigmaG,sigmaG2Frac_mu)) #R.RooArgList(sigmaG,R.RooFit.RooConst(0.95)
+    sigmaG2_el = R.RooFormulaVar("sigmaG2_el","sigmaG2_el","@0/@1",R.RooArgList(sigmaG,sigmaG2Frac_el)) #R.RooArgList(sigmaG,R.RooFit.RooConst(0.98)
+    ##sigmaG2_mu = R.RooFormulaVar("sigmaG2_mu","sigmaG2_mu","@0/@1",R.RooArgList(sigmaG, R.RooFit.RooConst(0.858)))# R.RooFit.RooConst(0.860)))#R.RooFit.RooConst(0.860)))
+    #sigmaG2_el = R.RooFormulaVar("sigmaG2_el","sigmaG2_el","@0/@1",R.RooArgList(sigmaG, R.RooFit.RooConst(0.845))) # R.RooFit.RooConst(0.852)))# R.RooFit.RooConst(0.852)))
     #signal Bifrac gaussian pdf
     """gauss_mu = R.RooBifurGauss("gauss_mu","gauss_mu",logM,mean,sigmaG,R.RooFit.RooConst(0.1430)) #only core sigma flaoted frac fixed
     gauss_el = R.RooBifurGauss("gauss_el","gauss_el",logM,mean, sigmaG,R.RooFit.RooConst(0.1394)) #only core sigma flaoted
@@ -200,19 +203,19 @@ if __name__ == "__main__":
     #topbkg_pdf_mu = R.RooCBShape("topbkg_pdf_mu","Crystal Ball PDF",logM,R.RooFit.RooConst(5.119),mean,sigmaG,alpha,num)#R.RooFit.RooConst(0.171),R.RooFit.RooConst(-1.679),R.RooFit.RooConst(142.0))#mean,sigmaG,alpha,num)#R.RooFit.RooConst(-1.5047),R.RooFit.RooConst(100.0)) # sigma float
     #topbkg_pdf_el = R.RooCBShape("topbkg_pdf_el","Crystal Ball PDF",logM,mean,sigmaG,alpha,num)#R.RooFit.RooConst(5.113),R.RooFit.RooConst(0.172),R.RooFit.RooConst(-1.607),R.RooFit.RooConst(19.0))#mean,sigmaG,alpha,num2)#R.RooFit.RooConst(-1.5164),R.RooFit.RooConst(125)) # sigma float
 
-    sigmaL_topbkg_mu = R.RooFit.RooConst(0.169)
+    sigmaL_topbkg_mu = R.RooFit.RooConst(0.190)
     #sigmaL_topbkg_mu = R.RooRealVar("sigmaL_topbkg_mu","sigmaL_topbkg_mu",0.15098,0.01,1)
-    sigmaL_topbkg_el = R.RooFit.RooConst(0.180)
+    sigmaL_topbkg_el = R.RooFit.RooConst(0.201)
     #sigmaL_topbkg_el = R.RooRealVar("sigmaL_topbkg_el","sigmaL_topbkg_el",0.15098,0.01,1)
     #mean_top_bkg_mu = R.RooRealVar("mean_top_bkg_mu","mean_top_bkg_mu",5.1,4.5,5.5)
     #mean_top_bkg_el = R.RooRealVar("mean_top_bkg_el","mean_top_bkg_el",5.1,4.5,5.5)
     
     #sigmaFrac_el = R.RooRealVar("sigmaFrac_el","sigmaFrac_el",0.1,0.0,5.0) #Best Fit Value
     #sigmaFrac_mu = R.RooRealVar("sigmaFrac_mu","sigmaFrac_mu",0.1,0.0,5.0)
-    sigmaR_mu = R.RooFormulaVar("sigmaR_mu","sigmaR_mu","@0/@1",R.RooArgList(sigmaL_topbkg_mu,R.RooFit.RooConst(0.98)))#sigmaFrac))#R.RooFit.RooConst(0.90)))
-    sigmaR_el = R.RooFormulaVar("sigmaR_el","sigmaR_el","@0/@1",R.RooArgList(sigmaL_topbkg_el,R.RooFit.RooConst(1.08)))#sigmaFrac))#R.RooFit.RooConst(0.87)))
-    topbkg_pdf_mu = R.RooBifurGauss("topbkg_pdf_mu","gauss_mu",logM,R.RooFit.RooConst(5.116),sigmaL_topbkg_mu,sigmaR_mu)#mean_top_bkg,sigmaL_topbkg_mu,sigmaR_mu) R.RooFit.RooConst(5.111)
-    topbkg_pdf_el = R.RooBifurGauss("topbkg_pdf_el","gauss_el",logM,R.RooFit.RooConst(5.124),sigmaL_topbkg_el,sigmaR_el)#logM,mean_top_bkg,sigmaL_topbkg_el,sigmaR_el)#R.RooFit.RooConst(5.101),sigmaL_topbkg_el,sigmaR_el)
+    sigmaR_mu = R.RooFormulaVar("sigmaR_mu","sigmaR_mu","@0/@1",R.RooArgList(sigmaL_topbkg_mu,R.RooFit.RooConst(1.03)))#sigmaFrac))#R.RooFit.RooConst(0.91)))
+    sigmaR_el = R.RooFormulaVar("sigmaR_el","sigmaR_el","@0/@1",R.RooArgList(sigmaL_topbkg_el,R.RooFit.RooConst(1.12)))#sigmaFrac))#R.RooFit.RooConst(0.88)))
+    topbkg_pdf_mu = R.RooBifurGauss("topbkg_pdf_mu","gauss_mu",logM,R.RooFit.RooConst(5.135),sigmaL_topbkg_mu,sigmaR_mu)#mean_top_bkg,sigmaL_topbkg_mu,sigmaR_mu)
+    topbkg_pdf_el = R.RooBifurGauss("topbkg_pdf_el","gauss_el",logM,R.RooFit.RooConst(5.147),sigmaL_topbkg_el,sigmaR_el)#logM,mean_top_bkg,sigmaL_topbkg_el,sigmaR_el)#R.RooFit.RooConst(5.100),sigmaL_topbkg_el,sigmaR_el)
     
     
     #topbkg_pdf_mu = R.RooBifurGauss("topbkg_pdf_mu","gauss_mu",logM,mean,sigmaG2_mu,sigmaG)
@@ -223,8 +226,8 @@ if __name__ == "__main__":
     #peak_mu = R.RooRealVar("peak_mu","peak_mu",5.,1.,10.0)
     #width_Novo_el = R.RooRealVar("width_Novo_el","width_Novo_el",0.1,0.0,5.0)
     #width_Novo_mu = R.RooRealVar("width_Novo_mu","width_Novo_mu",0.1,0.0,5.0)
-    #tail_el = R.RooRealVar("tail_el","tail_el",-0.25,-5.,1.0) 
-    #tail_mu = R.RooRealVar("tail_mu","tail_mu",-0.25,-5.,1.0) 
+    #tail_el = R.RooRealVar("tail_el","tail_el",0.0,-1.,1.0)
+    #tail_mu = R.RooRealVar("tail_mu","tail_mu",0.0,-1.,1.0)
     EWKbkg_pdf_mu = R.RooNovosibirsk("EWKbkg_pdf_mu","Novosibirsk PDF",logM,R.RooFit.RooConst(5.095),R.RooFit.RooConst(0.1789),R.RooFit.RooConst(-0.0155))
     EWKbkg_pdf_el = R.RooNovosibirsk("EWKbkg_pdf_el","Novosibirsk PDF",logM,R.RooFit.RooConst(5.081),R.RooFit.RooConst(0.2014),R.RooFit.RooConst(-0.053))
     
@@ -234,11 +237,11 @@ if __name__ == "__main__":
     nTop_mu = top_bkg_mu.Integral()
     nEWK_mu = EWK_bkg_mu.Integral()   
     print("\nEvent Yield mu+jets\n=============================================")
-    print( "Nsig_norm: ",nSig_mu,"\tNTop_norm: ",nTop_mu,"\tNEwk_norm: ",nEWK_mu,'\n')
+    print( "Nsig_norm: ",nSig_mu,"\tNTop_norm: ",nTop_mu,"\tNEwk_norm: ",nEWK_mu,"\n")
 
     sig_pdf_mu_norm = R.RooRealVar("sig_pdf_mu_norm","sig_pdf_mu_norm",nSig_mu)
-    topbkg_pdf_mu_norm = R.RooRealVar("topbkg_pdf_mu_norm","topbkg_pdf_mu_norm",nTop_mu)#,0,10*nTop_mu)
-    EWKbkg_pdf_mu_norm = R.RooRealVar("EWKbkg_pdf_mu_norm","EWKbkg_pdf_mu_norm",nEWK_mu)#,0,10*nEWK_mu)
+    topbkg_pdf_mu_norm = R.RooRealVar("topbkg_pdf_mu_norm","topbkg_pdf_mu_norm",nTop_mu)
+    EWKbkg_pdf_mu_norm = R.RooRealVar("EWKbkg_pdf_mu_norm","EWKbkg_pdf_mu_norm",nEWK_mu)
 
     #yields of signal and the background
     nSig_el = top_sig_el.Integral()
@@ -248,8 +251,8 @@ if __name__ == "__main__":
     print( "Nsig_norm: ",nSig_el, "\tNTop_norm: ",nTop_el,"\tNEwk_norm: ",nEWK_el,"\n")
 
     sig_pdf_el_norm = R.RooRealVar("sig_pdf_el_norm","sig_pdf_el_norm",nSig_el)
-    topbkg_pdf_el_norm = R.RooRealVar("topbkg_pdf_el_norm","topbkg_pdf_el_norm",nTop_el)#,0,10*nTop_el)
-    EWKbkg_pdf_el_norm = R.RooRealVar("EWKbkg_pdf_el_norm","EWKbkg_pdf_el_norm",nEWK_el)#,0,10*nEWK_el)
+    topbkg_pdf_el_norm = R.RooRealVar("topbkg_pdf_el_norm","topbkg_pdf_el_norm",nTop_el)
+    EWKbkg_pdf_el_norm = R.RooRealVar("EWKbkg_pdf_el_norm","EWKbkg_pdf_el_norm",nEWK_el)
 
     if(local_fit == None):
         #Create a new empty workspace
@@ -277,7 +280,7 @@ if __name__ == "__main__":
         # S a v e   w o r k s p a c e   i n   f i l e
         # -------------------------------------------
         # Save the workspace into a ROOT file
-        w.writeToFile("/home/mikumar/t3store/workarea/Higgs_Combine/CMSSW_11_3_4/src/Combine_Run2/workspace"+tag+".root")
+        w.writeToFile("/home/mikumar/t3store/workarea/Higgs_Combine/CMSSW_11_3_4/src/Combine_Run2/workspace"+tag+"_con.root")
         # Workspace will remain in memory after macro finishes
         R.gDirectory.Add(w)
 
@@ -350,7 +353,7 @@ if __name__ == "__main__":
         can_mu.Update()
         #raw_input()
         #write canvas in png image
-        can_mu.Print("Plots/Signal_only_local_fit"+mass+tag+gt_or_lt_tag+"_fix_par.png")
+        can_mu.Print("Plots/Signal_only_local_con_fit"+mass+tag+gt_or_lt_tag+"_fix_par.png")
 
         
         
@@ -425,9 +428,9 @@ if __name__ == "__main__":
         #write canvas in png image
         
         if(mass!=None):
-            can_mu_topbkg.Print("Plots/Topbkg_only_local_fit"+mass+tag+gt_or_lt_tag+"_fix_par.png")
+            can_mu_topbkg.Print("Plots/Topbkg_only_local_con_fit"+mass+tag+gt_or_lt_tag+"_fix_par.png")
         if(width!=None):
-            can_mu_topbkg.Print("Plots/Topbkg_only_local_fit"+width+tag+gt_or_lt_tag+"_fix_par.png")
+            can_mu_topbkg.Print("Plots/Topbkg_only_local_con_fit"+width+tag+gt_or_lt_tag+"_fix_par.png")
 
         
         
@@ -498,9 +501,9 @@ if __name__ == "__main__":
         #raw_input()
         #write canvas in png image
         if(mass!=None):
-            can_mu_ewkbkg.Print("Plots/EWKbkg_only_local_fit_"+mass+tag+gt_or_lt_tag+"_fix_par.png")
+            can_mu_ewkbkg.Print("Plots/EWKbkg_only_local_fit_con_"+mass+tag+gt_or_lt_tag+"_fix_par.png")
         if(width!=None):
-            can_mu_ewkbkg.Print("Plots/EWKbkg_only_local_fit_"+width+tag+gt_or_lt_tag+"_fix_par.png")
+            can_mu_ewkbkg.Print("Plots/EWKbkg_only_local_fit_con_"+width+tag+gt_or_lt_tag+"_fix_par.png")
         
         
         
@@ -520,26 +523,6 @@ if __name__ == "__main__":
         leg.SetFillStyle(0)
         leg.SetFillColor(0)
 
-        #create dummy histogram to show color in legend
-        h1 = R.TH1F("h1","h1",2,0,2)
-        h1.SetLineColor(R.kBlue)
-        h1.SetLineWidth(2)
-        h2 = R.TH1F("h2","h2",2,0,2)
-        h2.SetLineColor(R.kRed)
-        h2.SetLineWidth(2)
-        h3 = R.TH1F("h3","h3",2,0,2)
-        h3.SetLineColor(R.kOrange-2)
-        h3.SetLineWidth(2)
-        h4 = R.TH1F("h4","h4",2,0,2)
-        h4.SetLineColor(R.kGreen-2)
-        h4.SetLineWidth(2)
-
-        leg.AddEntry("data","Combined MC","ple1")
-        leg.AddEntry(h1,"Final Model","l")
-        leg.AddEntry(h2,"Signal PDF","l")
-        leg.AddEntry(h3,"TOP-bkg PDF","l")
-        leg.AddEntry(h4,"EWK-bkg PDF","l")
-            
         data_mu.Print("v");	
 
         #Create an empty plot frame 
@@ -580,7 +563,7 @@ if __name__ == "__main__":
         #define final model
         model_mu = R.RooAddPdf("model_mu","Total Model mu",R.RooArgList(sig_pdf_mu,topbkg_pdf_mu,EWKbkg_pdf_mu),R.RooArgList(Nsig_mu,Ntop_mu,Newk_mu))
         model_mu_Final= R.RooProdPdf("model_mu_Final","Total Model mu with constraints",R.RooArgList(model_mu,tch_constraint, top_constraint, ewk_constraint))
-        print(topbkg_pdf_el.getNorm(),"  =====================================")
+
         model_el = R.RooAddPdf("model_el","Total Model el",R.RooArgList(sig_pdf_el,topbkg_pdf_el,EWKbkg_pdf_el),R.RooArgList(Nsig_el,Ntop_el,Newk_el))
         model_el_Final = R.RooProdPdf("model_el_Final","Total Model el with constraints",R.RooArgList(model_el,tch_constraint, top_constraint, ewk_constraint))
 
@@ -594,6 +577,13 @@ if __name__ == "__main__":
         if(local_fit == "final_mu"):
             #fit to the data
             res = model_mu_Final.fitTo(data_mu,R.RooFit.Constrain(R.RooArgSet(sf_tch,sf_top,sf_ewk)),R.RooFit.Extended(R.kTRUE),R.RooFit.NumCPU(4,0),R.RooFit.Save(),R.RooFit.SumW2Error(R.kTRUE))
+            #model_mu_Final.paramOn(Frame,R.RooFit.Layout(0.55, 0.85, 0.85))
+            #R.RooFit.FillColor(R.kRed),
+            #R.RooFit.Label("Global Fit parameters:"),
+            #R.RooFit.Layout(0.1, 0.4, 0.9),
+            #R.RooFit.Format("NEU", R.RooFit.AutoPrecision(1)),
+            #R.RooFit.ShowConstants())
+            #Frame.SetTextSize(0.12)
             res.Print()
 
 
@@ -610,18 +600,42 @@ if __name__ == "__main__":
             topbkg_pdf_mu.plotOn(Frame,R.RooFit.Normalization( (Ntop_mu.getVal()),R.RooAbsReal.NumEvent), R.RooFit.Name("top_mu"), R.RooFit.DrawOption("L"), R.RooFit.LineColor(R.kOrange-2), R.RooFit.LineStyle(1), R.RooFit.LineWidth(2),R.RooFit.VLines())
             EWKbkg_pdf_mu.plotOn(Frame,R.RooFit.Normalization(Newk_mu.getVal(),R.RooAbsReal.NumEvent), R.RooFit.Name("ewk_mu"), R.RooFit.DrawOption("L"), R.RooFit.LineColor(R.kGreen-2), R.RooFit.LineStyle(1), R.RooFit.LineWidth(2),R.RooFit.VLines()) 
 
-            
+            #create dummy histogram to show color in legend
+            h1 = R.TH1F("h1","h1",2,0,2)
+            h1.SetLineColor(R.kBlue)
+            h1.SetLineWidth(2)
+            h2 = R.TH1F("h2","h2",2,0,2)
+            h2.SetLineColor(R.kRed)
+            h2.SetLineWidth(2)
+            h3 = R.TH1F("h3","h3",2,0,2)
+            h3.SetLineColor(R.kOrange-2)
+            h3.SetLineWidth(2)
+            h4 = R.TH1F("h4","h4",2,0,2)
+            h4.SetLineColor(R.kGreen-2)
+            h4.SetLineWidth(2)
+
+            #add legend
+            leg.AddEntry("data_mu","Combined MC","ple1")
+            leg.AddEntry(h1,"Final Model","l")
+            leg.AddEntry(h2,"Signal PDF","l")
+            leg.AddEntry(h3,"TOP-bkg PDF","l")
+            leg.AddEntry(h4,"EWK-bkg PDF","l")
+
             pad1 = R.TPad('pad1', 'pad1', 0.0, 0.195259, 1.0, 0.990683)
             pad1.SetBottomMargin(0.089)
             pad1.SetTicky()
             pad1.SetTickx()
-            
+            #pad1.GetGridy().SetMaximum(Data.GetMaximum() * 1.2)
+            #pad1.SetRightMargin(0.143)
             pad1.Draw()
-            pad1.cd()
+            pad1.cd()		
 
             #Draw data on frame
             hist_dummy = data_mu.createHistogram("dummy",logM, R.RooFit.Binning(15)) 
             print("Integral just before ploting : ",hist_dummy.Integral())	
+            #data_mu.plotOn(Frame)
+            #Draw frame on canvas
+            #Frame.getAttText().SetTextSize(0.025)
             Frame.Draw()
             #Draw Legend
 
@@ -714,8 +728,8 @@ if __name__ == "__main__":
             pad2.Update()
             can.Update()
             #raw_input()
-            if(mass!=None):can.Print("Plots/final_model_mu_"+mass+tag+gt_or_lt_tag+".png")
-            if(width!=None):can.Print("Plots/final_model_mu_"+width+tag+gt_or_lt_tag+".png")
+            if(mass!=None):can.Print("Plots/final_model_mu_con_"+mass+tag+gt_or_lt_tag+".png")
+            if(width!=None):can.Print("Plots/final_model_mu_con_"+width+tag+gt_or_lt_tag+".png")
             #raw_input()
             #Toy_Mc(model_mu_Final,logM,mean)		
 
@@ -730,6 +744,13 @@ if __name__ == "__main__":
         if(local_fit == "final_el"):
             #fit to the data
             res = model_el_Final.fitTo(data_el,R.RooFit.Constrain(R.RooArgSet(sf_tch,sf_top,sf_ewk)),R.RooFit.Extended(R.kTRUE),R.RooFit.NumCPU(4,0),R.RooFit.Save(),R.RooFit.SumW2Error(R.kTRUE))
+            #model_el_Final.paramOn(Frame,R.RooFit.Layout(0.55, 0.85, 0.85))
+            #R.RooFit.FillColor(R.kRed),
+            #R.RooFit.Label("Global Fit parameters:"),
+            #R.RooFit.Layout(0.1, 0.4, 0.9),
+            #R.RooFit.Format("NEU", R.RooFit.AutoPrecision(1)),
+            #R.RooFit.ShowConstants())
+
             res.Print()
 
 
@@ -742,9 +763,36 @@ if __name__ == "__main__":
             topbkg_pdf_el.plotOn(Frame,R.RooFit.Normalization( (Ntop_el.getVal()),R.RooAbsReal.NumEvent ), R.RooFit.Name("top_el"), R.RooFit.DrawOption("L"), R.RooFit.LineColor(R.kOrange-2), R.RooFit.LineStyle(1), R.RooFit.LineWidth(2),R.RooFit.VLines())
             EWKbkg_pdf_el.plotOn(Frame,R.RooFit.Normalization(Newk_el.getVal(),R.RooAbsReal.NumEvent ), R.RooFit.Name("ewk_el"), R.RooFit.DrawOption("L"), R.RooFit.LineColor(R.kGreen-2), R.RooFit.LineStyle(1), R.RooFit.LineWidth(2),R.RooFit.VLines()); 
 
-            
+            #create dummy histogram to show color in legend
+            h1 = R.TH1F("h1","h1",2,0,2)
+            h1.SetLineColor(R.kBlue)
+            h1.SetLineWidth(2)
+            h2 = R.TH1F("h2","h2",2,0,2)
+            h2.SetLineColor(R.kRed)
+            h2.SetLineWidth(2)
+            h3 = R.TH1F("h3","h3",2,0,2)
+            h3.SetLineColor(R.kOrange-2)
+            h3.SetLineWidth(2)
+            h4 = R.TH1F("h4","h4",2,0,2)
+            h4.SetLineColor(R.kGreen-2)
+            h4.SetLineWidth(2)
+
+            #add legend
+            leg.AddEntry("data_el","Combined MC","ple1")
+            leg.AddEntry(h1,"Final Model","l")
+            leg.AddEntry(h2,"Signal PDF","l")
+            leg.AddEntry(h3,"TOP-bkg PDF","l")
+            leg.AddEntry(h4,"EWK-bkg PDF","l")
+
+            #Draw data on frame	
+            #data_el.plotOn(Frame)
+            #Draw frame on canvas 
+            #Frame.Draw()
+            #Draw Legend
+            #leg.Draw("SAME")
             can.Update()
-            
+            #can.GetListOfPrimitives().FindObject("gaus_paramBox").SetAttTextPS (0, 0, R.Red,11 , 17)
+            #can.GetListOfPrimitives().FindObject("gaus_paramBox").SetTextSize(10)
             pad1 = R.TPad('pad1', 'pad1', 0.0, 0.195259, 1.0, 0.990683)
             pad1.SetBottomMargin(0.089)
             pad1.SetTicky()
@@ -752,9 +800,11 @@ if __name__ == "__main__":
             #pad1.GetGridy().SetMaximum(Data.GetMaximum() * 1.2)
             #pad1.SetRightMargin(0.143)
             pad1.Draw()
-            pad1.cd()
+            pad1.cd()		
 
-            
+            #Draw data on frame	
+            #data_el.plotOn(Frame)
+            #Draw frame on canvas 
             Frame.Draw()
             #Draw Legend
             leg.Draw("SAME")
@@ -849,15 +899,10 @@ if __name__ == "__main__":
 
             #raw_input()
 
-            if(mass!=None):can.Print("Plots/final_model_el_"+mass+tag+gt_or_lt_tag+".png")
-            if(width!=None):can.Print("Plots/final_model_el_"+width+tag+gt_or_lt_tag+".png")
+            if(mass!=None):can.Print("Plots/final_model_el_con_"+mass+tag+gt_or_lt_tag+".png")
+            if(width!=None):can.Print("Plots/final_model_el_con_"+width+tag+gt_or_lt_tag+".png")
 
 
-        
-        
-        
-        
-        
         
 #########----------------------------------------------------###############------------------###########
         if(local_fit == "final"):
@@ -866,10 +911,10 @@ if __name__ == "__main__":
             sample.defineType("el")
             
             simPdf=R.RooSimultaneous("simPdf", "simultaneous pdf", sample)
-            simPdf.addPdf(model_mu_Final,"mu")
-            simPdf.addPdf(model_el_Final,"el")
-            #simPdf.addPdf(model_mu,"mu")
-            #simPdf.addPdf(model_el,"el")
+            #simPdf.addPdf(model_mu_Final,"mu")
+            #simPdf.addPdf(model_el_Final,"el")
+            simPdf.addPdf(model_mu,"mu")
+            simPdf.addPdf(model_el,"el")
             
             combData = R.RooDataHist("combData", "combined data", R.RooArgList(logM), RooFit.Index(sample), R.RooFit.Import("mu", data_mu),R.RooFit.Import("el", data_el))
 
@@ -906,7 +951,7 @@ if __name__ == "__main__":
             Frame_el.Draw() 
             
             leg.Draw()
-            if(mass!=None):can.Print("Plots/final_model_comb_"+mass+tag+gt_or_lt_tag+".png")
-            if(width!=None):can.Print("Plots/final_model_comb_"+width+tag+gt_or_lt_tag+".png")
+            if(mass!=None):can.Print("Plots/final_model_comb_con_"+mass+tag+gt_or_lt_tag+".png")
+            if(width!=None):can.Print("Plots/final_model_comb_con"+width+tag+gt_or_lt_tag+".png")
   
-            
+ 

@@ -1,0 +1,35 @@
+imax    1 number of bins
+jmax    3 number of processes minus 1
+kmax    * number of nuisance parameters
+--------------------------------------------------------------------------------
+shapes * eljets /home/mikumar/t3store/workarea/Nanoaod_tools/CMSSW_10_2_28/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_DNNFit_Input_t_ch_CAsi_histograms_UL2018_el.root eljets/$PROCESS eljets/$PROCESS_$SYSTEMATIC
+--------------------------------------------------------------------------------
+bin          eljets
+observation   -1
+--------------------------------------------------------------------------------
+bin                                     eljets                  eljets          eljets                  eljets 
+process                                 top_sig_1725_UL18       EWK_bkg_UL18    top_bkg_1725_UL18       QCD_DD_UL18
+process                                 0                       1               2                       3  
+rate                                    -1                      -1              -1                      -1 
+--------------------------------------------------------------------------------
+
+* autoMCStats 1
+
+cons_EWK_bkg            lnN             -              1.1      -               -
+cons_top_bkg            lnN             -              -        1.06            -
+cons_QCD_bkg            lnN             -              -         -              1.5
+
+elSF_Iso_ID             shape           1              1        1               0
+elSF_Iso_Trig           shape           1              1        1               0
+
+puWeight                shape           1              1        1               0
+
+bWeight_lf              shape           1              1        1               0
+bWeight_hf              shape           1              1        1               0
+bWeight_cferr1          shape           1              1        1               0
+bWeight_cferr2          shape           1              1        1               0
+bWeight_lfstats1        shape           1              1        1               0
+bWeight_lfstats2        shape           1              1        1               0
+bWeight_hfstats1        shape           1              1        1               0
+bWeight_hfstats2        shape           1              1        1               0
+bWeight_jes             shape           1              1        1               0

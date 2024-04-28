@@ -1,0 +1,36 @@
+Combination of mujets_ULpre16=datacard_DNN_hist_mu_UL2016preVFP.txt  eljets_ULpre16=datacard_DNN_hist_el_UL2016preVFP.txt
+imax 2 number of bins
+jmax 3 number of processes minus 1
+kmax 18 number of nuisance parameters
+----------------------------------------------------------------------------------------------------------------------------------
+shapes *               eljets_ULpre16  /home/mikumar/t3store/workarea/Nanoaod_tools/CMSSW_10_2_28/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_DNNFit_Input_t_ch_CAsi_histograms_UL2016preVFP_el.root eljets/$PROCESS eljets/$PROCESS_$SYSTEMATIC
+shapes *               mujets_ULpre16  /home/mikumar/t3store/workarea/Nanoaod_tools/CMSSW_10_2_28/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_DNNFit_Input_t_ch_CAsi_histograms_UL2016preVFP_mu.root mujets/$PROCESS mujets/$PROCESS_$SYSTEMATIC
+----------------------------------------------------------------------------------------------------------------------------------
+bin          mujets_ULpre16  eljets_ULpre16
+observation  -1              -1            
+----------------------------------------------------------------------------------------------------------------------------------
+bin                                   mujets_ULpre16        mujets_ULpre16        mujets_ULpre16        mujets_ULpre16        eljets_ULpre16        eljets_ULpre16        eljets_ULpre16        eljets_ULpre16      
+process                               top_sig_1725_ULpre16  EWK_bkg_ULpre16       top_bkg_1725_ULpre16  QCD_DD_ULpre16        top_sig_1725_ULpre16  EWK_bkg_ULpre16       top_bkg_1725_ULpre16  QCD_DD_ULpre16      
+process                               0                     1                     2                     3                     0                     1                     2                     3                   
+rate                                  -1                    -1                    -1                    -1                    -1                    -1                    -1                    -1                  
+----------------------------------------------------------------------------------------------------------------------------------
+bWeight_cferr1          shape         1.0                   1.0                   1.0                   -                     1.0                   1.0                   1.0                   -                   
+bWeight_cferr2          shape         1.0                   1.0                   1.0                   -                     1.0                   1.0                   1.0                   -                   
+bWeight_hf              shape         1.0                   1.0                   1.0                   -                     1.0                   1.0                   1.0                   -                   
+bWeight_hfstats1        shape         1.0                   1.0                   1.0                   -                     1.0                   1.0                   1.0                   -                   
+bWeight_hfstats2        shape         1.0                   1.0                   1.0                   -                     1.0                   1.0                   1.0                   -                   
+bWeight_jes             shape         1.0                   1.0                   1.0                   -                     1.0                   1.0                   1.0                   -                   
+bWeight_lf              shape         1.0                   1.0                   1.0                   -                     1.0                   1.0                   1.0                   -                   
+bWeight_lfstats1        shape         1.0                   1.0                   1.0                   -                     1.0                   1.0                   1.0                   -                   
+bWeight_lfstats2        shape         1.0                   1.0                   1.0                   -                     1.0                   1.0                   1.0                   -                   
+cons_EWK_bkg            lnN           -                     1.1                   -                     -                     -                     1.1                   -                     -                   
+cons_QCD_bkg            lnN           -                     -                     -                     1.5                   -                     -                     -                     1.5                 
+cons_top_bkg            lnN           -                     -                     1.06                  -                     -                     -                     1.06                  -                   
+elSF_Iso_ID             shape         -                     -                     -                     -                     1.0                   1.0                   1.0                   -                   
+elSF_Iso_Trig           shape         -                     -                     -                     -                     1.0                   1.0                   1.0                   -                   
+muSF_Iso                shape         1.0                   1.0                   1.0                   -                     -                     -                     -                     -                   
+muSF_Iso_ID             shape         1.0                   1.0                   1.0                   -                     -                     -                     -                     -                   
+muSF_Iso_Trig           shape         1.0                   1.0                   1.0                   -                     -                     -                     -                     -                   
+puWeight                shape         1.0                   1.0                   1.0                   -                     1.0                   1.0                   1.0                   -                   
+mujets_ULpre16 autoMCStats 1 0 1
+eljets_ULpre16 autoMCStats 1 0 1

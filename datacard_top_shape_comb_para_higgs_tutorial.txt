@@ -1,7 +1,7 @@
 Combination of mujets_UL18=datacard_top_shape_mu_para_UL18.txt  eljets_UL18=datacard_top_shape_el_para_UL18.txt
 imax 2 number of bins
 jmax 2 number of processes minus 1
-kmax 3 number of nuisance parameters
+kmax 0 number of nuisance parameters
 ----------------------------------------------------------------------------------------------------------------------------------
 shapes EWK_bkg      eljets_UL18  workspace_UL18.root w_UL18:EWKbkg_pdf_el
 shapes data_obs     eljets_UL18  workspace_UL18.root w_UL18:data_el
@@ -20,6 +20,11 @@ process                         top_sig      EWK_bkg      top_bkg      top_sig  
 process                         0            1            2            0            1            2          
 rate                            1            1            1            1            1            1          
 ----------------------------------------------------------------------------------------------------------------------------------
-cons_EWK_bkg            lnN     -            1.1          -            -            1.1          -          
-cons_top_bkg            lnN     -            -            1.06         -            -            1.06       
-cons_top_sig            lnN     1.16         -            -            1.16         -            -          
+sf_ewk        rateParam mujets_UL18 EWK_bkg 1 [0.1,5.0]
+sf_top        rateParam mujets_UL18 top_bkg 1 [0.1,5.0]
+sf_tch        rateParam mujets_UL18 top_sig 1 [0.1,5.0]
+sf_ewk        rateParam eljets_UL18 EWK_bkg 1 [0.1,5.0]
+sf_top        rateParam eljets_UL18 top_bkg 1 [0.1,5.0]
+sf_tch        rateParam eljets_UL18 top_sig 1 [0.1,5.0]
+
+#cons_top_sig            lnN     1.16         -            -            -            -            -          

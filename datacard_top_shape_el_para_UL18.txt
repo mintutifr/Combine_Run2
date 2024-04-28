@@ -12,14 +12,19 @@ observation    -1
 ----------------------------------------------------------------------------------------------------------------------------------
 bin                             eljets   eljets   eljets   
 process                         top_sig  EWK_bkg  top_bkg 
-process                         0        1        2          
-rate                            1        1        1           
+process                          0         1          2          
+rate                             1         1         1           
 ----------------------------------------------------------------------------------------------------------------------------------
-cons_EWK_bkg            lnN     -        1.1      -             
-cons_top_bkg            lnN     -        -        1.06    
-cons_top_sig            lnN     1.16     -        -     
+sf_top   rateParam eljets top_bkg 1 [0.1,5.0] 
+sf_ewk   rateParam eljets EWK_bkg 1 [0.1,5.0]
+#sf_sig   rateParam eljets top_sig 1 [0.1,5.0]
+
+#cons_EWK_bkg            lnN      -        1.1        -             
+#cons_top_bkg            lnN      -         -        1.06    
+#cons_top_sig            lnN     1.16       -         -     
  
-#rate_topbkg   rateParam mujets top_bkg 1 [-1.0,5.0] 
-#rate_sig      rateParam mujets top_sig 1 [-1.0,5.0] 
-#rate_EWKbkg   rateParam mujets EWK_bkg 1 [-1.0,5.0] 
+#eljets autoMCStats 0 0 1
+#rate_sig      rateParam eljets top_sig 1 [-1.0,5.0] 
+
+
  

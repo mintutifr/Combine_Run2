@@ -45,13 +45,13 @@ def getcons(mass,width):
 
 def getprefit_hist(mass,width,lep):
     hists = []
-    Filename = "/home/mikumar/t3store/workarea/Nanoaod_tools/CMSSW_10_2_28/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_"+lep+"_gteq0p7_withDNNfit_rebin.root"
-    Filename_cont = "/home/mikumar/t3store/workarea/Nanoaod_tools/CMSSW_10_2_28/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_"+lep+"_gteq0p3_withDNNfit_rebin.root"
+    Filename = "/home/mikumar/t3store/workarea/Nanoaod_tools/CMSSW_10_2_28/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_"+lep+"_lt0p7gteq0p5_withoutDNNfit_rebin.root"
+    Filename_cont = "/home/mikumar/t3store/workarea/Nanoaod_tools/CMSSW_10_2_28/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_"+lep+"_gteq0p3_withoutDNNfit_rebin.root"
     File = rt.TFile(Filename,"Read")
     File_cont = rt.TFile(Filename_cont,"Read")
     gt_or_lt_tag=''
-    if('gteq' in Filename):gt_or_lt_tag = '_gt'
-    if('lt' in Filename):gt_or_lt_tag = '_lt'   
+    if('gteq' in Filename):gt_or_lt_tag = gt_or_lt_tag+'_gt'
+    if('lt' in Filename):gt_or_lt_tag = gt_or_lt_tag+'_lt'   
         #Data Vs Mc Condition
     rt.gROOT.cd()
     #Get the file and director where historgrams are stored for muon final state
@@ -62,10 +62,10 @@ def getprefit_hist(mass,width,lep):
         top_sig = Dir.Get("top_sig_"+mass+tag+gt_or_lt_tag) 
     if(width!=None):
         top_sig = Dir.Get("top_sig_"+width+tag+gt_or_lt_tag)#+width)
-        
+    print("top_bkg_1725"+tag+gt_or_lt_tag)
     top_bkg = Dir.Get("top_bkg_1725"+tag+gt_or_lt_tag)
     EWK_bkg = Dir.Get("EWK_bkg"+tag+gt_or_lt_tag)
-    EWK_bkg_cont = Dir_cont.Get("EWK_bkg"+tag+gt_or_lt_tag)
+    EWK_bkg_cont = Dir_cont.Get("EWK_bkg"+tag+"_gt")
     EWK_bkg_cont.Scale(EWK_bkg.Integral()/EWK_bkg_cont.Integral())
     EWK_bkg = EWK_bkg_cont.Clone()
     QCD = Dir.Get("QCD_DD"+tag+gt_or_lt_tag)
@@ -109,8 +109,8 @@ def Get_hist_from_Tgraph_asy_Error(Tgraph,Hist):
 def getthefit(mass,width,lep):
     if(mass!=None):fitfile = rt.TFile.Open("fitDiagnostics_M"+mass+".root")
     else : fitfile = rt.TFile.Open("fitDiagnostics_W"+width+".root")
-    print(lep+"jets"+tag+"_logM_fit_s")
-    fit = fitfile.Get(lep+"jets"+tag+"_logM_fit_s")
+    print(lep+"jets"+tag+"_con_logM_fit_s")
+    fit = fitfile.Get(lep+"jets"+tag+"_con_logM_fit_s")
     fit.Print()
     prefit_hists = getprefit_hist(mass,width,lep) #return top_sig,topbkg,EWK_bkg
     rt.gROOT.cd()
@@ -120,19 +120,13 @@ def getthefit(mass,width,lep):
     
     Data_prefit_from_input_file_saved_as_data = prefit_hists[4].Clone()  
     
-    prefit_total = fitfile.Get("shapes_prefit/"+lep+"jets"+tag+"/total")
+    prefit_total = fitfile.Get("shapes_prefit/"+lep+"jets"+tag+"_con/total")
     prefit_total.Print()
-    print("comapare higgs combine and input histogram : ======================")
-    for Bin in range(1,prefit_total.GetNbinsX()+1):
-        print(Bin,prefit_total.GetBinContent(Bin),Data_prefit_from_input_file_saved_as_data.GetBinContent(Bin),prefit_total.GetBinContent(Bin)/Data_prefit_from_input_file_saved_as_data.GetBinContent(Bin)) #*prefit_total.GetBinWidth(Bin)
-        #prefit_total.SetBinContent(Bin,prefit_total.GetBinContent(Bin)*prefit_total.GetBinWidth(Bin))
-        
-    print("comaparision done : ======================")
     
-    prefit_data_TError = fitfile.Get("shapes_prefit/"+lep+"jets"+tag+"/data")#.GetHistogram()
+    prefit_data_TError = fitfile.Get("shapes_prefit/"+lep+"jets"+tag+"_con/data")#.GetHistogram()
     #prefit_data_TError.Print()
     
-    prefit_signal = fitfile.Get("shapes_prefit/"+lep+"jets"+tag+"/top_sig")#.GetHistogram()
+    prefit_signal = fitfile.Get("shapes_prefit/"+lep+"jets"+tag+"_con/top_sig_con")#.GetHistogram()
     
     nbin = prefit_total.GetXaxis().GetNbins()
     ledge = prefit_total.GetXaxis().GetXmin()
@@ -140,7 +134,6 @@ def getthefit(mass,width,lep):
     
     Data_prefit = rt.TH1D('Data_refit_hist', '', nbin, ledge, uedge)
     Data_prefit = Get_hist_from_Tgraph_asy_Error(prefit_data_TError,Data_prefit_from_input_file)
-    #Data_prefit = Data_prefit_from_input_file_saved_as_data
     Match_hist_from_Tgraph_asy_Error(prefit_hists[0],prefit_signal)
     print("================================")
     Data_prefit.Print()
@@ -154,12 +147,12 @@ def getthefit(mass,width,lep):
     Data_prefit.Print()
   
     
-    Data_postfit_roohist = fit.findObject("h_"+lep+"jets"+tag)
+    Data_postfit_roohist = fit.findObject("h_"+lep+"jets"+tag+"_con")
     #Data_postfit_roohist.SetFillCOlor(R.kRed)
-    ResultPDF = fit.findObject("pdf_bin"+lep+"jets"+tag+"_Norm[logM]")
-    ResultPDF_error = fit.findObject("pdf_bin"+lep+"jets"+tag+"_Norm[logM]_errorband")
-    SigPDF = fit.findObject("pdf_bin"+lep+"jets"+tag+"_Norm[logM]_Comp[shapeSig*]")
-    BkgPDF = fit.findObject("pdf_bin"+lep+"jets"+tag+"_Norm[logM]_Comp[shapeBkg*]")
+    ResultPDF = fit.findObject("pdf_bin"+lep+"jets"+tag+"_con_Norm[logM]")
+    ResultPDF_error = fit.findObject("pdf_bin"+lep+"jets"+tag+"_con_Norm[logM]_errorband")
+    SigPDF = fit.findObject("pdf_bin"+lep+"jets"+tag+"_con_Norm[logM]_Comp[shapeSig*]")
+    BkgPDF = fit.findObject("pdf_bin"+lep+"jets"+tag+"_con_Norm[logM]_Comp[shapeBkg*]")
     
     """if(mass!=None):fitfile = rt.TFile.Open("fitDiagnostics_M"+mass+".root")
     else : fitfile = rt.TFile.Open("fitDiagnostics_width"+width+".root")
@@ -181,7 +174,7 @@ def getthefit(mass,width,lep):
     legend.SetLineStyle(1)
     legend.SetLineWidth(1)
     legend.SetFillColor(0)
-    legend.SetFillStyle(0)
+    legend.SetFillStyle(1001)
     #legend.SetHeader("beNDC", "C")
     legend.AddEntry(Data_prefit, "QCD Substr. MC", "ple1")
     legend.AddEntry(ResultPDF, "Fit.", "l")
@@ -212,7 +205,6 @@ def getthefit(mass,width,lep):
 
     Data_prefit.SetTitle("")
     Data_prefit.Draw("P")
-    prefit_total.Draw("same")
     #prefit_data_hist.Draw("P")
     
     #Data_postfit_roohist.Draw("same;P")
@@ -220,6 +212,7 @@ def getthefit(mass,width,lep):
     ResultPDF.Draw("same")
     SigPDF.Draw("same")
     BkgPDF.Draw("same")
+    legend.Draw("same")
     yeartag = year_tag(dataYear,0.82,0.92,0.90,0.95)
     cmstext = getCMSInt_tag(0.33, 0.86, 0.38, 0.88)
     finalstate = leptonjet_tag(lep,0.24,0.81,0.37,0.83)
@@ -227,7 +220,6 @@ def getthefit(mass,width,lep):
     cmstext.Draw()
     finalstate.Draw()
     yeartag.Draw()
-    legend.Draw()
     can.Update()
 
     can.cd()
@@ -241,7 +233,7 @@ def getthefit(mass,width,lep):
     pad2.cd()
 
     rt.gROOT.cd()
-    Data_postfit_fitdignostics = fitfile.Get("shapes_fit_s/"+lep+"jets"+tag+"/total") # this is done because if we use it dictrly in trgraph Ass error is shows error
+    Data_postfit_fitdignostics = fitfile.Get("shapes_fit_s/"+lep+"jets"+tag+"_con/total") # this is done because if we use it dictrly in trgraph Ass error is shows error
     #Data_postfit_fitdignostics = fitfile.Get("shapes_fit_s/"+lep+"jets/total")
     print("Data_postfit info from fitdigonistic ")
     Data_postfit_fitdignostics.Print()
@@ -308,11 +300,11 @@ def getthefit(mass,width,lep):
     can.Update()
     #raw_input()
     if(mass!=None):
-        can.Print("Plots/Final_combine_fit_Control_"+mass+"_"+dataYear+"_"+lep+".png")
-        can.Print("Plots/Final_combine_fit_Control_"+mass+"_"+dataYear+"_"+lep+".pdf")
+        can.Print("Plots/Final_combine_fit_Control_"+mass+"_"+dataYear+"_"+lep+"_con.png")
+        can.Print("Plots/Final_combine_fit_Control_"+mass+"_"+dataYear+"_"+lep+"_con.pdf")
     if(width!=None):
-        can.Print("Plots/Final_combine_fit_Control_"+width+"_"+dataYear+"_"+lep+".png")
-        can.Print("Plots/Final_combine_fit_Control_"+width+"_"+dataYear+"_"+lep+".pdf")
+        can.Print("Plots/Final_combine_fit_Control_"+width+"_"+dataYear+"_"+lep+"_con.png")
+        can.Print("Plots/Final_combine_fit_Control_"+width+"_"+dataYear+"_"+lep+"_con.pdf")
 def getparams(mass,width):
     if(mass!=None): fitfile = rt.TFile.Open("fitDiagnostics_M"+mass+".root")
     else : fitfile = rt.TFile.Open("fitDiagnostics_W"+width+".root")
