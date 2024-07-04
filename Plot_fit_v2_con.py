@@ -33,20 +33,20 @@ def getcons(mass,width):
         roofitResults = fitfile.Get("fit_s")
 
         cons_top_sig = (roofitResults.floatParsFinal()).find("cons_EWK_bkg")
-        print "cons_top_sig : ",cons_top_sig.getVal()," Error : ",cons_top_sig.getError()
+        print("cons_top_sig : ",cons_top_sig.getVal()," Error : ",cons_top_sig.getError())
 
         cons_top_bkg = (roofitResults.floatParsFinal()).find("cons_top_bkg")
-        print "cons_top_bkg : ",cons_top_bkg.getVal()," Error : ",cons_top_bkg.getError()
+        print("cons_top_bkg : ",cons_top_bkg.getVal()," Error : ",cons_top_bkg.getError())
 
         cons_EWK_bkg = (roofitResults.floatParsFinal()).find("cons_EWK_bkg")
-        print "cons_EWK_bkg : ",cons_EWK_bkg.getVal()," Error : ",cons_EWK_bkg.getError()
+        print("cons_EWK_bkg : ",cons_EWK_bkg.getVal()," Error : ",cons_EWK_bkg.getError())
 
         return cons_top_sig.getVal(),cons_top_bkg.getVal(),cons_top_bkg.getVal()
 
 def getprefit_hist(mass,width,lep):
     hists = []
-    Filename = "/home/mikumar/t3store/workarea/Nanoaod_tools/CMSSW_10_2_28/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_"+lep+"_lt0p7gteq0p5_withoutDNNfit_rebin.root"
-    Filename_cont = "/home/mikumar/t3store/workarea/Nanoaod_tools/CMSSW_10_2_28/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_"+lep+"_gteq0p3_withoutDNNfit_rebin.root"
+    Filename = "/feynman/home/dphp/mk277705/work/HiggsCombine/CMSSW_12_3_4/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace//Combine_Input_lntopMass_histograms_"+dataYear+"_"+lep+"_lt0p7gteq0p5_withoutDNNfit_rebin.root"
+    Filename_cont = "/feynman/home/dphp/mk277705/work/HiggsCombine/CMSSW_12_3_4/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_"+lep+"_gteq0p3_withoutDNNfit_rebin.root"
     File = rt.TFile(Filename,"Read")
     File_cont = rt.TFile(Filename_cont,"Read")
     gt_or_lt_tag=''
@@ -273,7 +273,8 @@ def getthefit(mass,width,lep):
         cont_prefit = Data_prefit.GetBinContent(iBin)
         cont_postfit = Data_postfit.GetBinContent(iBin)
         #h_ratio.SetBinContent(i,(Data_prefit.GetBinContent(i)-Data_postfit.GetBinContent(i))/math.sqrt(error_prefit*error_prefit+error_postfit*error_postfit))
-        sigma_pull = rt.TMath.Sqrt( abs(error_prefit*error_prefit - error_postfit*error_postfit) )
+        #sigma_pull = rt.TMath.Sqrt( abs(error_prefit*error_prefit - error_postfit*error_postfit))
+        sigma_pull = error_prefit
         pull= ( cont_prefit - cont_postfit )/ sigma_pull
         pull_err = ( error_postfit-error_prefit )/ sigma_pull
         #print(pull," : ", pull_err, " : ",sigma_pull, " : ",  cont_prefit - cont_postfit)
@@ -293,6 +294,7 @@ def getthefit(mass,width,lep):
     h_ratio.GetXaxis().SetTitleSize(0.12)
     h_ratio.GetYaxis().SetLabelSize(0.07)
     h_ratio.GetXaxis().SetLabelSize(0.1)
+    h_ratio.GetYaxis().SetRangeUser(-3,3)
 
 
 
@@ -311,10 +313,10 @@ def getparams(mass,width):
     roofitResults = fitfile.Get("fit_s")
 
     mean = (roofitResults.floatParsFinal()).find("mean")
-    print "mean : ",mean.getVal()," Error : ",mean.getError()
+    print("mean : ",mean.getVal()," Error : ",mean.getError())
 
     Sigma = (roofitResults.floatParsFinal()).find("sigmaG")
-    print "Sigma : ",Sigma.getVal()," Error : ",Sigma.getError()
+    print("Sigma : ",Sigma.getVal()," Error : ",Sigma.getError())
 
 if __name__ == "__main__":
     getthefit(mass,width,"mu")

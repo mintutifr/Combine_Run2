@@ -65,7 +65,7 @@ def GetCons_fromJson(jsonfile):
                      }
                 }
         for category in ["top_sig","top_bkg","EWK_bkg","QCD_bkg"]:
-                print category," ", cons_N_Er['cons_val'][category],"  ",cons_N_Er['cons_Error'][category]
+                print(category," ", cons_N_Er['cons_val'][category],"  ",cons_N_Er['cons_Error'][category])
         return cons_N_Er
 
 
@@ -78,16 +78,16 @@ def getcons(File,lep):
         roofitResults = fitfile.Get("fit_s")
 
         cons_top_sig = (roofitResults.floatParsFinal()).find("r")
-        print "cons_top_sig : ",cons_top_sig.getVal()," Error : ",cons_top_sig.getError()
+        print("cons_top_sig : ",cons_top_sig.getVal()," Error : ",cons_top_sig.getError())
 
         cons_top_bkg = (roofitResults.floatParsFinal()).find("cons_top_bkg")
-        print "cons_top_bkg : ",cons_top_bkg.getVal()," Error : ",cons_top_bkg.getError()
+        print("cons_top_bkg : ",cons_top_bkg.getVal()," Error : ",cons_top_bkg.getError())
 
         cons_EWK_bkg = (roofitResults.floatParsFinal()).find("cons_EWK_bkg")
-        print "cons_EWK_bkg : ",cons_EWK_bkg.getVal()," Error : ",cons_EWK_bkg.getError()
+        print("cons_EWK_bkg : ",cons_EWK_bkg.getVal()," Error : ",cons_EWK_bkg.getError())
 
         cons_QCD_bkg = (roofitResults.floatParsFinal()).find("cons_QCD_bkg")
-        print "cons_QCD_bkg : ",cons_QCD_bkg.getVal()," Error : ",cons_QCD_bkg.getError()
+        print("cons_QCD_bkg : ",cons_QCD_bkg.getVal()," Error : ",cons_QCD_bkg.getError())
         
         cons_N_Er = {"cons_val":{"top_sig": cons_top_sig.getVal(),
                       "top_bkg": cons_top_bkg.getVal(),
@@ -101,12 +101,12 @@ def getcons(File,lep):
                          }
                 }
         for category in ["top_sig","top_bkg","EWK_bkg","QCD_bkg"]:
-                print category," ", cons_N_Er['cons_val'][category],"  ",cons_N_Er['cons_Error'][category]
+                print(category," ", cons_N_Er['cons_val'][category],"  ",cons_N_Er['cons_Error'][category])
         return cons_N_Er
 
-def getprefit_hist(mass,lep,year):
+def getprefit_hist(mass,lep,year,Combine_year_tag):
         hists = []
-        Filename = R.TFile("/home/mikumar/t3store/workarea/Nanoaod_tools/CMSSW_10_2_28/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_DNNFit_Input_t_ch_CAsi_histograms_"+year+"_"+lep+".root","Read")
+        Filename = R.TFile("/feynman/home/dphp/mk277705/work/HiggsCombine/CMSSW_12_3_4/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_DNNFit_Input_t_ch_CAsi_histograms_"+year+"_"+lep+".root","Read")
         
         #Data Vs Mc Condition
         R.gROOT.cd()
@@ -114,10 +114,11 @@ def getprefit_hist(mass,lep,year):
         Dir = Filename.GetDirectory(lep+"jets")
         #Get Mc histograms for muon final state
         if(mass!=None):
-                top_sig = Dir.Get("top_sig_"+mass)
-                top_bkg = Dir.Get("top_bkg_"+mass)
-                EWK_bkg = Dir.Get("EWK_bkg")
-                QCD = Dir.Get("QCD_DD")
+                tag = Combine_year_tag[year]
+                top_sig = Dir.Get("top_sig_"+mass+tag)
+                top_bkg = Dir.Get("top_bkg_"+mass+tag)
+                EWK_bkg = Dir.Get("EWK_bkg"+tag)
+                QCD = Dir.Get("QCD_DD"+tag)
 
                 hists.append(top_sig.Clone())
                 hists.append(top_bkg.Clone())
@@ -143,12 +144,12 @@ def getthefit(mass,lep,year,fitdignostic):
                 'UL2016postVFP' : "_ULpost16",
                 'UL2017' : "_UL17",
                 'UL2018' : "_UL18"} 
-        prefit_hists = getprefit_hist(mass,lep,year) #return top_sig,topbkg,EWK_bkg
+        prefit_hists = getprefit_hist(mass,lep,year,Combine_year_tag) #return top_sig,topbkg,EWK_bkg
         R.gROOT.cd()
         Data_prefit = prefit_hists[0].Clone()  
         if(mass!=None):
-	        Data_prefit.Add(prefit_hists[1])
-	        Data_prefit.Add(prefit_hists[2])
+                Data_prefit.Add(prefit_hists[1])
+                Data_prefit.Add(prefit_hists[2])
                 Data_prefit.Add(prefit_hists[3])
         Data_prefit.SetName("Data_prefit")
         Data_prefit.SetLineColor(R.kBlack)
@@ -429,18 +430,18 @@ def getthefit(mass,lep,year,fitdignostic):
 
 
 
-	#raw_input()
-	can.Print("Plots/Final_combine_DNNfit_Control_data_"+year+"_"+lep+".png")
-	can.Print("Plots/Final_combine_DNNfit_Control_data_"+year+"_"+lep+".pdf")
+        #raw_input()
+        can.Print("Plots/Final_combine_DNNfit_Control_data_"+year+"_"+lep+".png")
+        can.Print("Plots/Final_combine_DNNfit_Control_data_"+year+"_"+lep+".pdf")
 def getparams(mass):
 	fitfile = R.TFile.Open("fitDiagnostics_M"+mass+".root")
 	roofitResults = fitfile.Get("fit_s")
 	
 	mean = (roofitResults.floatParsFinal()).find("mean")
-	print "mean : ",mean.getVal()," Error : ",mean.getError()
+	print("mean : ",mean.getVal()," Error : ",mean.getError())
 
 	Sigma = (roofitResults.floatParsFinal()).find("sigmaG")
-	print "Sigma : ",Sigma.getVal()," Error : ",Sigma.getError()
+	print("Sigma : ",Sigma.getVal()," Error : ",Sigma.getError())
 
 if __name__ == "__main__":
         parser = arg.ArgumentParser(description='Create workspace for higgs combine')
@@ -455,8 +456,8 @@ if __name__ == "__main__":
         dataYear = args.Year[0]
         Fitdignostic_outFile = args.fitdignostic_outFile[0]
 
-	getthefit(mass,"mu",year=dataYear,fitdignostic=Fitdignostic_outFile)
-	getthefit(mass,"el",year=dataYear,fitdignostic=Fitdignostic_outFile)
+        getthefit(mass,"mu",year=dataYear,fitdignostic=Fitdignostic_outFile)
+        getthefit(mass,"el",year=dataYear,fitdignostic=Fitdignostic_outFile)
 	#getparams(mass)
 	#getcons(mass)
 	#prefit_hist = getprefit_hist(mass,"mu")
