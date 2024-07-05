@@ -209,20 +209,6 @@ def getthefit(mass,lep,year,fitdignostic):
         ResultFitHist_Mc_unct_prop.Add(EWKBkgFitHist_Mc);   EWKBkgFitHist_Mc.Print();#print(EWKBkgFitHist_Mc.Integral())
         ResultFitHist_Mc_unct_prop.Add(QCDBkgFitHist_Mc);   QCDBkgFitHist_Mc.Print();#print(QCDBkgFitHist_Mc.Integral())
 
-        """DNN_postfit_Norm = {lep :{
-                                year:{
-                                        "top_sig_1725": TopSigFitHist_Mc.Integral(),
-                                        "top_bkg_1725": TopBkgFitHist_Mc.Integral(),
-                                        "EWK_bkg": EWKBkgFitHist_Mc.Integral(),
-                                        "QCD_DD": QCDBkgFitHist_Mc.Integral()
-                                        }
-                                }
-                           }
-        for category in ["top_sig_1725","top_bkg_1725","EWK_bkg","QCD_DD"]:
-               print lep," ",category," ", DNN_postfit_Norm[lep][year][category]
-               print Norm_and_error_from_fit[lep+'jets'][category]['S+B-Fit']['Norm']
-        print(DNN_postfit_Norm)"""
-         
         QCDBkgFitHist_Mc.SetFillColor(R.kGray)
         QCDBkgFitHist_Mc.SetLineColor(R.kGray)
         EWKBkgFitHist_Mc.SetFillColor(R.kGreen+2)
@@ -241,10 +227,10 @@ def getthefit(mass,lep,year,fitdignostic):
         MC_error_band = QCDBkgFitHist_Mc.Clone(); MC_error_band.Add(EWKBkgFitHist_Mc)
         MC_error_band.Add(TopBkgFitHist_Mc); MC_error_band.Add(TopSigFitHist_Mc)       
         MC_error_band.SetFillColor(rt.kGray+3)
-        MC_error_band.SetFillStyle(3018)
+        MC_error_band.SetFillStyle(3354)
  
         ResultFitHist_total = fitfile.Get("shapes_fit_s/"+lep+"jets"+tag+"/total");
-        ResultFitHist_total=Rebase_Xaxies_scale(ResultFitHist_total,ResultFitHist_Mc_unct_prop)
+        ResultFitHist_total=Rebase_Xaxies_scale(ResultFitHist_total,ResultFitHist_total)#ResultFitHist_Mc_unct_prop)
         del ResultFitHist_Mc_unct_prop
         del tag
         ResultFitHist_total.SetLineColor(R.kBlue)
@@ -275,7 +261,7 @@ def getthefit(mass,lep,year,fitdignostic):
         can = R.TCanvas("can","can",800,700)
         R.gStyle.SetOptStat(0)
         can.cd()
-        R.gStyle.SetErrorX(0)
+        #R.gStyle.SetErrorX(0)
         R.TGaxis.SetMaxDigits(3)
 
         pad1 = R.TPad('pad1', 'pad1', 0.0, 0.195259, 1.0, 0.990683)
@@ -346,22 +332,20 @@ def getthefit(mass,lep,year,fitdignostic):
         R.gROOT.cd()
  
 
-        #h_ratio = R.TGraphAsymmErrors(ResultFitHist_total, ResultFitHist_total, 'pois')
-        #print h_ratio.GetN()
-
         nbin = Data_prefit.GetXaxis().GetNbins()
         ledge = Data_prefit.GetXaxis().GetXmin()
         uedge = Data_prefit.GetXaxis().GetXmax()
         BINS = [0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,1.0]
         print("redefine assymatic histogram bins ", BINS)
         h_ratio = R.TH1F('h_ratio', '', len(BINS)-1,np.array(BINS))
-        for iBin in range(1,nbin+1):
+        """for iBin in range(1,nbin+1):
                 error_prefit = Data_prefit.GetBinError(iBin)
                 error_postfit = ResultFitHist_total.GetBinError(iBin)
                 cont_prefit = Data_prefit.GetBinContent(iBin)
                 cont_postfit = ResultFitHist_total.GetBinContent(iBin)
                 #h_ratio.SetBinContent(i,(Data_prefit.GetBinContent(i)-ResultFitHist_total.GetBinContent(i))/math.sqrt(error_prefit*error_prefit+error_postfit*error_postfit))
-                sigma_pull = R.TMath.Sqrt( R.TMath.Abs(error_prefit*error_prefit - error_postfit*error_postfit ))
+                #sigma_pull = R.TMath.Sqrt( R.TMath.Abs(error_prefit*error_prefit - error_postfit*error_postfit ))
+                sigma_pull = error_prefit
                 pull= ( cont_postfit-cont_prefit) / sigma_pull
                 pull_err = ( error_prefit - error_postfit )/ sigma_pull
                 #print(error_prefit, error_postfit, sigma_pull)
@@ -392,47 +376,81 @@ def getthefit(mass,lep,year,fitdignostic):
         c.SetTickSize(0.01);
 
         h_ratio.Draw("hist")
-        can.Update()
+        can.Update()"""
 
-        """Ratio_hist= R.TGraphAsymmErrors(ResultFitHist_total, ResultFitHist_total,"pois")
+        Ratio_hist = rt.TGraphAsymmErrors(Data_prefit,ResultFitHist_total, "pois")
         axis = Ratio_hist.GetXaxis()
-        axis.SetLimits(ResultFitHist_total.GetXaxis().GetXmin(),ResultFitHist_total.GetXaxis().GetXmax())
+        axis.SetLimits(Data_prefit.GetXaxis().GetXmin(), Data_prefit.GetXaxis().GetXmax())
         Ratio_hist.SetMarkerColor(1)
         Ratio_hist.SetMarkerStyle(20)
         Ratio_hist.SetMarkerSize(0.89)
-        Ratio_hist.SetLineColor(kBlack)
+        Ratio_hist.SetLineColor(rt.kBlack)
 
-        #Draw Uncertanity band
-        TH1F* dummyData;
-        dummyData=(TH1F*)h[15]->Clone();
-        dummyData->Divide(hMC);
-        nBin=dummyData->GetXaxis()->GetNbins();
-        lEdge=dummyData->GetXaxis()->GetXmin();
-        uEdge=dummyData->GetXaxis()->GetXmax();
-        TString bandTitle="Band_"+Variable;
+        # Draw Uncertainty band
+        dummyData = Data_prefit.Clone()
+        dummyData.Divide(ResultFitHist_total)
+        nBin = dummyData.GetXaxis().GetNbins()
+        lEdge = dummyData.GetXaxis().GetXmin()
+        uEdge = dummyData.GetXaxis().GetXmax()
+        bandTitle = "Band_" + Variable
 
-        band=new TH1F(bandTitle,"",nBin,lEdge,uEdge);gStyle->SetOptStat(0);
-        for(int nn=0; nn<=nBin; nn++){
-                band->SetBinContent(nn+1,1.0);  // nn+1 because 0-th bin is the underflow bin.
+        band = rt.TH1F(bandTitle, "", nBin, lEdge, uEdge)
+        rt.gStyle.SetOptStat(0)
 
-                if( hMC->GetBinContent(nn+1)!=0 && h[15]->GetBinContent(nn+1)!=0 ){
-                    err=(hMC->GetBinError(nn+1))*(dummyData->GetBinContent(nn+1))/hMC->GetBinContent(nn+1);
-                }
-                else{
-                    if(h[15]->GetBinContent(nn+1)==0 && hMC->GetBinContent(nn+1)!=0 ) err = (hMC->GetBinError(nn+1))/hMC->GetBinContent(nn+1);
-                    else err=0.0;
-                }
-                band->SetBinError(nn+1,err);
-        }
-        band->SetFillColor(kGray+3);
-        band->SetFillStyle(3018);
-        band->GetYaxis()->SetTitle("Data/MC");"""        
 
+
+        for nn in range(nBin):
+            band.SetBinContent(nn + 1, 1.0)
+
+            if ResultFitHist_total.GetBinContent(nn + 1) != 0 and Data_prefit.GetBinContent(nn + 1) != 0:
+                err = (ResultFitHist_total.GetBinError(nn + 1)) * (dummyData.GetBinContent(nn + 1))  / ResultFitHist_total.GetBinContent(nn + 1)
+                A = Data_prefit.GetBinContent(nn + 1)
+                B = ResultFitHist_total.GetBinContent(nn + 1)
+                SA = Data_prefit.GetBinError(nn + 1)
+                SB = ResultFitHist_total.GetBinError(nn + 1)
+                err = dummyData.GetBinContent(nn + 1)*R.TMath.Sqrt( (SA*SA)/(A*A)+(SB*SB)/(B*B) )
+                print(err)
+            else:
+                if ata_prefit.GetBinContent(nn + 1) == 0 and ResultFitHist_total.GetBinContent(nn + 1) != 0:
+                    err = (ResultFitHist_total.GetBinError(nn + 1)) / ResultFitHist_total.GetBinContent(nn + 1)
+                else:
+                    err = 0.0
+            band.SetBinError(nn + 1, err)
+
+        band.SetFillColor(rt.kGray + 3)
+        band.SetFillStyle(3354)
+        band.GetYaxis().SetTitle("#frac{Data}{Fit}")
+        band.GetYaxis().CenterTitle(1)
+        band.GetYaxis().SetTitleOffset(0.4)
+        band.GetYaxis().SetLabelSize(0.12)
+        band.GetYaxis().SetLabelFont(42)
+        band.GetXaxis().SetTitle("DNN Score (Corr. Assign Signal)")
+        band.GetXaxis().SetLabelSize(0.1)
+        band.GetXaxis().SetLabelFont(42)
+        band.GetYaxis().SetTitleSize(0.12)
+        band.GetXaxis().SetTitleSize(0.12)
+        band.GetXaxis().SetLabelSize(0.125)
+        band.GetXaxis().SetLabelFont(42)
+
+        band.SetMaximum(1.545665)
+        band.SetMinimum(0.464544)
+        c = band.GetYaxis()
+        c.SetNdivisions(10)
+        c.SetTickSize(0.01)
+        d = band.GetXaxis()
+        d.SetNdivisions(10)
+        d.SetTickSize(0.03)
+
+        band.Draw("E2")
+        Ratio_hist.Draw("PE1SAME")
+
+        can.Update()
 
 
         #raw_input()
         can.Print("Plots/Final_combine_DNNfit_Control_data_"+year+"_"+lep+".png")
         can.Print("Plots/Final_combine_DNNfit_Control_data_"+year+"_"+lep+".pdf")
+
 def getparams(mass):
 	fitfile = R.TFile.Open("fitDiagnostics_M"+mass+".root")
 	roofitResults = fitfile.Get("fit_s")
