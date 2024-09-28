@@ -1,7 +1,7 @@
 import fileinput, string, sys, os, time, subprocess
 import argparse as arg
 import ROOT as rt
-
+import numpy
 parser = arg.ArgumentParser(description='Run Higgs combine Tool')
 parser.add_argument('-m', '--mass', dest='mass_sample', default=[None], type=str, nargs=1, help="is Alternate MC top mass sample used ['data','1695', '1715', '1725', '1735', '1755']")
 parser.add_argument('-w', '--width', dest='width_sample', default=[None], type=str, nargs=1, help="is Altrnate MC top width sample used ['data','190','170','150','130','090','075']")
@@ -73,7 +73,7 @@ for Mass in mass_point:
     
 
 
-    cmd_RunCombine = "combine -M FitDiagnostics workspace_top_Mass_"+Mass+"_shape_comb_para.root -n _M"+Mass+"  --redefineSignalPOIs sigmaG,mean  --setParameters mean=5.1,r=1,sigmaG=0.15 --freezeParameters r --X-rtd ADDNLL_CBNLL=0  --trackParameters r,mean,sigmaG --trackErrors r,mean,sigmaG --X-rtd TMCSO_AdaptivePseudoAsimov=0 --X-rtd TMCSO_PseudoAsimov=0  --plots  --saveShapes --saveWithUncertainties --saveWorkspace"
+    cmd_RunCombine = "combine -M FitDiagnostics workspace_top_Mass_"+Mass+"_shape_comb_para.root -n _M"+Mass+"  --redefineSignalPOIs sigmaG,mean  --setParameters mean=5.1,r=1,sigmaG=0.15 --freezeParameters r --X-rtd ADDNLL_CBNLL=0  --trackParameters r,mean,sigmaG --trackErrors r,mean,sigmaG --X-rtd TMCSO_PseudoAsimov=0  --plots  --saveShapes --saveWithUncertainties --saveWorkspace"
 
     #cmd_RunCombine = "combine -M FitDiagnostics workspace_top_Mass_"+Mass+"_shape_comb_para.root -n _M"+Mass+"  --freezeParameters r --redefineSignalPOIs sigmaG,mean  --setParameters mean=5.1,r=1,sigmaG=0.15  --X-rtd ADDNLL_CBNLL=0  --trackParameters mean,sigmaG --trackErrors mean,sigmaG --X-rtd TMCSO_AdaptivePseudoAsimov=0 --X-rtd TMCSO_PseudoAsimov=0  --plots  --saveShapes --saveWithUncertainties --saveWorkspace"
     
@@ -97,17 +97,17 @@ for Mass in mass_point:
     print("\n",cmd_Impact_doInitialFit)
     os.system(cmd_Impact_doInitialFit)
 
-"""cmd_Impact_doFit = "combineTool.py -M Impacts -d workspace_DNN_"+year+".root -m 172.5 --robustFit 1 --doFits -n M1725_DNNfit_"+year   #nuisance parameter with the --doFits options
-print("\n",cmd_Impact_doFit)
-os.system(cmd_Impact_doFit)"""
+    cmd_Impact_doFit = "combineTool.py -M Impacts -d workspace_top_Mass_"+Mass+"_shape_comb_para.root -m 172.5 --robustFit 1 --doFits -n _M"+Mass+"_InitialFit --redefineSignalPOIs sigmaG,mean --setParameters mean=5.1,r=1,sigmaG=0.15 --freezeParameters r --X-rtd ADDNLL_CBNLL=0"   #nuisance parameter with the --doFits options
+    print("\n",cmd_Impact_doFit)
+    os.system(cmd_Impact_doFit)
 
-"""cmd_Impact_json = "combineTool.py -M Impacts -d workspace_DNN_"+year+".root -m 172.5 -o impacts_DNN_"+year+".json  -n M1725_DNNfit_"+year#+ "  --named r, bWeight_lf, bWeight_hf , bWeight_cferr1, bWeight_cferr2, bWeight_lfstats1, bWeight_lfstats2, bWeight_hfstats1, bWeight_hfstats2, bWeight_jes"
-print("\n",cmd_Impact_json)
-os.system(cmd_Impact_json)
+    cmd_Impact_json = "combineTool.py -M Impacts -d workspace_top_Mass_"+Mass+"_shape_comb_para.root -m 172.5 -o impacts_mtop_"+year+".json  -n _M"+Mass+"_InitialFit --redefineSignalPOIs sigmaG,mean --setParameters mean=5.1,r=1,sigmaG=0.15 --freezeParameters r --X-rtd ADDNLL_CBNLL=0"  #--named r, bWeight_lf, bWeight_hf , bWeight_cferr1, bWeight_cferr2, bWeight_lfstats1, bWeight_lfstats2, bWeight_hfstats1, bWeight_hfstats2, bWeight_jes"
+    print("\n",cmd_Impact_json)
+    os.system(cmd_Impact_json)
 
-cmd_Impact_plot = "plotImpacts.py -i impacts_DNN_"+year+".json -o impacts_DNN_"+year
-print("\n",cmd_Impact_plot)
-os.system(cmd_Impact_plot)"""
+    cmd_Impact_plot = "plotImpacts.py -i impacts_mtop_"+year+".json -o impacts_mtop_"+year
+    print("\n",cmd_Impact_plot)
+    os.system(cmd_Impact_plot)
     
 
 for width in width_point:
