@@ -38,32 +38,32 @@ for Mass in mass_point:
     #os.system(scp_file)
     if(year=="Run2"):
         for yearloop in ['UL2016preVFP', 'UL2016postVFP','UL2017', 'UL2018']:
-            cmd_createWorkspace = "python Create_Workspace.py -m "+Mass+" -y  "+yearloop
+            cmd_createWorkspace = "python3 Create_Workspace.py -m "+Mass+" -y  "+yearloop
             os.system(cmd_createWorkspace)
         cmd_adddatacards = "combineCards.py mujets_UL18=datacard_top_shape_mu_para_UL18.txt eljets_UL18=datacard_top_shape_el_para_UL18.txt mujets_UL17=datacard_top_shape_mu_para_UL17.txt eljets_UL17=datacard_top_shape_el_para_UL17.txt  mujets_ULpre16=datacard_top_shape_mu_para_ULpre16.txt eljets_ULpre16=datacard_top_shape_el_para_ULpre16.txt mujets_ULpost16=datacard_top_shape_mu_para_ULpost16.txt eljets_ULpost16=datacard_top_shape_el_para_ULpost16.txt > datacard_top_shape_comb_para.txt"
     else:
-        cmd_createWorkspace = "python Create_Workspace.py -m "+Mass+" -y  "+year #+ " -s " + sys
-        print cmd_createWorkspace
+        cmd_createWorkspace = "python3 Create_Workspace.py -m "+Mass+" -y  "+year #+ " -s " + sys
+        print(cmd_createWorkspace)
         os.system(cmd_createWorkspace)
         cmd_adddatacards = "combineCards.py mujets"+tag+"=datacard_top_shape_mu_para"+tag+".txt eljets"+tag+"=datacard_top_shape_el_para"+tag+".txt > datacard_top_shape_comb_para.txt"
 
-    print "\n",cmd_adddatacards
+    print("\n",cmd_adddatacards)
     os.system(cmd_adddatacards)
     
     cmd_Runtext2workspace = "text2workspace.py datacard_top_shape_comb_para.txt -o workspace_top_Mass_"+Mass+"_shape_comb_para.root"
-    print "\n",cmd_Runtext2workspace
+    print("\n",cmd_Runtext2workspace)
     os.system(cmd_Runtext2workspace)
     
     
     cmd_GoodnessOfFit = "combine -M GoodnessOfFit workspace_top_Mass_"+Mass+"_shape_comb_para.root -n .goodnessOfFit_data --freezeParameters r --redefineSignalPOIs sigmaG,mean --setParameters mean=5.1,r=1,sigmaG=0.15  --X-rtd ADDNLL_CBNLL=0 --algo saturated  --expectSignal 1 -m 172.5"
     
-    print "\n",cmd_GoodnessOfFit
+    print("\n",cmd_GoodnessOfFit)
     #os.system(cmd_GoodnessOfFit)
     #os.system(cmd_GoodnessOfFit+" -t 1000")
     
     cms_create_json = "combineTool.py -M CollectGoodnessOfFit --input higgsCombine.goodnessOfFit_data.GoodnessOfFit.mH172.5.root higgsCombine.goodnessOfFit_data.GoodnessOfFit.mH172.5.123456.root -m 172.5 -o gof.json"
 
-    print "\n",cms_create_json
+    print("\n",cms_create_json)
     #os.system(cms_create_json)
     #os.system("plotGof.py gof.json --statistic saturated --mass 172.5 -o part2_gof")
     
@@ -73,7 +73,7 @@ for Mass in mass_point:
     
 
 
-    cmd_RunCombine = "combine -M FitDiagnostics workspace_top_Mass_"+Mass+"_shape_comb_para.root -n _M"+Mass+"  --redefineSignalPOIs r,sigmaG,mean  --setParameters mean=5.1,r=1,sigmaG=0.15  --X-rtd ADDNLL_CBNLL=0  --trackParameters r,mean,sigmaG --trackErrors r,mean,sigmaG --X-rtd TMCSO_AdaptivePseudoAsimov=0 --X-rtd TMCSO_PseudoAsimov=0  --plots  --saveShapes --saveWithUncertainties --saveWorkspace"
+    cmd_RunCombine = "combine -M FitDiagnostics workspace_top_Mass_"+Mass+"_shape_comb_para.root -n _M"+Mass+"  --redefineSignalPOIs sigmaG,mean  --setParameters mean=5.1,r=1,sigmaG=0.15 --freezeParameters r --X-rtd ADDNLL_CBNLL=0  --trackParameters r,mean,sigmaG --trackErrors r,mean,sigmaG --X-rtd TMCSO_AdaptivePseudoAsimov=0 --X-rtd TMCSO_PseudoAsimov=0  --plots  --saveShapes --saveWithUncertainties --saveWorkspace"
 
     #cmd_RunCombine = "combine -M FitDiagnostics workspace_top_Mass_"+Mass+"_shape_comb_para.root -n _M"+Mass+"  --freezeParameters r --redefineSignalPOIs sigmaG,mean  --setParameters mean=5.1,r=1,sigmaG=0.15  --X-rtd ADDNLL_CBNLL=0  --trackParameters mean,sigmaG --trackErrors mean,sigmaG --X-rtd TMCSO_AdaptivePseudoAsimov=0 --X-rtd TMCSO_PseudoAsimov=0  --plots  --saveShapes --saveWithUncertainties --saveWorkspace"
     
@@ -85,10 +85,29 @@ for Mass in mass_point:
     #FitDiagnostics
     #MultiDimFit
 
-    print "\n",cmd_RunCombine
+    print("\n",cmd_RunCombine)
     os.system(cmd_RunCombine)
+    
 
+    cmd_diffNuisances = "python3 diffNuisances.py fitDiagnostics_M"+mass+".root -a -g higgsCombine_M"+mass+"_"+year+".FitDiagnostics_nuisance.mH120.root "
+    print("\n",cmd_diffNuisances)
+    #os.system(cmd_diffNuisances)
 
+    cmd_Impact_doInitialFit = "combineTool.py -M Impacts -d workspace_top_Mass_"+Mass+"_shape_comb_para.root -m 172.5 --doInitialFit --robustFit 1 -n _M"+Mass+"_InitialFit --redefineSignalPOIs sigmaG,mean  --setParameters mean=5.1,r=1,sigmaG=0.15 --freezeParameters r --X-rtd ADDNLL_CBNLL=0"  #for likelihood scans when using robustFit 1
+    print("\n",cmd_Impact_doInitialFit)
+    os.system(cmd_Impact_doInitialFit)
+
+"""cmd_Impact_doFit = "combineTool.py -M Impacts -d workspace_DNN_"+year+".root -m 172.5 --robustFit 1 --doFits -n M1725_DNNfit_"+year   #nuisance parameter with the --doFits options
+print("\n",cmd_Impact_doFit)
+os.system(cmd_Impact_doFit)"""
+
+"""cmd_Impact_json = "combineTool.py -M Impacts -d workspace_DNN_"+year+".root -m 172.5 -o impacts_DNN_"+year+".json  -n M1725_DNNfit_"+year#+ "  --named r, bWeight_lf, bWeight_hf , bWeight_cferr1, bWeight_cferr2, bWeight_lfstats1, bWeight_lfstats2, bWeight_hfstats1, bWeight_hfstats2, bWeight_jes"
+print("\n",cmd_Impact_json)
+os.system(cmd_Impact_json)
+
+cmd_Impact_plot = "plotImpacts.py -i impacts_DNN_"+year+".json -o impacts_DNN_"+year
+print("\n",cmd_Impact_plot)
+os.system(cmd_Impact_plot)"""
     
 
 for width in width_point:
@@ -96,26 +115,27 @@ for width in width_point:
     #os.system(scp_file)
     if(year=="Run2"):
         for yearloop in ['UL2016preVFP', 'UL2016postVFP','UL2017', 'UL2018']:
-            cmd_createWorkspace = "python Create_Workspace.py -m "+width+" -y  "+yearloop
+            cmd_createWorkspace = "python3 Create_Workspace.py -m "+width+" -y  "+yearloop
             os.system(cmd_createWorkspace)
         cmd_adddatacards = "combineCards.py mujets_UL18=datacard_top_shape_mu_para_UL18.txt eljets_UL18=datacard_top_shape_el_para_UL18.txt mujets_UL17=datacard_top_shape_mu_para_UL17.txt eljets_UL17=datacard_top_shape_el_para_UL17.txt  mujets_ULpre16=datacard_top_shape_mu_para_ULpre16.txt eljets_ULpre16=datacard_top_shape_el_para_ULpre16.txt mujets_ULpost16=datacard_top_shape_mu_para_ULpost16.txt eljets_ULpost16=datacard_top_shape_el_para_ULpost16.txt > datacard_top_shape_comb_para.txt"
     else:
-        cmd_createWorkspace = "python Create_Workspace.py -w "+width+" -y  "+year
-        print cmd_createWorkspace
+        cmd_createWorkspace = "python3 Create_Workspace.py -w "+width+" -y  "+year
+        print(cmd_createWorkspace)
         os.system(cmd_createWorkspace)
         cmd_adddatacards = "combineCards.py mujets"+tag+"=datacard_top_shape_mu_para"+tag+".txt eljets"+tag+"=datacard_top_shape_el_para"+tag+".txt > datacard_top_shape_comb_para.txt"
 
-    print "\n",cmd_adddatacards
+    print("\n",cmd_adddatacards)
     os.system(cmd_adddatacards)
     
     cmd_Runtext2workspace = "text2workspace.py datacard_top_shape_comb_para.txt -o workspace_top_width_"+width+"_shape_comb_para.root"
-    print "\n",cmd_Runtext2workspace
+    print("\n",cmd_Runtext2workspace)
     os.system(cmd_Runtext2workspace)
     
     
-    cmd_RunCombine = "combine -M FitDiagnostics workspace_top_width_"+width+"_shape_comb_para.root -n _W"+width+"  --freezeParameters r --redefineSignalPOIs sigmaG,mean --setParameters mean=5.1,r=1,sigmaG=0.15  --X-rtd ADDNLL_CBNLL=0  --saveShapes --plots"
-    
-    print "\n",cmd_RunCombine
+    #cmd_RunCombine = "combine -M FitDiagnostics workspace_top_width_"+width+"_shape_comb_para.root -n _W"+width+"  --freezeParameters r --redefineSignalPOIs sigmaG,mean --setParameters mean=5.1,r=1,sigmaG=0.15  --X-rtd ADDNLL_CBNLL=0  --saveShapes --plots"
+    cmd_RunCombine = "combine -M FitDiagnostics workspace_top_width_"+width+"_shape_comb_para.root -n _W"+width+"   --redefineSignalPOIs sigmaG,mean  --setParameters mean=5.1,r=1,sigmaG=0.15 --freezeParameters r  --X-rtd ADDNLL_CBNLL=0  --trackParameters r,mean,sigmaG --trackErrors r,mean,sigmaG --X-rtd TMCSO_AdaptivePseudoAsimov=0 --X-rtd TMCSO_PseudoAsimov=0  --plots  --saveShapes --saveWithUncertainties --saveWorkspace"
+
+    print("\n",cmd_RunCombine)
     os.system(cmd_RunCombine)
     
 def getparams(mass,width):
@@ -124,16 +144,17 @@ def getparams(mass,width):
     roofitResults = fitfile.Get("fit_s")
 
     print
-    print "results from one fit_s from ",fitfile.GetName()," file is (do not qoute this results from toy results) : "
+    print("results from one fit_s from ",fitfile.GetName()," file is (do not qoute this results from toy results) : ")
 
     mean = (roofitResults.floatParsFinal()).find("mean")
-    print "mean : ",mean.getVal()," Error : ",mean.getError()
+    print("mean : ",mean.getVal()," Error : ",mean.getError())
+
+    #r = (roofitResults.floatParsFinal()).find("r")
+    #print("r : ",r.getVal()," Error : ",r.getError())
 
     Sigma = (roofitResults.floatParsFinal()).find("sigmaG")
-    print "Sigma : ",Sigma.getVal()," Error : ",Sigma.getError()
+    print("Sigma : ",Sigma.getVal()," Error : ",Sigma.getError())
     
-    r = (roofitResults.floatParsFinal()).find("r")
-    print "r : ",r.getVal()," Error : ",r.getError()
 
 if(len(mass_point)==1 and len(width_point)==0): getparams(mass_point[0],None)
 if(len(mass_point)==0 and len(width_point)==1): getparams(None,width_point[0])

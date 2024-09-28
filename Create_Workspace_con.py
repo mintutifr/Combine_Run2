@@ -71,10 +71,10 @@ if __name__ == "__main__":
     #create RooDataHist
     #------------------------------------------------i
     #read the file to get the hustogrms
-    Filename_mu = "/home/mikumar/t3store/workarea/Nanoaod_tools/CMSSW_10_2_28/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_mu_lt0p7gteq0p5_withoutDNNfit_rebin.root"
-    Filename_el = "/home/mikumar/t3store/workarea/Nanoaod_tools/CMSSW_10_2_28/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_el_lt0p7gteq0p5_withoutDNNfit_rebin.root"
-    Filename_mu_cont = "/home/mikumar/t3store/workarea/Nanoaod_tools/CMSSW_10_2_28/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_mu_gteq0p3_withoutDNNfit_rebin.root"
-    Filename_el_cont = "/home/mikumar/t3store/workarea/Nanoaod_tools/CMSSW_10_2_28/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_el_gteq0p3_withoutDNNfit_rebin.root"
+    Filename_mu = "/feynman/home/dphp/mk277705/work/HiggsCombine/CMSSW_12_3_4/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_mu_lt0p7gteq0p5_withoutDNNfit_rebin.root"
+    Filename_el = "/feynman/home/dphp/mk277705/work/HiggsCombine/CMSSW_12_3_4/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_el_lt0p7gteq0p5_withoutDNNfit_rebin.root"
+    Filename_mu_cont = "/feynman/home/dphp/mk277705/work/HiggsCombine/CMSSW_12_3_4/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_mu_gteq0p3_withoutDNNfit_rebin.root"
+    Filename_el_cont = "/feynman/home/dphp/mk277705/work/HiggsCombine/CMSSW_12_3_4/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_el_gteq0p3_withoutDNNfit_rebin.root"
 
     File_mu = R.TFile(Filename_mu,"Read")
     File_el = R.TFile(Filename_el,"Read")
@@ -98,6 +98,7 @@ if __name__ == "__main__":
         
     top_bkg_mu = dir_mu.Get("top_bkg_1725"+tag+gt_or_lt_tag+sys)
     EWK_bkg_mu = dir_mu.Get("EWK_bkg"+tag+gt_or_lt_tag)
+    #EWK_bkg_mu_cont = dir_mu_cont.Get("EWK_bkg"+tag+gt_or_lt_tag)#"_gt")
     EWK_bkg_mu_cont = dir_mu_cont.Get("EWK_bkg"+tag+"_gt")
     QCD_DD = dir_mu.Get("QCD_DD"+tag+gt_or_lt_tag)
 
@@ -131,6 +132,7 @@ if __name__ == "__main__":
 
     top_bkg_el = dir_el.Get("top_bkg_1725"+tag+gt_or_lt_tag+sys)
     EWK_bkg_el = dir_el.Get("EWK_bkg"+tag+gt_or_lt_tag)
+    #EWK_bkg_el_cont = dir_el_cont.Get("EWK_bkg"+tag+gt_or_lt_tag)#"_gt")
     EWK_bkg_el_cont = dir_el_cont.Get("EWK_bkg"+tag+"_gt")
     QCD_DD = dir_mu.Get("QCD_DD"+tag+gt_or_lt_tag)
 
@@ -222,15 +224,31 @@ if __name__ == "__main__":
     #topbkg_pdf_el = R.RooBifurGauss("topbkg_pdf_el","gauss_el",logM,mean,sigmaG2_el,sigmaG)
 
     #EWK bakground pdf Novosibirsk
-    #peak_el = R.RooRealVar("peak_el","peak_el",5.,1.,10.0)
-    #peak_mu = R.RooRealVar("peak_mu","peak_mu",5.,1.,10.0)
-    #width_Novo_el = R.RooRealVar("width_Novo_el","width_Novo_el",0.1,0.0,5.0)
-    #width_Novo_mu = R.RooRealVar("width_Novo_mu","width_Novo_mu",0.1,0.0,5.0)
-    #tail_el = R.RooRealVar("tail_el","tail_el",0.0,-1.,1.0)
-    #tail_mu = R.RooRealVar("tail_mu","tail_mu",0.0,-1.,1.0)
+    peak_el = R.RooRealVar("peak_el","peak_el",5.,1.,10.0)
+    peak_mu = R.RooRealVar("peak_mu","peak_mu",5.,1.,10.0)
+    width_Novo_el = R.RooRealVar("width_Novo_el","width_Novo_el",0.1,0.0,5.0)
+    width_Novo_mu = R.RooRealVar("width_Novo_mu","width_Novo_mu",0.1,0.0,5.0)
+    tail_el = R.RooRealVar("tail_el","tail_el",0.0,-1.,1.0)
+    tail_mu = R.RooRealVar("tail_mu","tail_mu",0.0,-1.,1.0)
     EWKbkg_pdf_mu = R.RooNovosibirsk("EWKbkg_pdf_mu","Novosibirsk PDF",logM,R.RooFit.RooConst(5.095),R.RooFit.RooConst(0.1789),R.RooFit.RooConst(-0.0155))
-    EWKbkg_pdf_el = R.RooNovosibirsk("EWKbkg_pdf_el","Novosibirsk PDF",logM,R.RooFit.RooConst(5.081),R.RooFit.RooConst(0.2014),R.RooFit.RooConst(-0.053))
+    EWKbkg_pdf_el1 = R.RooNovosibirsk("EWKbkg_pdf_el1","Novosibirsk PDF",logM,peak_el,width_Novo_el,tail_el) #R.RooFit.RooConst(5.081),R.RooFit.RooConst(0.2014),R.RooFit.RooConst(-0.053))
     
+    mean_EWK = R.RooRealVar("meanEWK","meanEWK",5.1,4.5,5.5)
+    sigmaG_EWK = R.RooRealVar("sigmaG_EWK","sigmaG_EWK",0.15098,0.01,5)#0.186
+    gauss_el_EWK = R.RooGaussian("gauss_el_EWK","gauss_el_EWK",logM,mean_EWK,sigmaG_EWK) #only core sigma flaoted frac fixed
+    
+    norm_Novo = R.RooRealVar("norm_Novo","norm_Novo",EWK_bkg_el.Integral(),0.001*EWK_bkg_el.Integral(),50.0*EWK_bkg_el.Integral())
+    frac_gaus_EWK= R.RooRealVar("frac_gaus_EWK","Scale factor for gaus EWK",1.0,0.0,5.0)
+    norm_Gaus_EWK = R.RooFormulaVar("Nsig_mu","frac_gaus_EWK*norm_Novo",R.RooArgList(frac_gaus_EWK,norm_Novo))
+
+    EWKbkg_pdf_el = R.RooAddPdf("EWKbkg_pdf_el","Total Model EWK el",R.RooArgList(EWKbkg_pdf_el1,gauss_el_EWK),R.RooArgList(norm_Novo,norm_Gaus_EWK))
+
+    EWKbkg_pdf_mu = R.RooNovosibirsk("EWKbkg_pdf_mu","Novosibirsk PDF",logM,R.RooFit.RooConst(5.085),R.RooFit.RooConst(0.1850),R.RooFit.RooConst(-0.0889))
+    EWKbkg_pdf_el = R.RooNovosibirsk("EWKbkg_pdf_el","Novosibirsk PDF",logM,R.RooFit.RooConst(5.091),R.RooFit.RooConst(0.1943),R.RooFit.RooConst(0.024))
+    EWKG_el = R.RooGaussian("EWKG_el","gauss_el_EWK",logM,mean_EWK,sigmaG_EWK)
+
+    #EWKbkg_pdf_el = R.RooNovosibirsk("EWKbkg_pdf_el","Novosibirsk PDF",logM,peak_el,width_Novo_el,tail_el)
+    #EWKbkg_pdf_mu = R.RooNovosibirsk("EWKbkg_pdf_mu","Novosibirsk PDF",logM,peak_mu,width_Novo_mu,tail_mu)
 
     #yields of signal and the background
     nSig_mu = top_sig_mu.Integral() 
@@ -280,7 +298,7 @@ if __name__ == "__main__":
         # S a v e   w o r k s p a c e   i n   f i l e
         # -------------------------------------------
         # Save the workspace into a ROOT file
-        w.writeToFile("/home/mikumar/t3store/workarea/Higgs_Combine/CMSSW_11_3_4/src/Combine_Run2/workspace"+tag+"_con.root")
+        w.writeToFile("/feynman/home/dphp/mk277705/work/HiggsCombine/CMSSW_12_3_4/src/Combine_Run2/workspace"+tag+"_con.root")
         # Workspace will remain in memory after macro finishes
         R.gDirectory.Add(w)
 
@@ -454,7 +472,8 @@ if __name__ == "__main__":
         R.gPad.SetTicky()
         R.gPad.SetTickx()
         R.TGaxis.SetMaxDigits(3)
-        #fit to the signal model	
+        #fit to the signal model
+
         res_mu_ewkbkg =  EWKbkg_pdf_mu.fitTo(data_mu_ewk_bkg,R.RooFit.Save(),R.RooFit.SumW2Error(R.kTRUE))
         #res_mu_ewkbkg.Print()
         #deine frame for ploting
@@ -480,6 +499,7 @@ if __name__ == "__main__":
         R.gPad.SetTicky()
         R.gPad.SetTickx()
         #fit to the signal model
+
         res_el_ewkbkg =  EWKbkg_pdf_el.fitTo(data_el_ewk_bkg,R.RooFit.Save(),R.RooFit.SumW2Error(R.kTRUE))
         #res_el_ewkbkg.Print()
         #deine frame for ploting
@@ -501,9 +521,9 @@ if __name__ == "__main__":
         #raw_input()
         #write canvas in png image
         if(mass!=None):
-            can_mu_ewkbkg.Print("Plots/EWKbkg_only_local_fit_con_"+mass+tag+gt_or_lt_tag+"_fix_par.png")
+            can_mu_ewkbkg.Print("Plots/EWKbkg_only_local_con_fit"+mass+tag+gt_or_lt_tag+"_fix_par.png")
         if(width!=None):
-            can_mu_ewkbkg.Print("Plots/EWKbkg_only_local_fit_con_"+width+tag+gt_or_lt_tag+"_fix_par.png")
+            can_mu_ewkbkg.Print("Plots/EWKbkg_only_local_con_fit"+width+tag+gt_or_lt_tag+"_fix_par.png")
         
         
         

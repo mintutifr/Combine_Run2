@@ -45,8 +45,8 @@ def getcons(mass,width):
 
 def getprefit_hist(mass,width,lep):
     hists = []
-    Filename = "/feynman/home/dphp/mk277705/work/HiggsCombine/CMSSW_12_3_4/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_"+lep+"_gteq0p7_withDNNfit_rebin.root"
-    Filename_cont = "/feynman/home/dphp/mk277705/work/HiggsCombine/CMSSW_12_3_4/src/PhysicsTools/NanoAODTools/crab//WorkSpace/Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_"+lep+"_gteq0p3_withDNNfit_rebin.root"
+    Filename = "/feynman/home/dphp/mk277705/work/HiggsCombine/CMSSW_12_3_4/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_"+lep+"_gteq0p7_withoutDNNfit_rebin.root"
+    Filename_cont = "/feynman/home/dphp/mk277705/work/HiggsCombine/CMSSW_12_3_4/src/PhysicsTools/NanoAODTools/crab//WorkSpace/Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_"+lep+"_gteq0p3_withoutDNNfit_rebin.root"
     File = rt.TFile(Filename,"Read")
     File_cont = rt.TFile(Filename_cont,"Read")
     gt_or_lt_tag=''
@@ -59,7 +59,10 @@ def getprefit_hist(mass,width,lep):
     Dir_cont = File_cont.GetDirectory(lep+"jets")
     #Get Mc histograms for muon final state
     if(mass!=None):
-        top_sig = Dir.Get("top_sig_"+mass+tag+gt_or_lt_tag) 
+        top_sig = Dir.Get("top_sig_"+mass+tag+gt_or_lt_tag)
+        print("----------")
+        top_sig.Print()
+        print("----------")
     if(width!=None):
         top_sig = Dir.Get("top_sig_"+width+tag+gt_or_lt_tag)#+width)
         
@@ -307,6 +310,10 @@ def getthefit(mass,width,lep):
 
 
     h_ratio.Draw('hist')
+
+
+
+
     can.Update()
     #raw_input()
     if(mass!=None):

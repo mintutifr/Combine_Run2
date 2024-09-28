@@ -2,7 +2,7 @@ imax    1 number of bins
 jmax    3 number of processes minus 1
 kmax    * number of nuisance parameters
 --------------------------------------------------------------------------------
-shapes * eljets /home/mikumar/t3store/workarea/Nanoaod_tools/CMSSW_10_2_28/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_DNNFit_Input_t_ch_CAsi_histograms_UL2018_el.root eljets/$PROCESS eljets/$PROCESS_$SYSTEMATIC
+shapes * eljets /feynman/home/dphp/mk277705/work/HiggsCombine/HiggsCombine_Workspace_files/Hist_for_workspace/Combine_DNNFit_Input_t_ch_CAsi_histograms_UL2018_el.root eljets/$PROCESS eljets/$PROCESS_$SYSTEMATIC
 --------------------------------------------------------------------------------
 bin          eljets
 observation   -1

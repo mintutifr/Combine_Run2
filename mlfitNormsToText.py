@@ -10,7 +10,7 @@ from six.moves import range
 # import ROOT with a fix to get batch mode (http://root.cern.ch/phpBB3/viewtopic.php?t=3198)
 import ROOT
 
-ROOT.gROOT.SetBatch(True)
+#ROOT.gROOT.SetBatch(True)
 
 
 

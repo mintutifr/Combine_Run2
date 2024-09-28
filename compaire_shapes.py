@@ -5,7 +5,7 @@ from Hist_style import *
 #from TOY_local_fit import Toy_Mc 
 parser = arg.ArgumentParser(description='Create workspace for higgs combine')
 parser.add_argument('-y', '--year', dest='Year', default=['UL2017'], type=str, nargs=1, help="Year of Data collection [ UL2016preVFP  UL2016postVFP  UL2017  UL2018 ]")
-parser.add_argument('-s', '--shape', dest='shape', default=[None], type=str, nargs=1, help="shape for  ['top_sig','top_bkg','EWK_bkg','QCD_DD']")
+parser.add_argument('-s', '--shape', dest='shape', default=[None], type=str, nargs=1, help="shape for  [for lntopMass use 'top' beacuse hist file are stored with this name]")
 args = parser.parse_args()
 
         
@@ -15,9 +15,9 @@ shape = args.shape[0]
 date   = datetime.datetime.now()
 
 
-print "mass: ",mass
-print "dataYear: ",dataYear
-print "shape: ",shape
+print("mass: ",mass)
+print("dataYear: ",dataYear)
+print("shape: ",shape)
 
 
 
@@ -33,14 +33,22 @@ tag = Combine_year_tag[dataYear]
 if __name__ == "__main__":
     
     #read the file to get the hustogrms
-    Filename_mu_sig = "/home/mikumar/t3store/workarea/Nanoaod_tools/CMSSW_10_2_28/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_mu_gteq0p7.root"
-    Filename_el_sig = "/home/mikumar/t3store/workarea/Nanoaod_tools/CMSSW_10_2_28/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_el_gteq0p7.root"
+    Dir = "/feynman/home/dphp/mk277705/work/HiggsCombine/CMSSW_12_3_4/src/PhysicsTools/NanoAODTools/crab/WorkSpace/"
+    Filename_mu_sig = Dir+"Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_mu_gteq0p7_withoutDNNfit_rebin.root"
+    Filename_el_sig = Dir+"Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_el_gteq0p7_withoutDNNfit_rebin.root"
     #read the file to get the hustogrms
-    Filename_mu_con = "/home/mikumar/t3store/workarea/Nanoaod_tools/CMSSW_10_2_28/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_mu_lt0p7gteq0p3.root"
-    Filename_el_con = "/home/mikumar/t3store/workarea/Nanoaod_tools/CMSSW_10_2_28/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_el_lt0p7gteq0p3.root"
+    print(f'{Filename_mu_sig = }')
+    print(f'{Filename_el_sig = }')
 
-    Filename_mu_sig_plus_con = "/home/mikumar/t3store/workarea/Nanoaod_tools/CMSSW_10_2_28/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_mu_gteq0p3.root"
-    Filename_el_sig_plus_con = "/home/mikumar/t3store/workarea/Nanoaod_tools/CMSSW_10_2_28/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_el_gteq0p3.root"
+    Filename_mu_con = Dir+"Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_mu_lt0p7gteq0p3_withoutDNNfit_rebin.root"
+    Filename_el_con = Dir+"Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_el_lt0p7gteq0p3_withoutDNNfit_rebin.root"
+    print(f'{Filename_mu_con = }')
+    print(f'{Filename_el_con = }')
+
+    Filename_mu_sig_plus_con = Dir+"Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_mu_gteq0p3_withoutDNNfit_rebin.root"
+    Filename_el_sig_plus_con = Dir+"Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_el_gteq0p3_withoutDNNfit_rebin.root"
+    print(f'{Filename_mu_sig_plus_con = }')
+    print(f'{Filename_el_sig_plus_con = }')
 
     File_mu_sig = R.TFile(Filename_mu_sig,"Read")
     File_el_sig = R.TFile(Filename_el_sig,"Read")
@@ -59,6 +67,7 @@ if __name__ == "__main__":
     dir_el_sig_plus_con = File_el_sig_plus_con.GetDirectory("eljets")
     #Get Mc histograms for muon final state
     if("top" in shape):
+        print("trying to get hist with name : ", shape+"_"+mass+tag+"_gt")
         shape_mu_sig = dir_mu_sig.Get(shape+"_"+mass+tag+"_gt")
         shape_el_sig = dir_el_sig.Get(shape+"_"+mass+tag+"_gt")
         shape_mu_con = dir_mu_con.Get(shape+"_"+mass+tag+"_lt")
@@ -67,10 +76,12 @@ if __name__ == "__main__":
         shape_el_sig_plus_con = dir_el_sig_plus_con.Get(shape+"_"+mass+tag+"_gt")
         
     else:
-        shape_mu_sig = dir_mu_sig.Get(shape+tag+"_gt")
+        #rt.gROOT.cd()
+        print("trying to get hist with name : ", shape+tag+"_gt")
+        shape_mu_sig = dir_mu_sig.Get(shape+tag+"_gt").Clone()
         shape_el_sig = dir_el_sig.Get(shape+tag+"_gt")
-        shape_mu_con = dir_mu_con.Get(shape+tag+"_lt")
-        shape_el_con = dir_el_con.Get(shape+tag+"_lt")
+        shape_mu_con = dir_mu_con.Get(shape+tag+"_gt_lt")
+        shape_el_con = dir_el_con.Get(shape+tag+"_gt_lt")
         shape_mu_sig_plus_con = dir_mu_sig_plus_con.Get(shape+tag+"_gt")
         shape_el_sig_plus_con = dir_el_sig_plus_con.Get(shape+tag+"_gt")
 

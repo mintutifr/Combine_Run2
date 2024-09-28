@@ -1,3 +1,4 @@
+import json
 import ROOT as R
 from ROOT import RooFit 
 import sys, datetime
@@ -11,6 +12,7 @@ parser.add_argument('-w', '--width', dest='width_sample', default=[None], type=s
 parser.add_argument('-y', '--year', dest='Year', default=['UL2017'], type=str, nargs=1, help="Year of Data collection [ UL2016preVFP  UL2016postVFP  UL2017  UL2018 ]")
 parser.add_argument('-f', '--localfit', dest='local_fit', default=[None], type=str, nargs=1, help="Local fit run for  ['sig','top_bkg','ewk_bkg','final', 'final_mu', 'final_el']")
 parser.add_argument('-s', '--sys', dest='sys', default=[''], type=str, nargs=1, help='systematic sample replace the sig and background  ["PSWeight_ISR_Up", "PSWeight_ISR_Down", "PSWeight_FSR_Up", "PSWeight_FSR_Down","hdamp_Up", "hdamp_Down"]')
+parser.add_argument( '--DropFixParam', action="store_true", help=" call if you dont want use optimized paramters  [--DropFixParam]")
 args = parser.parse_args()
 
         
@@ -20,6 +22,7 @@ dataYear = args.Year[0]
 local_fit = args.local_fit[0]
 sys = args.sys[0]
 date   = datetime.datetime.now()
+DropFixParam = args.DropFixParam
 
 if(mass=='data' or width =='data'):
 	RealData = True
@@ -63,7 +66,8 @@ lepton_tag_mu = leptonjet_tag(lep="mu",x1=0.32, y1=0.82, x2=0.4, y2=0.84)
 lepton_tag_el = leptonjet_tag(lep="el",x1=0.32, y1=0.82, x2=0.4, y2=0.84)
 year_tag = year_tag(dataYear,x1=0.85, y1=0.92, x2=0.9, y2=0.95)
    
-
+with open('FixPara_Run2.json', 'r') as f:
+    FixParam = json.load(f)
 
 if __name__ == "__main__":
     #define Variable
@@ -71,10 +75,10 @@ if __name__ == "__main__":
     #create RooDataHist
     #------------------------------------------------i
     #read the file to get the hustogrms
-    Filename_mu = "/home/mikumar/t3store/workarea/Nanoaod_tools/CMSSW_10_2_28/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_mu_gteq0p7_withDNNfit_rebin.root"
-    Filename_el = "/home/mikumar/t3store/workarea/Nanoaod_tools/CMSSW_10_2_28/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_el_gteq0p7_withDNNfit_rebin.root"
-    Filename_mu_cont = "/home/mikumar/t3store/workarea/Nanoaod_tools/CMSSW_10_2_28/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_mu_gteq0p3_withDNNfit_rebin.root"
-    Filename_el_cont = "/home/mikumar/t3store/workarea/Nanoaod_tools/CMSSW_10_2_28/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_el_gteq0p3_withDNNfit_rebin.root"
+    Filename_mu = "/feynman/home/dphp/mk277705/work/HiggsCombine/CMSSW_12_3_4/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_mu_gteq0p7_withoutDNNfit_rebin.root"
+    Filename_el = "/feynman/home/dphp/mk277705/work/HiggsCombine/CMSSW_12_3_4/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_el_gteq0p7_withoutDNNfit_rebin.root"
+    Filename_mu_cont = "/feynman/home/dphp/mk277705/work/HiggsCombine/CMSSW_12_3_4/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_mu_gteq0p3_withoutDNNfit_rebin.root"
+    Filename_el_cont = "/feynman/home/dphp/mk277705/work/HiggsCombine/CMSSW_12_3_4/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_el_gteq0p3_withoutDNNfit_rebin.root"
 
     File_mu = R.TFile(Filename_mu,"Read")
     File_el = R.TFile(Filename_el,"Read")
@@ -155,11 +159,12 @@ if __name__ == "__main__":
     #Create RooDatahist for muon final state
     data_el = R.RooDataHist("data_el","data_el",R.RooArgList(logM),histData_el)
 
-    #Frame_mu = logM.frame(R.RooFit.Title("mu"))	
-    #data_el.plotOn(Frame_mu)
-    #Frame_mu.Draw()
-    #raw_input()
-    #sys.exit()
+
+
+
+
+
+
     # C r e a t e   m o d e l 
     # -----------------------------------------------
     # Declare observable mean and data
@@ -168,65 +173,80 @@ if __name__ == "__main__":
     sigmaG = R.RooRealVar("sigmaG","sigmaG",0.15098,0.01,5)#0.186
     sigmaG2Frac_mu = R.RooRealVar("sigmaG2Frac_mu","sigmaG2Frac_mu",0.1,0.0,5.0) #Best Fit Value
     sigmaG2Frac_el = R.RooRealVar("sigmaG2Frac_el","sigmaG2Frac_el",0.1,0.0,5.0) #Best Fit Value
-    sigmaG2_mu = R.RooFormulaVar("sigmaG2_mu","sigmaG2_mu","@0/@1",R.RooArgList(sigmaG,	sigmaG2Frac_mu))#R.RooFit.RooConst(0.935)))#R.RooFit.RooConst(0.935)))
-    sigmaG2_el = R.RooFormulaVar("sigmaG2_el","sigmaG2_el","@0/@1",R.RooArgList(sigmaG,sigmaG2Frac_el))#R.RooFit.RooConst(0.917)))#sigmaG2Frac_el))#R.RooFit.RooConst(0.917)))
+    sigmaG2_mu = R.RooFormulaVar("sigmaG2_mu","sigmaG2_mu","@0/@1",R.RooArgList(sigmaG,	sigmaG2Frac_mu))
+    sigmaG2_el = R.RooFormulaVar("sigmaG2_el","sigmaG2_el","@0/@1",R.RooArgList(sigmaG,sigmaG2Frac_el))
+    
     #signal Bifrac gaussian pdf
-    """gauss_mu = R.RooBifurGauss("gauss_mu","gauss_mu",logM,mean,sigmaG,R.RooFit.RooConst(0.1430)) #only core sigma flaoted frac fixed
-    gauss_el = R.RooBifurGauss("gauss_el","gauss_el",logM,mean, sigmaG,R.RooFit.RooConst(0.1394)) #only core sigma flaoted
-
-    #Landau pdf
-    lnd_mu = R.RooLandau("lnd_mu","lnd_mu",logM,R.RooFit.RooConst(5.4),R.RooFit.RooConst(0.0689)) # sigma fixed
-    lnd_el = R.RooLandau("lnd_el","lnd_el",logM,R.RooFit.RooConst(5.456871),R.RooFit.RooConst(0.08981)) # sigma fixed
-    sig_pdf_mu = R.RooAddPdf("sig_pdf_mu","Gaussian+Landau",R.RooArgList(gauss_mu,lnd_mu),R.RooArgList(R.RooFit.RooConst(0.9186)),True)
-    sig_pdf_el = R.RooAddPdf("sig_pdf_el","Gaussian+Landau",R.RooArgList(gauss_el,lnd_el),R.RooArgList(R.RooFit.RooConst(0.9298)),True)"""
+    sig_pdf_mu = R.RooBifurGauss("sig_pdf_mu","gauss_mu",logM,mean,sigmaG,sigmaG2_mu)
+    sig_pdf_el = R.RooBifurGauss("sig_pdf_el","gauss_el",logM,mean,sigmaG,sigmaG2_el)
 
 
-   
-    #redefine the sig pdf
-    #sig_pdf_mu = R.RooGaussian("sig_pdf_mu","gauss_mu",logM,mean,sigmaG)
-    #sig_pdf_el = R.RooGaussian("sig_pdf_el","gauss_el",logM,mean,sigmaG)
-
-    sig_pdf_mu = R.RooBifurGauss("sig_pdf_mu","gauss_mu",logM,mean,sigmaG,sigmaG2_mu)#R.RooFit.RooConst(0.147))#sigmaG2)#R.RooFit.RooConst(0.141887))
-    sig_pdf_el = R.RooBifurGauss("sig_pdf_el","gauss_el",logM,mean,sigmaG,sigmaG2_el)#R.RooFit.RooConst(0.140))#sigmaG2)#R.RooFit.RooConst(0.138264))
-
-    #Top background pdf CristalBall Shape
-    alpha = R.RooRealVar("alpha","alpha",-0.6642,-12.0,12.0)
-    num = R.RooRealVar("num","num",100.0,1.,500.0)
-    num2 = R.RooRealVar("num2","num2",100.0,1.,500.0)
-
-   
 
 
-    #topbkg_pdf_mu = R.RooCBShape("topbkg_pdf_mu","Crystal Ball PDF",logM,R.RooFit.RooConst(5.119),mean,sigmaG,alpha,num)#R.RooFit.RooConst(0.171),R.RooFit.RooConst(-1.679),R.RooFit.RooConst(142.0))#mean,sigmaG,alpha,num)#R.RooFit.RooConst(-1.5047),R.RooFit.RooConst(100.0)) # sigma float
-    #topbkg_pdf_el = R.RooCBShape("topbkg_pdf_el","Crystal Ball PDF",logM,mean,sigmaG,alpha,num)#R.RooFit.RooConst(5.113),R.RooFit.RooConst(0.172),R.RooFit.RooConst(-1.607),R.RooFit.RooConst(19.0))#mean,sigmaG,alpha,num2)#R.RooFit.RooConst(-1.5164),R.RooFit.RooConst(125)) # sigma float
 
-    sigmaL_topbkg_mu = R.RooFit.RooConst(0.169)
-    #sigmaL_topbkg_mu = R.RooRealVar("sigmaL_topbkg_mu","sigmaL_topbkg_mu",0.15098,0.01,1)
-    sigmaL_topbkg_el = R.RooFit.RooConst(0.180)
-    #sigmaL_topbkg_el = R.RooRealVar("sigmaL_topbkg_el","sigmaL_topbkg_el",0.15098,0.01,1)
-    #mean_top_bkg_mu = R.RooRealVar("mean_top_bkg_mu","mean_top_bkg_mu",5.1,4.5,5.5)
-    #mean_top_bkg_el = R.RooRealVar("mean_top_bkg_el","mean_top_bkg_el",5.1,4.5,5.5)
+
+
+
+
+    # Vaiable fit param
+    # ====================  #
+    sigmaL_topbkg_mu = R.RooRealVar("sigmaL_topbkg_mu","sigmaL_topbkg_mu",0.15098,0.01,1)
+    sigmaL_topbkg_el = R.RooRealVar("sigmaL_topbkg_el","sigmaL_topbkg_el",0.15098,0.01,1)
+    mean_top_bkg_mu = R.RooRealVar("mean_top_bkg_mu","mean_top_bkg_mu",5.1,4.5,5.5)
+    mean_top_bkg_el = R.RooRealVar("mean_top_bkg_el","mean_top_bkg_el",5.1,4.5,5.5)    
+    sigmaFracR_el = R.RooRealVar("sigmaFracR_el","sigmaFracR_el",0.1,0.0,5.0) 
+    sigmaFracR_mu = R.RooRealVar("sigmaFracR_mu","sigmaFracR_mu",0.1,0.0,5.0)
+    # ====================  #
+
+
+    # Best fit param
+    # ====================  #
+    if(DropFixParam==False):
+        mean_top_bkg_mu = R.RooFit.RooConst(FixParam["top_bkg"][dataYear]["mean_top_bkg_mu"])
+        mean_top_bkg_el = R.RooFit.RooConst(FixParam["top_bkg"][dataYear]["mean_top_bkg_el"])
+        sigmaL_topbkg_mu = R.RooFit.RooConst(FixParam["top_bkg"][dataYear]["sigmaL_topbkg_mu"])
+        sigmaL_topbkg_el = R.RooFit.RooConst(FixParam["top_bkg"][dataYear]["sigmaL_topbkg_el"])
+        sigmaFracR_mu = R.RooFit.RooConst(FixParam["top_bkg"][dataYear]["sigmaFracR_mu"])
+        sigmaFracR_el = R.RooFit.RooConst(FixParam["top_bkg"][dataYear]["sigmaFracR_el"])
+    # ===================  #
+
+    # top bakground BifracGauss
+    sigmaR_mu = R.RooFormulaVar("sigmaR_mu","sigmaR_mu","@0/@1",R.RooArgList(sigmaL_topbkg_mu,sigmaFracR_mu))
+    sigmaR_el = R.RooFormulaVar("sigmaR_el","sigmaR_el","@0/@1",R.RooArgList(sigmaL_topbkg_el,sigmaFracR_el))
+
+    topbkg_pdf_mu = R.RooBifurGauss("topbkg_pdf_mu","gauss_mu",logM,mean_top_bkg_mu,sigmaL_topbkg_mu,sigmaR_mu)
+    topbkg_pdf_el = R.RooBifurGauss("topbkg_pdf_el","gauss_el",logM,mean_top_bkg_el,sigmaL_topbkg_el,sigmaR_el)
     
-    #sigmaFrac_el = R.RooRealVar("sigmaFrac_el","sigmaFrac_el",0.1,0.0,5.0) #Best Fit Value
-    #sigmaFrac_mu = R.RooRealVar("sigmaFrac_mu","sigmaFrac_mu",0.1,0.0,5.0)
-    sigmaR_mu = R.RooFormulaVar("sigmaR_mu","sigmaR_mu","@0/@1",R.RooArgList(sigmaL_topbkg_mu,R.RooFit.RooConst(0.98)))#sigmaFrac))#R.RooFit.RooConst(0.90)))
-    sigmaR_el = R.RooFormulaVar("sigmaR_el","sigmaR_el","@0/@1",R.RooArgList(sigmaL_topbkg_el,R.RooFit.RooConst(1.08)))#sigmaFrac))#R.RooFit.RooConst(0.87)))
-    topbkg_pdf_mu = R.RooBifurGauss("topbkg_pdf_mu","gauss_mu",logM,R.RooFit.RooConst(5.116),sigmaL_topbkg_mu,sigmaR_mu)#mean_top_bkg,sigmaL_topbkg_mu,sigmaR_mu) R.RooFit.RooConst(5.111)
-    topbkg_pdf_el = R.RooBifurGauss("topbkg_pdf_el","gauss_el",logM,R.RooFit.RooConst(5.124),sigmaL_topbkg_el,sigmaR_el)#logM,mean_top_bkg,sigmaL_topbkg_el,sigmaR_el)#R.RooFit.RooConst(5.101),sigmaL_topbkg_el,sigmaR_el)
-    
-    
-    #topbkg_pdf_mu = R.RooBifurGauss("topbkg_pdf_mu","gauss_mu",logM,mean,sigmaG2_mu,sigmaG)
-    #topbkg_pdf_el = R.RooBifurGauss("topbkg_pdf_el","gauss_el",logM,mean,sigmaG2_el,sigmaG)
+
+
+
+
+
+    # Vaiable fit param
+    # ====================  #
+    peak_el = R.RooRealVar("peak_el","peak_el",5.,1.,10.0)
+    peak_mu = R.RooRealVar("peak_mu","peak_mu",5.,1.,10.0)
+    width_Novo_el = R.RooRealVar("width_Novo_el","width_Novo_el",0.1,0.0,5.0)
+    width_Novo_mu = R.RooRealVar("width_Novo_mu","width_Novo_mu",0.1,0.0,5.0)
+    tail_el = R.RooRealVar("tail_el","tail_el",-0.25,-5.,5.0) 
+    tail_mu = R.RooRealVar("tail_mu","tail_mu",-0.25,-5.,5.0)
+    # ====================  #
+
+
+    # Best fit param
+    # ====================  #
+    if(DropFixParam==False):
+        peak_el = R.RooFit.RooConst(FixParam["EWK_bkg"][dataYear]["peak_el"])
+        peak_mu = R.RooFit.RooConst(FixParam["EWK_bkg"][dataYear]["peak_mu"])
+        width_Novo_el = R.RooFit.RooConst(FixParam["EWK_bkg"][dataYear]["width_Novo_el"])
+        width_Novo_mu = R.RooFit.RooConst(FixParam["EWK_bkg"][dataYear]["width_Novo_mu"])
+        tail_el = R.RooFit.RooConst(FixParam["EWK_bkg"][dataYear]["tail_el"])
+        tail_mu = R.RooFit.RooConst(FixParam["EWK_bkg"][dataYear]["tail_mu"])
+    # ===================  #
 
     #EWK bakground pdf Novosibirsk
-    #peak_el = R.RooRealVar("peak_el","peak_el",5.,1.,10.0)
-    #peak_mu = R.RooRealVar("peak_mu","peak_mu",5.,1.,10.0)
-    #width_Novo_el = R.RooRealVar("width_Novo_el","width_Novo_el",0.1,0.0,5.0)
-    #width_Novo_mu = R.RooRealVar("width_Novo_mu","width_Novo_mu",0.1,0.0,5.0)
-    #tail_el = R.RooRealVar("tail_el","tail_el",-0.25,-5.,1.0) 
-    #tail_mu = R.RooRealVar("tail_mu","tail_mu",-0.25,-5.,1.0) 
-    EWKbkg_pdf_mu = R.RooNovosibirsk("EWKbkg_pdf_mu","Novosibirsk PDF",logM,R.RooFit.RooConst(5.095),R.RooFit.RooConst(0.1789),R.RooFit.RooConst(-0.0155))
-    EWKbkg_pdf_el = R.RooNovosibirsk("EWKbkg_pdf_el","Novosibirsk PDF",logM,R.RooFit.RooConst(5.081),R.RooFit.RooConst(0.2014),R.RooFit.RooConst(-0.053))
+    EWKbkg_pdf_mu = R.RooNovosibirsk("EWKbkg_pdf_mu","Novosibirsk PDF",logM,peak_mu,width_Novo_mu,tail_mu)
+    EWKbkg_pdf_el = R.RooNovosibirsk("EWKbkg_pdf_el","Novosibirsk PDF",logM,peak_el,width_Novo_el,tail_el)
     
 
     #yields of signal and the background
@@ -277,7 +297,7 @@ if __name__ == "__main__":
         # S a v e   w o r k s p a c e   i n   f i l e
         # -------------------------------------------
         # Save the workspace into a ROOT file
-        w.writeToFile("/home/mikumar/t3store/workarea/Higgs_Combine/CMSSW_11_3_4/src/Combine_Run2/workspace"+tag+".root")
+        w.writeToFile("/feynman/home/dphp/mk277705/work/HiggsCombine/CMSSW_12_3_4/src/Combine_Run2/workspace"+tag+".root")
         # Workspace will remain in memory after macro finishes
         R.gDirectory.Add(w)
 

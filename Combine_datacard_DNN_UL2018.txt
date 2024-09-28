@@ -3,8 +3,8 @@ imax 2 number of bins
 jmax 3 number of processes minus 1
 kmax 18 number of nuisance parameters
 ----------------------------------------------------------------------------------------------------------------------------------
-shapes *            eljets_UL18  /home/mikumar/t3store/workarea/Nanoaod_tools/CMSSW_10_2_28/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_DNNFit_Input_t_ch_CAsi_histograms_UL2018_el.root eljets/$PROCESS eljets/$PROCESS_$SYSTEMATIC
-shapes *            mujets_UL18  /home/mikumar/t3store/workarea/Nanoaod_tools/CMSSW_10_2_28/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_DNNFit_Input_t_ch_CAsi_histograms_UL2018_mu.root mujets/$PROCESS mujets/$PROCESS_$SYSTEMATIC
+shapes *            eljets_UL18  /feynman/home/dphp/mk277705/work/HiggsCombine/HiggsCombine_Workspace_files/Hist_for_workspace/Combine_DNNFit_Input_t_ch_CAsi_histograms_UL2018_el.root eljets/$PROCESS eljets/$PROCESS_$SYSTEMATIC
+shapes *            mujets_UL18  /feynman/home/dphp/mk277705/work/HiggsCombine/HiggsCombine_Workspace_files/Hist_for_workspace/Combine_DNNFit_Input_t_ch_CAsi_histograms_UL2018_mu.root mujets/$PROCESS mujets/$PROCESS_$SYSTEMATIC
 ----------------------------------------------------------------------------------------------------------------------------------
 bin          mujets_UL18  eljets_UL18
 observation  -1           -1         
