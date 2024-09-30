@@ -50,7 +50,7 @@ for Mass in mass_point:
     print("\n",cmd_adddatacards)
     os.system(cmd_adddatacards)
     
-    cmd_Runtext2workspace = "text2workspace.py datacard_top_shape_comb_para.txt -o workspace_top_Mass_"+Mass+"_shape_comb_para.root"
+    cmd_Runtext2workspace = "env PYTHONNOUSERSITE=1 text2workspace.py datacard_top_shape_comb_para.txt -o workspace_top_Mass_"+Mass+"_shape_comb_para.root"
     print("\n",cmd_Runtext2workspace)
     os.system(cmd_Runtext2workspace)
     
@@ -93,15 +93,15 @@ for Mass in mass_point:
     print("\n",cmd_diffNuisances)
     #os.system(cmd_diffNuisances)
 
-    cmd_Impact_doInitialFit = "combineTool.py -M Impacts -d workspace_top_Mass_"+Mass+"_shape_comb_para.root -m 172.5 --doInitialFit --robustFit 1 -n _M"+Mass+"_InitialFit --redefineSignalPOIs sigmaG,mean  --setParameters mean=5.1,r=1,sigmaG=0.15 --freezeParameters r --X-rtd ADDNLL_CBNLL=0"  #for likelihood scans when using robustFit 1
+    cmd_Impact_doInitialFit = "combineTool.py -M Impacts -d workspace_top_Mass_"+Mass+"_shape_comb_para.root -m 172.5 --doInitialFit --robustFit 1 -n _M"+Mass+"_InitialFit --redefineSignalPOIs sigmaG,mean  --setParameters mean=5.1,r=1,sigmaG=0.15 --freezeParameters r --X-rtd ADDNLL_CBNLL=0  --setParameterRanges mean=5.08,5.12:sigmaG=0.10,0.12"  #for likelihood scans when using robustFit 1
     print("\n",cmd_Impact_doInitialFit)
     os.system(cmd_Impact_doInitialFit)
 
-    cmd_Impact_doFit = "combineTool.py -M Impacts -d workspace_top_Mass_"+Mass+"_shape_comb_para.root -m 172.5 --robustFit 1 --doFits -n _M"+Mass+"_InitialFit --redefineSignalPOIs sigmaG,mean --setParameters mean=5.1,r=1,sigmaG=0.15 --freezeParameters r --X-rtd ADDNLL_CBNLL=0"   #nuisance parameter with the --doFits options
+    cmd_Impact_doFit = "combineTool.py -M Impacts -d workspace_top_Mass_"+Mass+"_shape_comb_para.root -m 172.5 --robustFit 1 --doFits -n _M"+Mass+"_InitialFit --redefineSignalPOIs sigmaG,mean --setParameters mean=5.1,r=1,sigmaG=0.15 --freezeParameters r --X-rtd ADDNLL_CBNLL=0 --setParameterRanges mean=5.08,5.12:sigmaG=0.10,0.12"   #nuisance parameter with the --doFits options
     print("\n",cmd_Impact_doFit)
     os.system(cmd_Impact_doFit)
 
-    cmd_Impact_json = "combineTool.py -M Impacts -d workspace_top_Mass_"+Mass+"_shape_comb_para.root -m 172.5 -o impacts_mtop_"+year+".json  -n _M"+Mass+"_InitialFit --redefineSignalPOIs sigmaG,mean --setParameters mean=5.1,r=1,sigmaG=0.15 --freezeParameters r --X-rtd ADDNLL_CBNLL=0"  #--named r, bWeight_lf, bWeight_hf , bWeight_cferr1, bWeight_cferr2, bWeight_lfstats1, bWeight_lfstats2, bWeight_hfstats1, bWeight_hfstats2, bWeight_jes"
+    cmd_Impact_json = "combineTool.py -M Impacts -d workspace_top_Mass_"+Mass+"_shape_comb_para.root -m 172.5 -o impacts_mtop_"+year+".json  -n _M"+Mass+"_InitialFit --redefineSignalPOIs sigmaG,mean --setParameters mean=5.1,r=1,sigmaG=0.15 --freezeParameters r --X-rtd ADDNLL_CBNLL=0 --setParameterRanges mean=5.08,5.12:sigmaG=0.10,0.12"  #--named r, bWeight_lf, bWeight_hf , bWeight_cferr1, bWeight_cferr2, bWeight_lfstats1, bWeight_lfstats2, bWeight_hfstats1, bWeight_hfstats2, bWeight_jes"
     print("\n",cmd_Impact_json)
     os.system(cmd_Impact_json)
 
