@@ -43,7 +43,7 @@ if len(args) == 0:
 if options.pullDef!="" and options.pullDef not in CP.allowed_methods(): exit("Method %s not allowed, choose one of [%s]"%(options.pullDef,",".join(CP.allowed_methods())))
 
 if options.pullDef and options.absolute_values : 
-  print "Pulls are always defined as absolute, will modify --absolute_values to False for you"
+  print("Pulls are always defined as absolute, will modify --absolute_values to False for you")
   options.absolute_values = False 
 
 if options.pullDef : options.show_all_parameters=True
@@ -51,13 +51,13 @@ if options.pullDef : options.show_all_parameters=True
 setUpString = "diffNuisances run on %s, at %s with the following options ... "%(args[0],datetime.datetime.utcnow())+str(options)
 
 file = ROOT.TFile(args[0])
-if file == None: raise RuntimeError, "Cannot open file %s" % args[0]
+if file == None: raise RuntimeError("Cannot open file %s" % args[0])
 fit_s  = file.Get("fit_s")
 fit_b  = file.Get("fit_b")
 prefit = file.Get("nuisances_prefit")
-if fit_s == None or fit_s.ClassName()   != "RooFitResult": raise RuntimeError, "File %s does not contain the output of the signal fit 'fit_s'"     % args[0]
-if fit_b == None or fit_b.ClassName()   != "RooFitResult": raise RuntimeError, "File %s does not contain the output of the background fit 'fit_b'" % args[0]
-if prefit == None or prefit.ClassName() != "RooArgSet":    raise RuntimeError, "File %s does not contain the prefit nuisances 'nuisances_prefit'"  % args[0]
+if fit_s == None or fit_s.ClassName()   != "RooFitResult": raise RuntimeError( "File %s does not contain the output of the signal fit 'fit_s'"     % args[0])
+if fit_b == None or fit_b.ClassName()   != "RooFitResult": raise RuntimeError( "File %s does not contain the output of the background fit 'fit_b'" % args[0])
+if prefit == None or prefit.ClassName() != "RooArgSet":    raise RuntimeError("File %s does not contain the prefit nuisances 'nuisances_prefit'"  % args[0])
 
 isFlagged = {}
 

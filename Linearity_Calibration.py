@@ -51,7 +51,7 @@ def get_linearity_plot(M_true, M_fit, Ey1, Size, variable="S", BDTCUT="0p8"):
     Num_points = Size
     print("size of the array:", Num_points)
     if variable == "M":    constant_array = np.full((len(M_true)), 172.5)  
-    elif variable == "S":  constant_array = np.full((len(M_true)), 1.31)
+    elif variable == "S":  constant_array = np.full((len(M_true)), 1.4)
     print(f'{constant_array = }')
     print(f'{np.array(M_true) = }')
     M_true_ori_shift = np.subtract(np.array(M_true),constant_array)
@@ -94,7 +94,7 @@ def get_linearity_plot(M_true, M_fit, Ey1, Size, variable="S", BDTCUT="0p8"):
         grint.SetMaximum(M_fit[Num_points - 1] + 1)
         grint.SetMinimum(M_fit[0] - 2)
     elif variable == "S":
-        grint.GetXaxis().SetTitle("#Gamma_{t}-1.31 (GeV)")
+        grint.GetXaxis().SetTitle("#Gamma_{t}-1.4 (GeV)")
         if("closer" in BDTCUT):
             grint.GetYaxis().SetTitle("#sigma_{Calibrated} (GeV)")
         else:
@@ -319,36 +319,36 @@ def plot_mass_vs_width(M_fit, M_fit_Error, S_fit, S_fit_Error):
 if __name__ == '__main__':
 
     M_true = [169.5, 170.5,171.5, 172.5, 173.5, 174.5,175.5]
-    Width_true = [0.75, 0.9, 1.3, 1.31,1.5, 1.7, 1.9]
+    Width_true = [0.75, 0.9,1.1, 1.3, 1.4,1.5, 1.7, 1.9]
     
-    M_fit_2018_AltMass_DNN_gt0p7 = [162.336,163.752,164.281,164.698,165.472]
-    Error_M_fit_2018_AltMass_DNN_gt0p7 = [0.236, 0.243, 0.245, 0.248, 0.257]
-    detaM_2018_AltMass_DNN_gt0p7 = [7.164,7.748,8.219,8.802,10.028]
+    M_fit_2018_AltMass_DNN_gt0p7 = []
+    Error_M_fit_2018_AltMass_DNN_gt0p7 = []
+    detaM_2018_AltMass_DNN_gt0p7 = []
     Error_detaM_2018_AltMass_DNN_gt0p7 = []
 
-    gamma_fit_2018_AltWidth_DNN_gt0p7 = [0.11410,0.11424,0.11463,0.11466,0.11477,0.11471]
-    Error_gamma_fit_2018_AltWidth_DNN_gt0p7 = [0.00111,0.00111,0.00111,0.00115,0.00111,0.00114]
-    S_fit_2018_AltWidth_DNN_gt0p7 = [18.799, 18.823, 18.893,  18.898, 18.918, 18.908]
-    deltaS_fit_2018_AltWidth_DNN_gt0p7 = [18.049,17.923,17.583,17.575,17.398,17.218,17.008]
-    Error_S_fit_2018_AltWidth_DNN_gt0p7 = [0.196, 0.196, 0.197,  0.203, 0.195, 0.202]
-    Reso_2018_AltWidth_DNN_gt0p7 = [18.784, 18.801, 18.848, 18.839, 18.841, 18.812]
-    Error_Reso_2018_AltWidth_DNN_gt0p7 = [0.196, 0.196, 0.196,  0.202, 0.195, 0.201]
+    gamma_fit_2018_AltWidth_DNN_gt0p7 = []
+    Error_gamma_fit_2018_AltWidth_DNN_gt0p7 = []
+    S_fit_2018_AltWidth_DNN_gt0p7 = []
+    deltaS_fit_2018_AltWidth_DNN_gt0p7 = []
+    Error_S_fit_2018_AltWidth_DNN_gt0p7 = []
+    Reso_2018_AltWidth_DNN_gt0p7 = []
+    Error_Reso_2018_AltWidth_DNN_gt0p7 = []
     
     LnM_AltMassfit_Run2_AltMass_DNN_gt0p7 = [5.093911,5.097217,5.098843,5.102156,5.104430,5.106490,5.110750]
-    gamma_AltMassfit_Run2_AltWidth_DNN_gt0p7 = [0.118247,0.115034,0.114924,0.115910,0.116368,0.117685,0.117314]
     M_AltMassfit_Run2_AltMass_DNN_gt0p7 = [164.170,164.652,164.918,165.484,165.869,166.237,166.940]
     Error_M_AltMassfit_Run2_AltMass_DNN_gt0p7 = [0.381,0.386,0.389,0.401,0.405,0.402,0.413]
     detaM_Run2_AltMass_DNN_gt0p7 = [5.330,5.848,6.582,7.016,7.631,8.263,8.560]
+    gamma_AltMassfit_Run2_AltWidth_DNN_gt0p7 = [0.118247,0.115034,0.114924,0.115910,0.116368,0.117685,0.117314]
     Error_detaM_2018_AltMass_DNN_gt0p7 = []
 
-    LnM_AltWidthfit_Run2_AltMass_DNN_gt0p7 = [5.101839,5.101905,5.102077,5.102156,5.102165,5.102252,5.102339]
-    gamma_AltWidthfit_Run2_AltWidth_DNN_gt0p7 = [0.115473,0.115559,0.115793,0.115910,0.115917,0.116041,0.116167]
-    Error_gamma_AltWidthfit_Run2_AltWidth_DNN_gt0p7 = [0.001455,0.001440,0.001419,0.001451,0.001387,0.001528,0.001501]
-    S_AltWidthfit_Run2_AltWidth_DNN_gt0p7 = [19.1657,19.1815,19.2245,19.2458,19.2471,19.2698,19.2929]
-    Error_S_AltWidthfit_Run2_AltWidth_DNN_gt0p7 = [0.243,0.250,0.264,0.255,0.270,0.262,0.287]
-    deltaS_AltWidthfit_Run2_AltWidth_DNN_gt0p7 = [18.416,18.282,17.925,17.936,17.747,17.570,17.393]
-    Reso_Run2_AltWidth_DNN_gt0p7 = [19.151,19.160,19.181,19.201,19.189,19.195,19.199]
-    Error_Reso_Run2_AltWidth_DNN_gt0p7 = [0.264,0.261,0.257,0.263,0.252,0.276,0.271]
+    LnM_AltWidthfit_Run2_AltMass_DNN_gt0p7 = [5.101839,5.101905,5.101990,5.102077,5.102156,5.102165,5.102252,5.102339]
+    gamma_AltWidthfit_Run2_AltWidth_DNN_gt0p7 = [0.115473,0.115559,0.115672, 0.115793,0.115910,0.115917,0.116041,0.116167]
+    Error_gamma_AltWidthfit_Run2_AltWidth_DNN_gt0p7 = [0.001455,0.001440,0.001401,0.001419,0.001451,0.001387,0.001528,0.001501]
+    S_AltWidthfit_Run2_AltWidth_DNN_gt0p7 = [19.1657,19.1815,19.2024,19.2245,19.2458,19.2471,19.2698,19.2929]
+    Error_S_AltWidthfit_Run2_AltWidth_DNN_gt0p7 = [0.264,0.261,0.255,0.258,0.264,0.253,0.277,0.272]
+    deltaS_AltWidthfit_Run2_AltWidth_DNN_gt0p7 = [18.416,18.282,18.102,17.925,17.936,17.747,17.570,17.393]
+    Reso_Run2_AltWidth_DNN_gt0p7 = [19.151,19.160,19.171,19.181,19.195,19.189,19.195,19.199]
+    Error_Reso_Run2_AltWidth_DNN_gt0p7 = [0.264,0.261,0.254,0.257,0.263,0.252,0.276,0.271]
 
     get_linearity_plot(M_true, M_AltMassfit_Run2_AltMass_DNN_gt0p7, Error_M_AltMassfit_Run2_AltMass_DNN_gt0p7,len(M_true), variable="M", BDTCUT="gt0p7_Run2")
     hband_mass = get_calib_hist(M_AltMassfit_Run2_AltMass_DNN_gt0p7, detaM_Run2_AltMass_DNN_gt0p7, Error_M_AltMassfit_Run2_AltMass_DNN_gt0p7,len(M_AltMassfit_Run2_AltMass_DNN_gt0p7), "M", "gt0p7_Run2", "pol1")
@@ -379,7 +379,7 @@ if __name__ == '__main__':
 
     for mass, sigmaG in zip(LnM_AltWidthfit_Run2_AltMass_DNN_gt0p7,gamma_AltWidthfit_Run2_AltWidth_DNN_gt0p7):
         #print(mass,sigmaG)
-        cali_width, Error_cali_width = get_calibrated_width(hband_width,mass,sigmaG,0.4064,11.37)
+        cali_width, Error_cali_width = get_calibrated_width(hband_width,mass,sigmaG,0.3964,11.56)
         calibrated_width.append(cali_width)
         Error_calibrated_width.append(Error_cali_width)
     print(f'{calibrated_width = }')
