@@ -387,6 +387,9 @@ if __name__ == '__main__':
    
     get_linearity_plot(Width_true, calibrated_width, Error_calibrated_width,len(Width_true), variable="S", BDTCUT="gt0p7_Run2_closer")
 
+    print(get_calibrated_width(hband_width,5.102882,0.116325,0.3964,11.56))
+    print(get_calibrated_width(hband_width,5.104548,0.115527,0.3964,11.56))
+    print(get_calibrated_width(hband_width,5.102972,0.118957,0.3964,11.56))
     """systs = ["PSWeight_ISR_Up", "PSWeight_ISR_Down", "PSWeight_FSR_Up", "PSWeight_FSR_Down","hdamp_Up", "hdamp_Down"]
     masses = [5.09500,5.09502,5.09545,5.09438,5.09504,5.09498]
     sigmaGs = [0.11466,0.11458,0.11473,0.11447,0.11461,0.11464]

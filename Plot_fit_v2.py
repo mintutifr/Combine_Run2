@@ -45,8 +45,11 @@ def getcons(mass,width):
 
 def getprefit_hist(mass,width,lep):
     hists = []
-    Filename = "/feynman/home/dphp/mk277705/work/HiggsCombine/CMSSW_12_3_4/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_"+lep+"_gteq0p7_withoutDNNfit_rebin.root"
-    Filename_cont = "/feynman/home/dphp/mk277705/work/HiggsCombine/CMSSW_12_3_4/src/PhysicsTools/NanoAODTools/crab//WorkSpace/Hist_for_workspace/Combine_Input_lntopMass_histograms_"+dataYear+"_"+lep+"_gteq0p3_withoutDNNfit_rebin.root"
+    File_Dir = "/feynman/home/dphp/mk277705/work/HiggsCombine/CMSSW_12_3_4/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/"
+    File_Dir ="/eos/home-m/mikumar/Higgs_Combine/CMSSW_14_1_0_pre4/src/HiggsAnalysis/Hist_for_workspace/"
+
+    Filename = File_Dir+"Combine_Input_lntopMass_histograms_"+dataYear+"_"+lep+"_gteq0p7_withoutDNNfit_rebin.root"
+    Filename_cont = File_Dir+"Combine_Input_lntopMass_histograms_"+dataYear+"_"+lep+"_gteq0p3_withoutDNNfit_rebin.root"
     File = rt.TFile(Filename,"Read")
     File_cont = rt.TFile(Filename_cont,"Read")
     gt_or_lt_tag=''
@@ -59,11 +62,13 @@ def getprefit_hist(mass,width,lep):
     Dir_cont = File_cont.GetDirectory(lep+"jets")
     #Get Mc histograms for muon final state
     if(mass!=None):
+        if(mass == "data"): mass = "1725"
         top_sig = Dir.Get("top_sig_"+mass+tag+gt_or_lt_tag)
         print("----------")
         top_sig.Print()
         print("----------")
     if(width!=None):
+        if(width == "data"): width = "1725"
         top_sig = Dir.Get("top_sig_"+width+tag+gt_or_lt_tag)#+width)
         
     top_bkg = Dir.Get("top_bkg_1725"+tag+gt_or_lt_tag)
@@ -112,7 +117,7 @@ def Get_hist_from_Tgraph_asy_Error(Tgraph,Hist):
 def getthefit(mass,width,lep):
     if(mass!=None):fitfile = rt.TFile.Open("fitDiagnostics_M"+mass+".root")
     else : fitfile = rt.TFile.Open("fitDiagnostics_W"+width+".root")
-    print(lep+"jets"+tag+"_logM_fit_s")
+    print(lep+"jets"+tag+"_logM_fit_s" + " if you dont find this dir in the fitDiagnostic file the check if you run the combine command with --plot option")
     fit = fitfile.Get(lep+"jets"+tag+"_logM_fit_s")
     fit.Print()
     prefit_hists = getprefit_hist(mass,width,lep) #return top_sig,topbkg,EWK_bkg

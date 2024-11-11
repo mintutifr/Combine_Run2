@@ -1,0 +1,104 @@
+
+
+
+==========================   UL 2018 =======================================
+mu bWeight_lf: mean = 5.10064 +- 0.01799 GeV, sigmaG = 0.12508 +- 0.00997 GeV
+el bWeight_lf: mean = 5.09168 +- 0.01569 GeV, sigmaG = 0.11734 +- 0.00863 GeV
+
+
+mu bWeight_lfUp: mean = 5.10065 +- 0.00052 GeV, sigmaG = 0.12511 +- 0.00034 GeV
+el bWeight_lfDown: mean = 5.09165 +- 0.00071 GeV, sigmaG = 0.11735 +- 0.00047 GeV
+
+
+mu bWeight_lfDown: mean = 5.10074 +- 0.00052 GeV, sigmaG = 0.12512 +- 0.00034 GeV
+el bWeight_lfDown: mean = 5.09174 +- 0.00071 GeV, sigmaG = 0.11733 +- 0.00047 GeV
+
+
+mu bWeight_lfUp: mean variation= -0.00018  sigmaG variation = -0.02288
+mu bWeight_lfDown: mean variation= -0.00188  sigmaG variation = -0.03083
+
+el bWeight_lfUp: mean variation= 0.00062  sigmaG variation = -0.00643
+el bWeight_lfDown: mean variation= -0.00123  sigmaG variation = 0.01282
+
+-----------------------------------------------------------------------------
+mu bWeight_lf: mean = 5.10362 +- 0.02752 GeV, sigmaG = 0.12383 +- 0.01630 GeV
+el bWeight_lf: mean = 5.09383 +- 0.02140 GeV, sigmaG = 0.11598 +- 0.01348 GeV
+
+
+mu bWeight_lfUp: mean = 5.10356 +- 0.00182 GeV, sigmaG = 0.12383 +- 0.00129 GeV
+el bWeight_lfDown: mean = 5.09378 +- 0.00141 GeV, sigmaG = 0.11601 +- 0.00129 GeV
+
+
+mu bWeight_lfDown: mean = 5.10369 +- 0.00189 GeV, sigmaG = 0.12379 +- 0.00134 GeV
+el bWeight_lfDown: mean = 5.09392 +- 0.00146 GeV, sigmaG = 0.11594 +- 0.00134 GeV
+
+
+mu bWeight_lfUp: mean variation= 0.00111  sigmaG variation = -0.00545
+mu bWeight_lfDown: mean variation= -0.00137  sigmaG variation = 0.02598
+
+el bWeight_lfUp: mean variation= 0.00098  sigmaG variation = -0.02025
+el bWeight_lfDown: mean variation= -0.00173  sigmaG variation = 0.03252
+
+
+=================   UL2017   =============================================
+
+mu bWeight_lf: mean = 5.10233 +- 0.02315 GeV, sigmaG = 0.12300 +- 0.01313 GeV
+el bWeight_lf: mean = 5.09716 +- 0.02127 GeV, sigmaG = 0.11734 +- 0.01288 GeV
+
+
+mu bWeight_lfUp: mean = 5.10230 +- 0.00143 GeV, sigmaG = 0.12302 +- 0.00099 GeV
+el bWeight_lfDown: mean = 5.09717 +- 0.00148 GeV, sigmaG = 0.11740 +- 0.00116 GeV
+
+
+mu bWeight_lfDown: mean = 5.10241 +- 0.00147 GeV, sigmaG = 0.12298 +- 0.00103 GeV
+el bWeight_lfDown: mean = 5.09718 +- 0.00151 GeV, sigmaG = 0.11726 +- 0.00119 GeV
+
+
+mu bWeight_lfUp: mean variation= 0.00064  sigmaG variation = -0.01227
+mu bWeight_lfDown: mean variation= -0.00146  sigmaG variation = 0.01834
+
+el bWeight_lfUp: mean variation= -0.00012  sigmaG variation = -0.04747
+el bWeight_lfDown: mean variation= -0.00027  sigmaG variation = 0.07065
+
+
+=================   UL2016preVFP    =================================
+
+mu bWeight_lf: mean = 5.10375 +- 0.02327 GeV, sigmaG = 0.12458 +- 0.01338 GeV
+el bWeight_lf: mean = 5.09123 +- 0.02083 GeV, sigmaG = 0.11736 +- 0.01302 GeV
+
+
+mu bWeight_lfUp: mean = 5.10363 +- 0.00167 GeV, sigmaG = 0.12453 +- 0.00114 GeV
+el bWeight_lfDown: mean = 5.09113 +- 0.00197 GeV, sigmaG = 0.11735 +- 0.00174 GeV
+
+
+mu bWeight_lfDown: mean = 5.10395 +- 0.00171 GeV, sigmaG = 0.12461 +- 0.00118 GeV
+el bWeight_lfDown: mean = 5.09139 +- 0.00201 GeV, sigmaG = 0.11733 +- 0.00179 GeV
+
+
+mu bWeight_lfUp: mean variation= 0.00246  sigmaG variation = 0.03462
+mu bWeight_lfDown: mean variation= -0.00378  sigmaG variation = -0.02549
+
+el bWeight_lfUp: mean variation= 0.00197  sigmaG variation = 0.00836
+el bWeight_lfDown: mean variation= -0.00297  sigmaG variation = 0.02134
+
+
+===============   UL2016preVFP  ====================================
+
+
+mu bWeight_lf: mean = 5.10365 +- 0.02356 GeV, sigmaG = 0.12305 +- 0.01376 GeV
+el bWeight_lf: mean = 5.09217 +- 0.02279 GeV, sigmaG = 0.12151 +- 0.01334 GeV
+
+
+mu bWeight_lfUp: mean = 5.10357 +- 0.00184 GeV, sigmaG = 0.12307 +- 0.00133 GeV
+el bWeight_lfDown: mean = 5.09194 +- 0.00239 GeV, sigmaG = 0.12149 +- 0.00161 GeV
+
+
+mu bWeight_lfDown: mean = 5.10372 +- 0.00190 GeV, sigmaG = 0.12300 +- 0.00138 GeV
+el bWeight_lfDown: mean = 5.09235 +- 0.00244 GeV, sigmaG = 0.12149 +- 0.00165 GeV
+
+
+mu bWeight_lfUp: mean variation= 0.00165  sigmaG variation = -0.01214
+mu bWeight_lfDown: mean variation= -0.00125  sigmaG variation = 0.03856
+
+el bWeight_lfUp: mean variation= 0.00435  sigmaG variation = 0.01856
+el bWeight_lfDown: mean variation= -0.00369  sigmaG variation = 0.01867

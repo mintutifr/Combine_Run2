@@ -73,41 +73,61 @@ for Mass in mass_point:
     
 
 
-    cmd_RunCombine = "combine -M FitDiagnostics workspace_top_Mass_"+Mass+"_shape_comb_para.root -n _M"+Mass+"  --redefineSignalPOIs sigmaG,mean  --setParameters mean=5.1,r=1,sigmaG=0.15 --freezeParameters r --X-rtd ADDNLL_CBNLL=0  --trackParameters r,mean,sigmaG --trackErrors r,mean,sigmaG --X-rtd TMCSO_PseudoAsimov=0  --plots  --saveShapes --saveWithUncertainties --saveWorkspace"
-
-    #cmd_RunCombine = "combine -M FitDiagnostics workspace_top_Mass_"+Mass+"_shape_comb_para.root -n _M"+Mass+"  --freezeParameters r --redefineSignalPOIs sigmaG,mean  --setParameters mean=5.1,r=1,sigmaG=0.15  --X-rtd ADDNLL_CBNLL=0  --trackParameters mean,sigmaG --trackErrors mean,sigmaG --X-rtd TMCSO_AdaptivePseudoAsimov=0 --X-rtd TMCSO_PseudoAsimov=0  --plots  --saveShapes --saveWithUncertainties --saveWorkspace"
-    
-    #cmd_RunCombine = "combine -M FitDiagnostics workspace_top_Mass_"+Mass+"_shape_comb_para.root -n _M"+Mass+"  --freezeParameters r --redefineSignalPOIs sigmaG,mean --setParameters mean=5.1,r=1,sigmaG=0.15  --X-rtd ADDNLL_CBNLL=0  --trackParameters mean,sigmaG --trackErrors mean,sigmaG --X-rtd TMCSO_AdaptivePseudoAsimov=0 --X-rtd TMCSO_PseudoAsimov=0" --plots --saveShapes# -t 10
-    
-    #cmd_RunCombine = "combine -M MultiDimFit workspace_top_Mass_"+Mass+"_shape_comb_para.root -n _M"+Mass+"  --freezeParameters r --redefineSignalPOIs sigmaG,mean --setParameters mean=5.1,r=1,sigmaG=0.15  --X-rtd ADDNLL_CBNLL=0  -t 10000 --saveToys --X-rtd TMCSO_AdaptivePseudoAsimov=0 --X-rtd TMCSO_PseudoAsimov=0"
-    #--trackParameters mean,sigmaG --trackErrors mean,sigmaG "
-    #--ignoreCovWarning"#--plots --saveShapes"#  --backgroundPdfNames=EWK_bkg,top_bkg"#-t 1000 --saveNLL"# --plots --saveShapes"# --saveWithUncertainties "#--plots -v3" 
-    #FitDiagnostics
-    #MultiDimFit
+    cmd_RunCombine = "combine -M FitDiagnostics workspace_top_Mass_"+Mass+"_shape_comb_para.root -n _M"+Mass+"  --redefineSignalPOIs sigmaG,mean  --setParameters mean=5.1,r=1,sigmaG=0.11 --freezeParameters  r --setParameterRanges mean=5.08,5.12:sigmaG=0.10,0.12 --X-rtd ADDNLL_CBNLL=0  --trackParameters r,mean,sigmaG --trackErrors r,mean,sigmaG --X-rtd TMCSO_PseudoAsimov=0 --saveShapes --saveWithUncertainties --saveWorkspace --plots"
 
     print("\n",cmd_RunCombine)
     os.system(cmd_RunCombine)
-    
 
-    cmd_diffNuisances = "python3 diffNuisances.py fitDiagnostics_M"+mass+".root -a -g higgsCombine_M"+mass+"_"+year+".FitDiagnostics_nuisance.mH120.root "
+    """#MultiDimFit for stat with fix mean
+    cmd_RunCombine = "combine -M MultiDimFit workspace_top_Mass_"+Mass+"_shape_comb_para.root -m 125 --freezeParameters  r,sigmaG,allConstrainedNuisances -n .scanformean.with_syst.statonly --algo grid --points 20 --setParameterRanges mean=5.08,5.12 --setParameters mean=5.1023,r=1,sigmaG=0.114 --redefineSignalPOIs mean  --X-rtd ADDNLL_CBNLL=0"
+    print("\n",cmd_RunCombine)
+    os.system(cmd_RunCombine)
+
+    #MultiDimFit for syst with fix mean
+    cmd_RunCombine = "combine -M MultiDimFit workspace_top_Mass_"+Mass+"_shape_comb_para.root  -m 125 --freezeParameters r,sigmaG -n .scanformean.with_syst --algo grid --points 20 --setParameterRanges mean=5.08,5.12 --setParameters mean=5.1023,r=1,sigmaG=0.114 --redefineSignalPOIs mean  --X-rtd ADDNLL_CBNLL=0"
+    print("\n",cmd_RunCombine)
+    os.system(cmd_RunCombine)
+
+    #plot scan
+    cms_scan_ploting = 'plot1DScan.py higgsCombine.scanformean.with_syst.MultiDimFit.mH125.root --main-label "With systematics" --main-color 1 --others higgsCombine.scanformean.with_syst.statonly.MultiDimFit.mH125.root:"Stat-only":2 -o Plots/mean_scan --POI mean'
+    print("\n",cms_scan_ploting)
+    os.system(cms_scan_ploting)
+
+    #MultiDimFit for stat with fix Sigma
+    cmd_RunCombine = "combine -M MultiDimFit workspace_top_Mass_"+Mass+"_shape_comb_para.root -m 125 --freezeParameters  r,mean,allConstrainedNuisances -n .scanforSigma.with_syst.statonly --algo grid --points 20 --setParameterRanges sigmaG=0.123,0.126 --setParameters mean=5.1023,r=1,sigmaG=0.114 --redefineSignalPOIs sigmaG  --X-rtd ADDNLL_CBNLL=0"
+    print("\n",cmd_RunCombine)
+    os.system(cmd_RunCombine)
+
+    #MultiDimFit for syst with fix Sigma
+    cmd_RunCombine = "combine -M MultiDimFit workspace_top_Mass_"+Mass+"_shape_comb_para.root  -m 125 --freezeParameters r,sigmaG -n .scanforSigma.with_syst --algo grid --points 20 --setParameterRanges sigmaG=0.10,0.12 --setParameters mean=5.1023,r=1,sigmaG=0.114 --redefineSignalPOIs sigmaG  --X-rtd ADDNLL_CBNLL=0"
+    print("\n",cmd_RunCombine)
+    os.system(cmd_RunCombine)
+
+    #plot scan
+    cms_scan_ploting = 'plot1DScan.py higgsCombine.scanforSigma.with_syst.MultiDimFit.mH125.root --main-label "With systematics" --main-color 1 --others higgsCombine.scanforSigma.with_syst.statonly.MultiDimFit.mH125.root:"Stat-only":2 -o Plots/Sigma_scan --POI sigmaG'
+    print("\n",cms_scan_ploting)
+    os.system(cms_scan_ploting)"""
+
+    # Plot impact Plots
+    """cmd_diffNuisances = "python3 diffNuisances.py fitDiagnostics_M"+mass+".root -a -g higgsCombine_M"+mass+"_"+year+".FitDiagnostics_nuisance.mH120.root "
     print("\n",cmd_diffNuisances)
     #os.system(cmd_diffNuisances)
 
-    cmd_Impact_doInitialFit = "combineTool.py -M Impacts -d workspace_top_Mass_"+Mass+"_shape_comb_para.root -m 172.5 --doInitialFit --robustFit 1 -n _M"+Mass+"_InitialFit --redefineSignalPOIs sigmaG,mean  --setParameters mean=5.1,r=1,sigmaG=0.15 --freezeParameters r --X-rtd ADDNLL_CBNLL=0  --setParameterRanges mean=5.08,5.12:sigmaG=0.10,0.12"  #for likelihood scans when using robustFit 1
+    cmd_Impact_doInitialFit = "combineTool.py -M Impacts -d workspace_top_Mass_"+Mass+"_shape_comb_para.root -m 172.5 --doInitialFit --robustFit 1 -n _M"+Mass+"_InitialFit --redefineSignalPOIs sigmaG,mean  --setParameters mean=5.1,r=1,sigmaG=0.11 --freezeParameters r --X-rtd ADDNLL_CBNLL=0  --setParameterRanges mean=5.08,5.12:sigmaG=0.10,0.12"  #for likelihood scans when using robustFit 1
     print("\n",cmd_Impact_doInitialFit)
     os.system(cmd_Impact_doInitialFit)
 
-    cmd_Impact_doFit = "combineTool.py -M Impacts -d workspace_top_Mass_"+Mass+"_shape_comb_para.root -m 172.5 --robustFit 1 --doFits -n _M"+Mass+"_InitialFit --redefineSignalPOIs sigmaG,mean --setParameters mean=5.1,r=1,sigmaG=0.15 --freezeParameters r --X-rtd ADDNLL_CBNLL=0 --setParameterRanges mean=5.08,5.12:sigmaG=0.10,0.12"   #nuisance parameter with the --doFits options
+    cmd_Impact_doFit = "combineTool.py -M Impacts -d workspace_top_Mass_"+Mass+"_shape_comb_para.root -m 172.5 --robustFit 1 --doFits -n _M"+Mass+"_InitialFit --redefineSignalPOIs sigmaG,mean --setParameters mean=5.1,r=1,sigmaG=0.11 --freezeParameters r --X-rtd ADDNLL_CBNLL=0 --setParameterRanges mean=5.08,5.12:sigmaG=0.10,0.12"   #nuisance parameter with the --doFits options
     print("\n",cmd_Impact_doFit)
     os.system(cmd_Impact_doFit)
 
-    cmd_Impact_json = "combineTool.py -M Impacts -d workspace_top_Mass_"+Mass+"_shape_comb_para.root -m 172.5 -o impacts_mtop_"+year+".json  -n _M"+Mass+"_InitialFit --redefineSignalPOIs sigmaG,mean --setParameters mean=5.1,r=1,sigmaG=0.15 --freezeParameters r --X-rtd ADDNLL_CBNLL=0 --setParameterRanges mean=5.08,5.12:sigmaG=0.10,0.12"  #--named r, bWeight_lf, bWeight_hf , bWeight_cferr1, bWeight_cferr2, bWeight_lfstats1, bWeight_lfstats2, bWeight_hfstats1, bWeight_hfstats2, bWeight_jes"
+    cmd_Impact_json = "combineTool.py -M Impacts -d workspace_top_Mass_"+Mass+"_shape_comb_para.root -m 172.5 -o impacts_mtop_"+year+".json  -n _M"+Mass+"_InitialFit --redefineSignalPOIs sigmaG,mean --setParameters mean=5.1,r=1,sigmaG=0.11 --freezeParameters r --X-rtd ADDNLL_CBNLL=0 --setParameterRanges mean=5.08,5.12:sigmaG=0.10,0.12"  #--named r, bWeight_lf, bWeight_hf , bWeight_cferr1, bWeight_cferr2, bWeight_lfstats1, bWeight_lfstats2, bWeight_hfstats1, bWeight_hfstats2, bWeight_jes"
     print("\n",cmd_Impact_json)
     os.system(cmd_Impact_json)
 
     cmd_Impact_plot = "plotImpacts.py -i impacts_mtop_"+year+".json -o impacts_mtop_"+year
     print("\n",cmd_Impact_plot)
-    os.system(cmd_Impact_plot)
+    os.system(cmd_Impact_plot)"""
     
 
 for width in width_point:
@@ -127,18 +147,18 @@ for width in width_point:
     print("\n",cmd_adddatacards)
     os.system(cmd_adddatacards)
     
-    cmd_Runtext2workspace = "text2workspace.py datacard_top_shape_comb_para.txt -o workspace_top_width_"+width+"_shape_comb_para.root"
+    cmd_Runtext2workspace = "env PYTHONNOUSERSITE=1 text2workspace.py datacard_top_shape_comb_para.txt -o workspace_top_width_"+width+"_shape_comb_para.root"
     print("\n",cmd_Runtext2workspace)
     os.system(cmd_Runtext2workspace)
     
     
     #cmd_RunCombine = "combine -M FitDiagnostics workspace_top_width_"+width+"_shape_comb_para.root -n _W"+width+"  --freezeParameters r --redefineSignalPOIs sigmaG,mean --setParameters mean=5.1,r=1,sigmaG=0.15  --X-rtd ADDNLL_CBNLL=0  --saveShapes --plots"
-    cmd_RunCombine = "combine -M FitDiagnostics workspace_top_width_"+width+"_shape_comb_para.root -n _W"+width+"   --redefineSignalPOIs sigmaG,mean  --setParameters mean=5.1,r=1,sigmaG=0.15 --freezeParameters r  --X-rtd ADDNLL_CBNLL=0  --trackParameters r,mean,sigmaG --trackErrors r,mean,sigmaG --X-rtd TMCSO_AdaptivePseudoAsimov=0 --X-rtd TMCSO_PseudoAsimov=0  --plots  --saveShapes --saveWithUncertainties --saveWorkspace"
+    cmd_RunCombine = "combine -M FitDiagnostics workspace_top_width_"+width+"_shape_comb_para.root -n _W"+width+"   --redefineSignalPOIs sigmaG,mean  --setParameters mean=5.1,r=1,sigmaG=0.15 --freezeParameters r  --X-rtd ADDNLL_CBNLL=0  --trackParameters r,mean,sigmaG --trackErrors r,mean,sigmaG --X-rtd TMCSO_AdaptivePseudoAsimov=0 --X-rtd TMCSO_PseudoAsimov=0  --saveShapes --saveWithUncertainties --saveWorkspace" #--plots
 
     print("\n",cmd_RunCombine)
     os.system(cmd_RunCombine)
     
-def getparams(mass,width):
+def getparams(mass,width,parms=[]):
     if(mass!=None): fitfile = rt.TFile.Open("fitDiagnostics_M"+mass+".root")
     else : fitfile = rt.TFile.Open("fitDiagnostics_W"+width+".root")
     roofitResults = fitfile.Get("fit_s")
@@ -146,15 +166,16 @@ def getparams(mass,width):
     print
     print("results from one fit_s from ",fitfile.GetName()," file is (do not qoute this results from toy results) : ")
 
-    mean = (roofitResults.floatParsFinal()).find("mean")
-    print("mean : ",mean.getVal()," Error : ",mean.getError())
+    for par in parms:
+       var = (roofitResults.floatParsFinal()).find(par)
+       print(par," : ",var.getVal()," Error : ",var.getError())
 
     #r = (roofitResults.floatParsFinal()).find("r")
     #print("r : ",r.getVal()," Error : ",r.getError())
 
-    Sigma = (roofitResults.floatParsFinal()).find("sigmaG")
-    print("Sigma : ",Sigma.getVal()," Error : ",Sigma.getError())
+    #Sigma = (roofitResults.floatParsFinal()).find("sigmaG")
+    #print("Sigma : ",Sigma.getVal()," Error : ",Sigma.getError())
     
 
-if(len(mass_point)==1 and len(width_point)==0): getparams(mass_point[0],None)
-if(len(mass_point)==0 and len(width_point)==1): getparams(None,width_point[0])
+if(len(mass_point)==1 and len(width_point)==0): getparams(mass_point[0],None,["mean","sigmaG","cons_top_sig","cons_top_bkg","cons_EWK_bkg"]) # "sigmaG2Frac_mu","sigmaG2Frac_el"
+if(len(mass_point)==0 and len(width_point)==1): getparams(None,width_point[0],["mean","sigmaG","sigmaG2Frac_mu","sigmaG2Frac_el","cons_top_sig","cons_top_bkg","cons_EWK_bkg"])

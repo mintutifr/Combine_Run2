@@ -15,8 +15,17 @@ process                         top_sig  EWK_bkg  top_bkg
 process                          0         1          2          
 rate                             1         1         1           
 ----------------------------------------------------------------------------------------------------------------------------------
-cons_top_sig            lnN     1.16     -         -  
-cons_top_bkg            lnN      -         -        1.06    
-cons_EWK_bkg            lnN      -        1.1        -             
+cons_EWK_bkg            lnN      -        1.1        - 
+cons_top_sig            lnN     1.138     -        -
+cons_top_bkg            lnN     -        -        1.091
 
-#eljets autoMCStats 0 0 1
+#SF_Iso_ID_el               lnN     0.993/1.007     0.993/1.007   0.993/1.007 
+
+
+#nuisance_bWeight_lf_sigmaG     param    0.0    1.0
+#nuisance_bWeight_lf_mean       param    0.0    1.0
+
+#SF_Iso_Trig_el          lnN     0.993/0.993   -      -     
+
+
+#eljets autoMCStats 0 0 0

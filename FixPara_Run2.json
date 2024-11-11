@@ -1,4 +1,22 @@
 {
+    "top_sig": {
+	"UL2018": {
+               "sigmaG2Frac_mu": 0.887, "sigmaG2Frac_mu_error": 0.021,
+	       "sigmaG2Frac_el": 0.968, "sigmaG2Frac_el_error": 0.026
+        },
+	"UL2017": {
+               "sigmaG2Frac_mu": 0.0 , "sigmaG2Frac_mu_error": 0.0 ,
+               "sigmaG2Frac_el": 0.0 , "sigmaG2Frac_el_error": 0.0
+        },
+	"UL2016preVFP": {
+               "sigmaG2Frac_mu": 0.0 , "sigmaG2Frac_mu_error": 0.0 ,
+               "sigmaG2Frac_el": 0.0 , "sigmaG2Frac_el_error": 0.0
+        },
+	"UL2016postVFP": {
+               "sigmaG2Frac_mu": 0.0 , "sigmaG2Frac_mu_error": 0.0 ,
+               "sigmaG2Frac_el": 0.0 , "sigmaG2Frac_el_error": 0.0
+        }
+    },
     "top_bkg": {
         "UL2018": {
 		"mean_top_bkg_mu": 5.117 , "mean_top_bkg_mu_error": 0.013 , "sigmaL_topbkg_mu" : 0.1699 , "sigmaL_topbkg_mu_error" : 0.0075 , "sigmaFracR_mu" : 0.970 , "sigmaFracR_mu_error" : 0.088 ,
