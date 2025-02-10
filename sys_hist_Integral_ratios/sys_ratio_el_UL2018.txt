@@ -1,11 +1,11 @@
-Info in <TCanvas::Print>: file Plots/topSig_bweight_variations_UL2018_el.png has been created
-Info in <TCanvas::Print>: file Plots/topSig_sf_iso_variations_UL2018_el.png has been created
-Info in <TCanvas::Print>: file Plots/topSig_hdamp_variations_UL2018_el.png has been created
-Info in <TCanvas::Print>: file Plots/topBkg_bweight_variations_UL2018_el.png has been created
-Info in <TCanvas::Print>: file Plots/topBkg_sf_iso_variations_UL2018_el.png has been created
-Info in <TCanvas::Print>: file Plots/topBkg_hdamp_variations_UL2018_el.png has been created
-Info in <TCanvas::Print>: file Plots/ewkBkg_bweight_variations_UL2018_el.png has been created
-Info in <TCanvas::Print>: file Plots/ewkBkg_sf_iso_variations_UL2018_el.png has been created
+Info in <TCanvas::Print>: png file Plots_sys/topSig_bweight_variations_UL2018_el.png has been created
+Info in <TCanvas::Print>: png file Plots_sys/topSig_sf_iso_variations_UL2018_el.png has been created
+Info in <TCanvas::Print>: png file Plots_sys/topSig_hdamp_variations_UL2018_el.png has been created
+Info in <TCanvas::Print>: png file Plots_sys/topBkg_bweight_variations_UL2018_el.png has been created
+Info in <TCanvas::Print>: png file Plots_sys/topBkg_sf_iso_variations_UL2018_el.png has been created
+Info in <TCanvas::Print>: png file Plots_sys/topBkg_hdamp_variations_UL2018_el.png has been created
+Info in <TCanvas::Print>: png file Plots_sys/ewkBkg_bweight_variations_UL2018_el.png has been created
+Info in <TCanvas::Print>: png file Plots_sys/ewkBkg_sf_iso_variations_UL2018_el.png has been created
 file_path  = '/eos/home-m/mikumar/Higgs_Combine/CMSSW_14_1_0_pre4/src/HiggsAnalysis/Hist_for_workspace/Combine_Input_lntopMass_histograms_UL2018_el_gteq0p7_withoutDNNfit_rebin.root'
 
   = = = = = = = = =  =      topSig bweight       = = = = = = = =  = = = 

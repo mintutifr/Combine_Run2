@@ -32,6 +32,7 @@ def getCMSInt_tag(x1=0.385, y1=0.86, x2=0.495, y2=0.88):
         cntrl.SetTextSize(0.05)
         cntrl.SetTextAlign(33)
         cntrl.AddText("#bf{CMS} #it{Internal}")
+        #cntrl.AddText("#bf{CMS} #it{Work in progress}")
         return cntrl
     
 def leptonjet_tag(lep="mu",x1=0.25, y1=0.82, x2=0.28, y2=0.84):

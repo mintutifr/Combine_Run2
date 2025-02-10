@@ -5,16 +5,16 @@
 	       "sigmaG2Frac_el": 0.968, "sigmaG2Frac_el_error": 0.026
         },
 	"UL2017": {
-               "sigmaG2Frac_mu": 0.0 , "sigmaG2Frac_mu_error": 0.0 ,
-               "sigmaG2Frac_el": 0.0 , "sigmaG2Frac_el_error": 0.0
+               "sigmaG2Frac_mu": 0.885 , "sigmaG2Frac_mu_error": 0.015 ,
+               "sigmaG2Frac_el": 0.940 , "sigmaG2Frac_el_error": 0.020
         },
 	"UL2016preVFP": {
-               "sigmaG2Frac_mu": 0.0 , "sigmaG2Frac_mu_error": 0.0 ,
-               "sigmaG2Frac_el": 0.0 , "sigmaG2Frac_el_error": 0.0
+               "sigmaG2Frac_mu": 0.941 , "sigmaG2Frac_mu_error": 0.022 ,
+               "sigmaG2Frac_el": 0.944 , "sigmaG2Frac_el_error": 0.028
         },
 	"UL2016postVFP": {
-               "sigmaG2Frac_mu": 0.0 , "sigmaG2Frac_mu_error": 0.0 ,
-               "sigmaG2Frac_el": 0.0 , "sigmaG2Frac_el_error": 0.0
+               "sigmaG2Frac_mu": 0.906 , "sigmaG2Frac_mu_error": 0.025 ,
+               "sigmaG2Frac_el": 0.953 , "sigmaG2Frac_el_error": 0.039
         }
     },
     "top_bkg": {

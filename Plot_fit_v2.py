@@ -207,7 +207,7 @@ def getthefit(mass,width,lep):
     pad1.SetBottomMargin(0.089)
     pad1.SetTicky()
     pad1.SetTickx()
-    #pad1.GetGridy().SetMaximum(Data.GetMaximum() * 1.2)
+    #pad1.SetMaximum(Data.GetMaximum() * 1.2)
     #pad1.SetRightMargin(0.143)
     pad1.Draw()
     pad1.cd()
@@ -219,6 +219,7 @@ def getthefit(mass,width,lep):
     frame.GetYaxis().SetTitleSize(0.04)
 
     Data_prefit.SetTitle("")
+    Data_prefit.SetMaximum(Data_prefit.GetMaximum()*1.2)
     Data_prefit.Draw("P")
     #prefit_total.Draw("same")
     #prefit_data_hist.Draw("P")
@@ -229,7 +230,7 @@ def getthefit(mass,width,lep):
     SigPDF.Draw("same")
     BkgPDF.Draw("same")
     yeartag = year_tag(dataYear,0.82,0.92,0.90,0.95)
-    cmstext = getCMSInt_tag(0.33, 0.86, 0.38, 0.88)
+    cmstext = getCMSInt_tag(0.33, 0.86, 0.48, 0.88)
     finalstate = leptonjet_tag(lep,0.24,0.81,0.37,0.83)
     
     cmstext.Draw()
