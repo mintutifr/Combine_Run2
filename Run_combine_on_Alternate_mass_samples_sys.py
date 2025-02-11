@@ -38,11 +38,11 @@ for Mass in mass_point:
     #os.system(scp_file)
     if(year=="Run2"):
         for yearloop in ['UL2016preVFP', 'UL2016postVFP','UL2017', 'UL2018']:
-            cmd_createWorkspace = "python3 Create_Workspace.py -m "+Mass+" -y  "+yearloop
+            cmd_createWorkspace = "python3 Create_Workspace_sys.py -m "+Mass+" -y  "+yearloop
             os.system(cmd_createWorkspace)
         cmd_adddatacards = "combineCards.py mujets_UL18=datacard_top_shape_mu_para_UL18.txt eljets_UL18=datacard_top_shape_el_para_UL18.txt mujets_UL17=datacard_top_shape_mu_para_UL17.txt eljets_UL17=datacard_top_shape_el_para_UL17.txt  mujets_ULpre16=datacard_top_shape_mu_para_ULpre16.txt eljets_ULpre16=datacard_top_shape_el_para_ULpre16.txt mujets_ULpost16=datacard_top_shape_mu_para_ULpost16.txt eljets_ULpost16=datacard_top_shape_el_para_ULpost16.txt > datacard_top_shape_comb_para.txt"
     else:
-        cmd_createWorkspace = "python3 Create_Workspace.py -m "+Mass+" -y  "+year #+ " -s " + sys
+        cmd_createWorkspace = "python3 Create_Workspace_sys.py -m "+Mass+" -y  "+year #+ " -s " + sys
         print(cmd_createWorkspace)
         os.system(cmd_createWorkspace)
         cmd_adddatacards = "combineCards.py mujets"+tag+"=datacard_top_shape_mu_para"+tag+".txt eljets"+tag+"=datacard_top_shape_el_para"+tag+".txt > datacard_top_shape_comb_para.txt"

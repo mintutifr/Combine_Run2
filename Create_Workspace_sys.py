@@ -2,9 +2,42 @@ import json
 import ROOT as R
 from ROOT import RooFit 
 import sys, datetime
+from Hist_style import *
 import argparse as arg
-import json
+from shape_Sys_variation_calculation import compute_variations
+from Add_sys_parameter_to_datacard import update_sys_parameters_to_datacard
+
 #from TOY_local_fit import Toy_Mc 
+parser = arg.ArgumentParser(description='Create workspace for higgs combine')
+parser.add_argument('-m', '--mass', dest='mass_sample', default=[None], type=str, nargs=1, help="MC top mass sample [data , 1695, 1715, 1735, 1755]")
+parser.add_argument('-w', '--width', dest='width_sample', default=[None], type=str, nargs=1, help="MC top width sample ['data','190', '170', '150','130','090','075']")
+#parser.add_argument('-d', '--isdata', dest='isRealData', default=[False], type=bool, nargs=1, help="run over real data ['True', 'False']")
+parser.add_argument('-y', '--year', dest='Year', default=['UL2017'], type=str, nargs=1, help="Year of Data collection [ UL2016preVFP  UL2016postVFP  UL2017  UL2018 ]")
+parser.add_argument('-f', '--localfit', dest='local_fit', default=[None], type=str, nargs=1, help="Local fit run for  ['sig','top_bkg','ewk_bkg','final', 'final_mu', 'final_el']")
+parser.add_argument('-s', '--sys', dest='sys', default=[''], type=str, nargs=1, help='systematic sample replace the sig and background  ["PSWeight_ISR_Up", "PSWeight_ISR_Down", "PSWeight_FSR_Up", "PSWeight_FSR_Down","hdamp_Up", "hdamp_Down"]')
+parser.add_argument( '--DropFixParam', action="store_true", help=" call if you dont want use optimized paramters  [--DropFixParam]")
+args = parser.parse_args()
+
+        
+mass  = args.mass_sample[0]
+width = args.width_sample[0]
+dataYear = args.Year[0]
+local_fit = args.local_fit[0]
+sys = args.sys[0]
+date   = datetime.datetime.now()
+DropFixParam = args.DropFixParam
+
+if(mass=='data' or width =='data'):
+	RealData = True
+	mass = "1725"
+else:
+	RealData = False
+
+print( "mass: ",mass)
+print( "width: ",width)
+print( "RealData: ",RealData)
+print( "dataYear: ",dataYear)
+print( "localfit: ",local_fit)
 
 def PrintPar(x1=0.385, y1=0.86, x2=0.495, y2=0.88,name="#chi^2/NDF",val=0.0):
         cntrl = R.TPaveText(x1,y1,x2,y2,"brNDC")
@@ -29,28 +62,17 @@ Combine_year_tag={
                 'UL2017' : "_UL17",
                 'UL2018' : "_UL18"}
 
+tag = Combine_year_tag[dataYear]
+
+CMSTAG  = getCMSInt_tag(x1=0.32, y1=0.86, x2=0.4, y2=0.88)
+lepton_tag_mu = leptonjet_tag(lep="mu",x1=0.32, y1=0.82, x2=0.4, y2=0.84)
+lepton_tag_el = leptonjet_tag(lep="el",x1=0.32, y1=0.82, x2=0.4, y2=0.84)
+year_tag = year_tag(dataYear,x1=0.85, y1=0.92, x2=0.9, y2=0.95)
    
+with open('FixPara_Run2.json', 'r') as f:
+    FixParam = json.load(f)
 
-def Get_fit_param(mass,width,RealData,dataYear,local_fit,sys):
-    """
-    return:
-    mean[]: list conatin mean and fit error on it
-    sigmaG[]: list of sigmaG and fit error on it
-    """
-    mean_fit = {}
-    sigmaG_fit = {}
-    tag = Combine_year_tag[dataYear]
-
-    from Hist_style import getCMSInt_tag,leptonjet_tag,leptonjet_tag,year_tag
-    CMSTAG  = getCMSInt_tag(x1=0.32, y1=0.86, x2=0.4, y2=0.88)
-    lepton_tag_mu = leptonjet_tag(lep="mu",x1=0.32, y1=0.82, x2=0.4, y2=0.84)
-    lepton_tag_el = leptonjet_tag(lep="el",x1=0.32, y1=0.82, x2=0.4, y2=0.84)
-    year_tag = year_tag(dataYear,x1=0.85, y1=0.92, x2=0.9, y2=0.95)
-
-
-    with open('FixPara_Run2.json', 'r') as f:
-        FixParam = json.load(f)
-
+if __name__ == "__main__":
     #define Variable
     logM = R.RooRealVar("logM","#it{ln} m_{t}",R.TMath.Log(100.0),R.TMath.Log(300))
     #create RooDataHist
@@ -81,8 +103,8 @@ def Get_fit_param(mass,width,RealData,dataYear,local_fit,sys):
         top_sig_mu = dir_mu.Get("top_sig_"+mass+tag+gt_or_lt_tag+sys)
     if(width!= None):
         top_sig_mu = dir_mu.Get("top_sig_"+width+tag+gt_or_lt_tag+sys)
-
-    top_bkg_mu = dir_mu.Get("top_bkg_1725"+tag+gt_or_lt_tag)#+sys)
+        
+    top_bkg_mu = dir_mu.Get("top_bkg_1725"+tag+gt_or_lt_tag+sys)
     EWK_bkg_mu = dir_mu.Get("EWK_bkg"+tag+gt_or_lt_tag)
     EWK_bkg_mu_cont = dir_mu_cont.Get("EWK_bkg"+tag+"_gt")
     QCD_DD = dir_mu.Get("QCD_DD"+tag+gt_or_lt_tag)
@@ -115,7 +137,7 @@ def Get_fit_param(mass,width,RealData,dataYear,local_fit,sys):
     if(width!= None):
         top_sig_el = dir_el.Get("top_sig_"+width+tag+gt_or_lt_tag+sys)
 
-    top_bkg_el = dir_el.Get("top_bkg_1725"+tag+gt_or_lt_tag)#+sys)
+    top_bkg_el = dir_el.Get("top_bkg_1725"+tag+gt_or_lt_tag+sys)
     EWK_bkg_el = dir_el.Get("EWK_bkg"+tag+gt_or_lt_tag)
     EWK_bkg_el_cont = dir_el_cont.Get("EWK_bkg"+tag+"_gt")
     QCD_DD = dir_mu.Get("QCD_DD"+tag+gt_or_lt_tag)
@@ -144,35 +166,120 @@ def Get_fit_param(mass,width,RealData,dataYear,local_fit,sys):
 
 
     # = = = = = = = = = = = = = =
-    # POIs
+    # POI
     # = = = = = = = = = = = = = =
-
+    
     mean = R.RooRealVar("mean","mean",5.1,4.5,5.5)
     sigmaG = R.RooRealVar("sigmaG","sigmaG",0.15098,0.01,5)
 
-    # = = = = = = = = = = = = = =
+
+    json_file = "Sys_fit_results_"+dataYear+".json"  # Replace with your actual JSON file path
+    systematic = ["bWeight_lf"] #,"bWeight_hf"]#,"bWeight_cferr1","bWeight_cferr2"]       # The systematic you want to analyze
+
+    # = = = = = = = = = = = = = = 
+    # Update systematic nuisance parameter in datacards
+    # = = = = = = = = = = = = = = 
+
+    update_sys_parameters_to_datacard("datacard_top_shape_mu_para"+Combine_year_tag[dataYear]+".txt",systematic)
+    update_sys_parameters_to_datacard("datacard_top_shape_el_para"+Combine_year_tag[dataYear]+".txt",systematic)
+
+    Nuisance_values= {dataYear:{}}
+    for sys in systematic:
+        _,Nuisance_values[dataYear][sys] = compute_variations(json_file, sys)
+    print("\n",Nuisance_values,"\n")
+   
+
+    # = = = = = = = = = = = = = = 
     # Nuisance parameters for syst.
     # = = = = = = = = = = = = = =
 
+    # Define nuisance parameters for all systematics
+    nuisance_vars_mean = {}
+    nuisance_vars_sigmaG = {}
+
+    for sys in systematic:
+        nuisance_vars_mean[sys] = R.RooRealVar(f"nuisance_{sys}_mean", f"nuisance_{sys}_mean", 0, -5, 5)
+        nuisance_vars_mean[sys].setConstant(True)
+
+        nuisance_vars_sigmaG[sys] = R.RooRealVar(f"nuisance_{sys}_sigmaG", f"nuisance_{sys}_sigmaG", 0, -5, 5)
+        nuisance_vars_sigmaG[sys].setConstant(True)
 
 
+    
+    # Construct the formula dynamically
+    mean_formula_expr = "@0"  # Initial mean value
+    sigmaG_formula_expr = "@0"  # Initial sigmaG value
 
+    arg_list_mean = [mean]
+    arg_list_sigmaG = [sigmaG]
+    arg_list_mean_str = ["mean"]
+    arg_list_sigmaG_str = ["sigmaG"]
+
+    for i, sys in enumerate(systematic, start=1):
+        mean_formula_expr += f"*(1+@{i*2-1}*@{i*2})"
+        sigmaG_formula_expr += f"*(1+@{i*2-1}*@{i*2})"
+        
+        arg_list_mean.append(nuisance_vars_mean[sys])
+        arg_list_mean.append(R.RooFit.RooConst(Nuisance_values[dataYear][sys]["mean_mu"]))
+        arg_list_mean_str.append(sys+"_Roovar_mean")
+        arg_list_mean_str.append(sys+"_variation_mean_mu")
+
+        arg_list_sigmaG.append(nuisance_vars_sigmaG[sys])
+        arg_list_sigmaG.append(R.RooFit.RooConst(Nuisance_values[dataYear][sys]["sigmaG_mu"]))
+        arg_list_sigmaG_str.append(sys+"_Roovar_SigmaG")
+        arg_list_sigmaG_str.append(sys+"_variation_SigmaG_mu")
+
+    print(f"{mean_formula_expr = }")
+    print(f"{arg_list_mean_str = }")
+
+    print(f"\n{sigmaG_formula_expr = }")
+    print(f"{arg_list_sigmaG_str = }")
+
+    # Create RooFormulaVar for mu and el
+    mean_formula_mu = R.RooFormulaVar("mean_form_mu", "mean_form_mu", mean_formula_expr, R.RooArgList(*arg_list_mean))
+    sigmaG_formula_mu = R.RooFormulaVar("sigmaG_form_mu", "sigmaG_form_mu", sigmaG_formula_expr, R.RooArgList(*arg_list_sigmaG))
+
+    arg_list_mean[2::2] = [R.RooFit.RooConst(Nuisance_values[dataYear][sys]["mean_el"]) for sys in systematic]
+    arg_list_sigmaG[2::2] = [R.RooFit.RooConst(Nuisance_values[dataYear][sys]["sigmaG_el"]) for sys in systematic]
+
+    arg_list_mean_str[2::2] = [ sys+"_variation_SigmaG_el" for sys in systematic]
+    arg_list_sigmaG_str[2::2] = [ sys+"_variation_mean_el" for sys in systematic]
+
+    print(f"\n{mean_formula_expr = }")
+    print(f"{arg_list_mean_str = }")
+
+    print(f"\n{sigmaG_formula_expr = }")
+    print(f"{arg_list_sigmaG_str = }")
+
+
+    mean_formula_el = R.RooFormulaVar("mean_form_el", "mean_form_el", mean_formula_expr, R.RooArgList(*arg_list_mean))
+    sigmaG_formula_el = R.RooFormulaVar("sigmaG_form_el", "sigmaG_form_el", sigmaG_formula_expr, R.RooArgList(*arg_list_sigmaG))
+    
     # C r e a t e   m o d e l 
     # -----------------------------------------------
-    # Declare observable mean and data
 
-    sigmaG2Frac_mu = R.RooRealVar("sigmaG2Frac_mu","sigmaG2Frac_mu",0.1,0.0,5.0) #Best Fit Value
-    sigmaG2Frac_el = R.RooRealVar("sigmaG2Frac_el","sigmaG2Frac_el",0.1,0.0,5.0) #Best Fit Value
+    # Vaiable fit param
+    # ====================  #
+    sigmaG2Frac_mu = R.RooRealVar("sigmaG2Frac_mu","sigmaG2Frac_mu",0.1,0.0,5.0) 
+    sigmaG2Frac_el = R.RooRealVar("sigmaG2Frac_el","sigmaG2Frac_el",0.1,0.0,5.0) 
+    # ====================  #
+    # Best fit param
+    # ====================  #
+    if(DropFixParam==False):
+        sigmaG2Frac_mu = R.RooFit.RooConst(FixParam["top_sig"][dataYear]["sigmaG2Frac_mu"])
+        sigmaG2Frac_el = R.RooFit.RooConst(FixParam["top_sig"][dataYear]["sigmaG2Frac_el"])
+    # ====================  #
+
     sigmaG2_mu = R.RooFormulaVar("sigmaG2_mu","sigmaG2_mu","@0/@1",R.RooArgList(sigmaG,	sigmaG2Frac_mu))
     sigmaG2_el = R.RooFormulaVar("sigmaG2_el","sigmaG2_el","@0/@1",R.RooArgList(sigmaG,sigmaG2Frac_el))
-    
     #signal Bifrac gaussian pdf
-    sig_pdf_mu = R.RooBifurGauss("sig_pdf_mu","gauss_mu",logM,mean,sigmaG,sigmaG2_mu)
-    sig_pdf_el = R.RooBifurGauss("sig_pdf_el","gauss_el",logM,mean,sigmaG,sigmaG2_el)
-
-
-
-
+    sig_pdf_mu = R.RooBifurGauss("sig_pdf_mu","gauss_mu",logM,mean_formula_mu,sigmaG_formula_mu,sigmaG2_mu)
+    sig_pdf_el = R.RooBifurGauss("sig_pdf_el","gauss_el",logM,mean_formula_el,sigmaG_formula_el,sigmaG2_el)
+    print(f"{sig_pdf_mu.Print() = }")
+    print(f"{sig_pdf_el.Print() = }")
+    
+    #sig_pdf_mu = R.RooBifurGauss("sig_pdf_mu","gauss_mu",logM,mean,sigmaG,sigmaG2_mu)
+    #sig_pdf_el = R.RooBifurGauss("sig_pdf_el","gauss_el",logM,mean,sigmaG,sigmaG2_el)
 
 
 
@@ -180,12 +287,12 @@ def Get_fit_param(mass,width,RealData,dataYear,local_fit,sys):
 
     # Vaiable fit param
     # ====================  #
-    sigmaL_topbkg_mu = R.RooRealVar("sigmaL_topbkg_mu","sigmaL_topbkg_mu",0.15098,0.01,1)
+    çsigmaL_topbkg_mu = R.RooRealVar("sigmaL_topbkg_mu","sigmaL_topbkg_mu",0.15098,0.01,1)
     sigmaL_topbkg_el = R.RooRealVar("sigmaL_topbkg_el","sigmaL_topbkg_el",0.15098,0.01,1)
     mean_top_bkg_mu = R.RooRealVar("mean_top_bkg_mu","mean_top_bkg_mu",5.1,4.5,5.5)
-    mean_top_bkg_el = R.RooRealVar("mean_top_bkg_el","mean_top_bkg_el",5.1,4.5,5.5)
-    sigmaFracR_mu = R.RooRealVar("sigmaFracR_mu","sigmaFracR_mu",0.1,0.0,5.0)
+    mean_top_bkg_el = R.RooRealVar("mean_top_bkg_el","mean_top_bkg_el",5.1,4.5,5.5)    
     sigmaFracR_el = R.RooRealVar("sigmaFracR_el","sigmaFracR_el",0.1,0.0,5.0) 
+    sigmaFracR_mu = R.RooRealVar("sigmaFracR_mu","sigmaFracR_mu",0.1,0.0,5.0)
     # ====================  #
 
 
@@ -247,8 +354,8 @@ def Get_fit_param(mass,width,RealData,dataYear,local_fit,sys):
     print( "Nsig_norm: ",nSig_mu,"\tNTop_norm: ",nTop_mu,"\tNEwk_norm: ",nEWK_mu,'\n')
 
     sig_pdf_mu_norm = R.RooRealVar("sig_pdf_mu_norm","sig_pdf_mu_norm",nSig_mu)
-    topbkg_pdf_mu_norm = R.RooRealVar("topbkg_pdf_mu_norm","topbkg_pdf_mu_norm",nTop_mu)
-    EWKbkg_pdf_mu_norm = R.RooRealVar("EWKbkg_pdf_mu_norm","EWKbkg_pdf_mu_norm",nEWK_mu)
+    topbkg_pdf_mu_norm = R.RooRealVar("topbkg_pdf_mu_norm","topbkg_pdf_mu_norm",nTop_mu)#,0,10*nTop_mu)
+    EWKbkg_pdf_mu_norm = R.RooRealVar("EWKbkg_pdf_mu_norm","EWKbkg_pdf_mu_norm",nEWK_mu)#,0,10*nEWK_mu)
 
     #yields of signal and the background
     nSig_el = top_sig_el.Integral()
@@ -258,11 +365,10 @@ def Get_fit_param(mass,width,RealData,dataYear,local_fit,sys):
     print( "Nsig_norm: ",nSig_el, "\tNTop_norm: ",nTop_el,"\tNEwk_norm: ",nEWK_el,"\n")
 
     sig_pdf_el_norm = R.RooRealVar("sig_pdf_el_norm","sig_pdf_el_norm",nSig_el)
-    topbkg_pdf_el_norm = R.RooRealVar("topbkg_pdf_el_norm","topbkg_pdf_el_norm",nTop_el)
-    EWKbkg_pdf_el_norm = R.RooRealVar("EWKbkg_pdf_el_norm","EWKbkg_pdf_el_norm",nEWK_el)
+    topbkg_pdf_el_norm = R.RooRealVar("topbkg_pdf_el_norm","topbkg_pdf_el_norm",nTop_el)#,0,10*nTop_el)
+    EWKbkg_pdf_el_norm = R.RooRealVar("EWKbkg_pdf_el_norm","EWKbkg_pdf_el_norm",nEWK_el)#,0,10*nEWK_el)
 
     if(local_fit == None):
-        pass
         #Create a new empty workspace
         w = R.RooWorkspace("w"+tag,"workspace"+tag+gt_or_lt_tag)
         #Import model and all its components into the workspace
@@ -293,13 +399,16 @@ def Get_fit_param(mass,width,RealData,dataYear,local_fit,sys):
         # Workspace will remain in memory after macro finishes
         R.gDirectory.Add(w)
 
-
-
-
+        
+        
+        
+        
+        
+        
 
 #########----------------------------------------------------###############------------------###########  
     if(local_fit == "sig"):
-        print("locally fitting for the signal shapes only (BiFrac Gaussian)")
+        print("locally fitting for the signal shapes only (Bifrac gaussian)")
         xpad = [0.0,0.495,0.505,1.0]
         ypad = [0.,1.]
         #hadd histogram to data hist for ploting
@@ -316,8 +425,6 @@ def Get_fit_param(mass,width,RealData,dataYear,local_fit,sys):
         #fit to the signal model	
         res_mu =  sig_pdf_mu.fitTo(data_mu_sig,R.RooFit.Save(),R.RooFit.SumW2Error(R.kTRUE))
         res_mu.Print()
-        mean_fit["mean_mu"] = [mean.getVal(), mean.getError()]
-        sigmaG_fit["sigmaG_mu"] = [sigmaG.getVal(), sigmaG.getError()]
         #deine frame for ploting
         Frame_mu = logM.frame(R.RooFit.Title("#mu"))#signal mu"))
         # draw fit on frame 
@@ -342,9 +449,6 @@ def Get_fit_param(mass,width,RealData,dataYear,local_fit,sys):
         R.gPad.SetTickx()
         #fit to the signal model
         res_el =  sig_pdf_el.fitTo(data_el_sig,R.RooFit.Save(),R.RooFit.SumW2Error(R.kTRUE))
-        res_el.Print()
-        mean_fit["mean_el"] = [mean.getVal(), mean.getError()]
-        sigmaG_fit["sigmaG_el"] = [sigmaG.getVal(), sigmaG.getError()]
         #deine frame for ploting
         Frame_el = logM.frame(R.RooFit.Title("el"))#signal el"))
         # draw fit on framee will let you know as soon as we upload the new version of AN. 
@@ -365,10 +469,13 @@ def Get_fit_param(mass,width,RealData,dataYear,local_fit,sys):
         can_mu.Update()
         #raw_input()
         #write canvas in png image
-        can_mu.Print("Plots/Signal_only_local_fit"+mass+tag+gt_or_lt_tag+sys+"_fix_par.png")
+        can_mu.Print("Plots/Signal_only_local_fit"+mass+tag+gt_or_lt_tag+"_fix_par.png")
+
         
-        #print("\n%s %s: mean = %.5f +- %.5f GeV, sigmaG = %.5f +- %.5f GeV"%('mu',sys,mean_fit['mean_mu'][0],mean_fit['mean_mu'][1],sigmaG_fit['sigmaG_mu'][0],sigmaG_fit['sigmaG_mu'][1]))
-        #print("%s %s: mean = %.5f +- %.5f GeV, sigmaG = %.5f +- %.5f GeV\n"%('el',sys,mean_fit['mean_el'][0],mean_fit['mean_el'][1],sigmaG_fit['sigmaG_el'][0],sigmaG_fit['sigmaG_el'][1]))
+        
+        
+        
+        
         
 #########----------------------------------------------------###############------------------###########  
     if(local_fit == "top_bkg"):
@@ -441,11 +548,12 @@ def Get_fit_param(mass,width,RealData,dataYear,local_fit,sys):
         if(width!=None):
             can_mu_topbkg.Print("Plots/Topbkg_only_local_fit"+width+tag+gt_or_lt_tag+"_fix_par.png")
 
-
-
-
-
-
+        
+        
+        
+        
+        
+        
 #########----------------------------------------------------###############------------------###########  
     if(local_fit == "ewk_bkg"):
         print("locally fitting for the EWK background shapes only (novosibrsk)")
@@ -512,12 +620,12 @@ def Get_fit_param(mass,width,RealData,dataYear,local_fit,sys):
             can_mu_ewkbkg.Print("Plots/EWKbkg_only_local_fit_"+mass+tag+gt_or_lt_tag+"_fix_par.png")
         if(width!=None):
             can_mu_ewkbkg.Print("Plots/EWKbkg_only_local_fit_"+width+tag+gt_or_lt_tag+"_fix_par.png")
-
-
-
-
-
-
+        
+        
+        
+        
+        
+        
 #########----------------------------------------------------###############------------------###########        
     if(local_fit == "final" or local_fit == "final_mu" or local_fit == "final_el"):
         print("locally fitting with full model")
@@ -595,18 +703,18 @@ def Get_fit_param(mass,width,RealData,dataYear,local_fit,sys):
         model_el = R.RooAddPdf("model_el","Total Model el",R.RooArgList(sig_pdf_el,topbkg_pdf_el,EWKbkg_pdf_el),R.RooArgList(Nsig_el,Ntop_el,Newk_el))
         model_el_Final = R.RooProdPdf("model_el_Final","Total Model el with constraints",R.RooArgList(model_el,tch_constraint, top_constraint, ewk_constraint))
 
-
-
-
-
-
+        
+        
+        
+        
+        
+        
 #########----------------------------------------------------###############------------------###########
-        if(local_fit == "final_mu" or local_fit == "final"):
+        if(local_fit == "final_mu"):
             #fit to the data
             res = model_mu_Final.fitTo(data_mu,R.RooFit.Constrain(R.RooArgSet(sf_tch,sf_top,sf_ewk)),R.RooFit.Extended(R.kTRUE),R.RooFit.NumCPU(4,0),R.RooFit.Save(),R.RooFit.SumW2Error(R.kTRUE))
             res.Print()
-            mean_fit["mean_mu"] = [mean.getVal(), mean.getError()]
-            sigmaG_fit["sigmaG_mu"] = [sigmaG.getVal(), sigmaG.getError()]
+
 
             #   // P  L  O   T  I  N  G  ------------------------
             #   // ----------------------------------------------
@@ -731,20 +839,18 @@ def Get_fit_param(mass,width,RealData,dataYear,local_fit,sys):
             #Toy_Mc(model_mu_Final,logM,mean)		
 
 
-
-
-
-
-
-
+        
+        
+        
+        
+        
+        
 #########----------------------------------------------------###############------------------###########
-        if(local_fit == "final_el" or local_fit == "final"):
+        if(local_fit == "final_el"):
             #fit to the data
             res = model_el_Final.fitTo(data_el,R.RooFit.Constrain(R.RooArgSet(sf_tch,sf_top,sf_ewk)),R.RooFit.Extended(R.kTRUE),R.RooFit.NumCPU(4,0),R.RooFit.Save(),R.RooFit.SumW2Error(R.kTRUE))
             res.Print()
-            
-            mean_fit["mean_el"] = [mean.getVal(), mean.getError()]
-            sigmaG_fit["sigmaG_el"] = [sigmaG.getVal(), sigmaG.getError()]
+
 
             #   // P  L  O   T  I  N  G  ------------------------
             #   // ----------------------------------------------
@@ -854,10 +960,10 @@ def Get_fit_param(mass,width,RealData,dataYear,local_fit,sys):
             gr_lep.SetMarkerColor(1)
             gr_lep.SetMarkerStyle(20)
             gr_lep.SetMarkerSize(0.89)
-            gr_lep.SetLineColor(R.kBlack)
-            gr_lep.Draw('PE1;SAME')
+            gr_lep.SetLineColor(R.kBlack)	
+            gr_lep.Draw('PE1;SAME')			
 
-            pad2.Update()
+            pad2.Update()	
             can.Update()
 
             #raw_input()
@@ -866,8 +972,14 @@ def Get_fit_param(mass,width,RealData,dataYear,local_fit,sys):
             if(width!=None):can.Print("Plots/final_model_el_"+width+tag+gt_or_lt_tag+".png")
 
 
+        
+        
+        
+        
+        
+        
 #########----------------------------------------------------###############------------------###########
-        if(local_fit == "simul_final"):
+        if(local_fit == "final"):
             sample = R.RooCategory("sample", "sample")
             sample.defineType("mu")
             sample.defineType("el")
@@ -915,121 +1027,3 @@ def Get_fit_param(mass,width,RealData,dataYear,local_fit,sys):
             leg.Draw()
             if(mass!=None):can.Print("Plots/final_model_comb_"+mass+tag+gt_or_lt_tag+".png")
             if(width!=None):can.Print("Plots/final_model_comb_"+width+tag+gt_or_lt_tag+".png")
-
-    return mean_fit,sigmaG_fit
-
-
-
-
-
-
-def save_fit_results_json(mass, width, isRealData, dataYear, local_fit, systematics, output_filename="fit_results.json"):
-    """
-    Runs over multiple systematic variations, retrieves fit parameters, and writes them to a JSON file.
-
-    Parameters:
-    - mass (float): Mass value
-    - width (float): Width value
-    - isRealData (bool): Flag for real or simulated data
-    - dataYear (int): Year of data
-    - local_fit (bool): Local fit flag
-    - systematics (list): List of systematic variations (e.g., ["JES", "JER", "PDF"])
-    - output_filename (str): Name of the JSON output file
-    """
-    fit_results = {}
-
-    mean_fit,sigmaG_fit = Get_fit_param(mass = mass,width = width,RealData = isRealData,dataYear = dataYear,local_fit = local_fit,sys='')
-
-    print("\n%s : mean = %.5f +- %.5f GeV, sigmaG = %.5f +- %.5f GeV"%('mu',mean_fit['mean_mu'][0],mean_fit['mean_mu'][1],sigmaG_fit['sigmaG_mu'][0],sigmaG_fit['sigmaG_mu'][1]))
-    print("%s: mean = %.5f +- %.5f GeV, sigmaG = %.5f +- %.5f GeV\n"%('el',mean_fit['mean_el'][0],mean_fit['mean_el'][1],sigmaG_fit['sigmaG_el'][0],sigmaG_fit['sigmaG_el'][1]))
-
-    fit_results["Nomi"] = {
-            "Nomi": {"mean_fit": mean_fit, "sigmaG_fit": sigmaG_fit}
-        }
-
-    for sys in systematics:
-        print(sys)
-        mean_fit_Up,sigmaG_fit_Up = Get_fit_param(mass = mass,width = width,RealData = isRealData,dataYear = dataYear,local_fit = local_fit,sys = sys+"Up")
-        mean_fit_Down,sigmaG_fit_Down = Get_fit_param(mass = mass,width = width,RealData = isRealData,dataYear = dataYear,local_fit = local_fit,sys = sys+"Down")
-
-        fit_results[sys] = {
-            "Up": {"mean_fit": mean_fit_Up, "sigmaG_fit": sigmaG_fit_Up},
-            "Down": {"mean_fit": mean_fit_Down, "sigmaG_fit": sigmaG_fit_Down},
-        }
-
-    # Write results to JSON file
-    with open(output_filename, "w") as json_file:
-        json.dump(fit_results, json_file, indent=4)
-
-    print(f"JSON file '{output_filename}' saved successfully!")
-
-
-
-
-
-
-if __name__ == "__main__":
-    parser = arg.ArgumentParser(description='Create workspace for higgs combine')
-    parser.add_argument('-m', '--mass', dest='mass_sample', default=[None], type=str, nargs=1, help="MC top mass sample [data , 1695, 1715, 1735, 1755]")
-    parser.add_argument('-w', '--width', dest='width_sample', default=[None], type=str, nargs=1, help="MC top width sample ['data','190', '170', '150','130','090','075']")
-    #parser.add_argument('-d', '--isdata', dest='isRealData', default=[False], type=bool, nargs=1, help="run over real data ['True', 'False']")
-    parser.add_argument('-y', '--year', dest='Year', default=['UL2017'], type=str, nargs=1, help="Year of Data collection [ UL2016preVFP  UL2016postVFP  UL2017  UL2018 ]")
-    parser.add_argument('-f', '--localfit', dest='local_fit', default=[None], type=str, nargs=1, help="Local fit run for  ['sig','top_bkg','ewk_bkg','final', 'final_mu', 'final_el']")
-    parser.add_argument('-s', '--sys', dest='sys', default=[''], type=str, nargs=1, help='systematic sample replace the sig and background  ["bWeight", "hdamp"]')
-    parser.add_argument( '--DropFixParam', action="store_true", help=" call if you dont want use optimized paramters  [--DropFixParam]")
-    args = parser.parse_args()
-    
-            
-    mass  = args.mass_sample[0]
-    width = args.width_sample[0]
-    dataYear = args.Year[0]
-    local_fit = args.local_fit[0]
-    sys = args.sys[0]
-    date   = datetime.datetime.now()
-    DropFixParam = args.DropFixParam
-    
-    if(mass=='data' or width =='data'):
-    	isRealData = True
-    	mass = "1725"
-    else:
-    	isRealData = False
-    
-    print( "mass: ",mass)
-    print( "width: ",width)
-    print( "isRealData: ",isRealData)
-    print( "dataYear: ",dataYear)
-    print( "localfit: ",local_fit)
-   
-    
-    
-
-    if(sys!=''):
-        print(sys)
-        if(sys=="bWeight"): 
-            systematics = ["bWeight_hf","bWeight_lf","bWeight_cferr1","bWeight_cferr2"]
-        save_fit_results_json(
-            mass=mass,
-            width=width,
-            isRealData=isRealData,
-            dataYear=dataYear,
-            local_fit=local_fit,
-            systematics=systematics,
-            output_filename="Sys_fit_results_"+dataYear+".json")
-        # mean_fit_Up,sigmaG_fit_Up = Get_fit_param(mass = mass,width = width,RealData = isRealData,dataYear = dataYear,local_fit = local_fit,sys = sys+"Up")
-        # mean_fit_Down,sigmaG_fit_Down = Get_fit_param(mass = mass,width = width,RealData = isRealData,dataYear = dataYear,local_fit = local_fit,sys = sys+"Down")
-
-        # print("\n%s %s: mean = %.5f +- %.5f GeV, sigmaG = %.5f +- %.5f GeV"%('mu',sys,mean_fit['mean_mu'][0],mean_fit['mean_mu'][1],sigmaG_fit['sigmaG_mu'][0],sigmaG_fit['sigmaG_mu'][1]))
-        # print("%s %s: mean = %.5f +- %.5f GeV, sigmaG = %.5f +- %.5f GeV\n"%('el',sys,mean_fit['mean_el'][0],mean_fit['mean_el'][1],sigmaG_fit['sigmaG_el'][0],sigmaG_fit['sigmaG_el'][1]))
-
-        # print("\n%s %s: mean = %.5f +- %.5f GeV, sigmaG = %.5f +- %.5f GeV"%('mu',sys+"Up",mean_fit_Up['mean_mu'][0],mean_fit_Up['mean_mu'][1],sigmaG_fit_Up['sigmaG_mu'][0],sigmaG_fit_Up['sigmaG_mu'][1]))
-        # print("%s %s: mean = %.5f +- %.5f GeV, sigmaG = %.5f +- %.5f GeV\n"%('el',sys+"Down",mean_fit_Up['mean_el'][0],mean_fit_Up['mean_el'][1],sigmaG_fit_Up['sigmaG_el'][0],sigmaG_fit_Up['sigmaG_el'][1]))
-
-
-        # print("\n%s %s: mean = %.5f +- %.5f GeV, sigmaG = %.5f +- %.5f GeV"%('mu',sys+"Down",mean_fit_Down['mean_mu'][0],mean_fit_Down['mean_mu'][1],sigmaG_fit_Down['sigmaG_mu'][0],sigmaG_fit_Down['sigmaG_mu'][1]))
-        # print("%s %s: mean = %.5f +- %.5f GeV, sigmaG = %.5f +- %.5f GeV\n"%('el',sys+"Down",mean_fit_Down['mean_el'][0],mean_fit_Down['mean_el'][1],sigmaG_fit_Down['sigmaG_el'][0],sigmaG_fit_Down['sigmaG_el'][1]))
-        
-        # print("\n%s %s: mean variation= %.5f  sigmaG variation = %.5f "%('mu',sys+"Up",(1-(mean_fit_Up['mean_mu'][0]/mean_fit['mean_mu'][0]))*100,(1-(sigmaG_fit_Up['sigmaG_mu'][0]/sigmaG_fit['sigmaG_mu'][0]))*100))
-        # print("%s %s: mean variation= %.5f  sigmaG variation = %.5f "%('mu',sys+"Down",(1-(mean_fit_Down['mean_mu'][0]/mean_fit['mean_mu'][0]))*100,(1-(sigmaG_fit_Down['sigmaG_mu'][0]/sigmaG_fit['sigmaG_mu'][0]))*100))
-        # print("\n%s %s: mean variation= %.5f  sigmaG variation = %.5f "%('el',sys+"Up",(1-(mean_fit_Up['mean_el'][0]/mean_fit['mean_el'][0]))*100,(1-(sigmaG_fit_Up['sigmaG_el'][0]/sigmaG_fit['sigmaG_el'][0]))*100))
-        
-        # print("%s %s: mean variation= %.5f  sigmaG variation = %.5f "%('el',sys+"Down",(1-(mean_fit_Down['mean_el'][0]/mean_fit['mean_el'][0]))*100,(1-(sigmaG_fit_Down['sigmaG_el'][0]/sigmaG_fit['sigmaG_el'][0]))*100))
