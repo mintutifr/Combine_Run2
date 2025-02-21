@@ -12,7 +12,7 @@ year = args.Year[0]
 lep = args.lepton[0]
 
 # Open the root file
-file_path = "/eos/home-m/mikumar/Higgs_Combine/CMSSW_14_1_0_pre4/src/HiggsAnalysis/Hist_for_workspace/Combine_Input_lntopMass_histograms_"+year+"_"+lep+"_gteq0p7_withoutDNNfit_rebin.root"
+file_path = "/eos/home-m/mikumar/Higgs_Combine/CMSSW_14_1_0_pre4/src/HiggsAnalysis/Hist_for_workspace/Combine_Input_lntopMass_histograms_"+year+"_"+lep+"_gteq0p7_withoutDNNfit_rebin_JES.root"
 print(f'{file_path  = }')
 root_file = ROOT.TFile(file_path, "READ")
 
@@ -83,124 +83,112 @@ def set_histogram_style(hist, syst_type, is_up):
     hist.SetMarkerColor(color)
     hist.SetMarkerStyle(24 if is_up else 25)  # Arrow up for Up, arrow down for Down
 
-# Function to draw histograms in a canvas with a legend
-def draw_histograms_old(Nominal_hist,histograms, canvas_name, canvas_title, output_path):
-    canvas = ROOT.TCanvas(canvas_name, canvas_title, 800, 600)
-    legend = ROOT.TLegend(0.7, 0.9-min(len(histograms)*.05,0.8), 0.9, 0.9)
-    legend.SetTextSize(0.03)
-    ROOT.gStyle.SetOptStat(0)
-    Nominal_hist.Draw("HIST")
-    legend.AddEntry(Nominal_hist, "Nominal", "l")
-    for i, hist in enumerate(histograms):
-        syst_type = get_systematic_type(hist.GetName())
-        is_up = 'Up' in hist.GetName()
-        hist.SetLineColor(color_list[i])
-        hist.SetMarkerColor(color_list[i])
-        hist.SetMarkerStyle(24 if is_up else 25)
-        hist.Draw("HIST SAME")# if i > 0 else "HIST")
-        legend.AddEntry(hist, hist.GetName().rsplit("_gt")[1], "l")
-
-        yield_variation = hist.Integral()/Nominal_hist.Integral()
-        print("Systematic varied yield (%s): %.3f"%(hist.GetName(),yield_variation))
-
-    legend.Draw()
-    canvas.SaveAs(output_path)
-    canvas.Close()
-
-
 
 def draw_histograms(Nominal_hist, histograms, canvas_name, canvas_title, output_path):
-    # Create the canvas with two pads (one for the histograms, one for the ratio plot)
-    canvas = ROOT.TCanvas(canvas_name, canvas_title, 800, 800)
-    canvas.Divide(1, 2)  # Divide canvas into 2 parts, top for histograms and bottom for ratio
+    # Set batch size to 15 histograms per canvas.
+    batch_size = 15
+    num_batches = (len(histograms) + batch_size - 1) // batch_size
 
-    # Top pad for the histograms
-    canvas.cd(1)
-    legend = ROOT.TLegend(0.7, 0.9-min(len(histograms)*.05, 0.8), 0.9, 0.9)
-    legend.SetTextSize(0.03)
-    ROOT.gStyle.SetOptStat(0)
-    
-    Nominal_hist.Draw("HIST")
-    legend.AddEntry(Nominal_hist, "Nominal", "l")
-
-    # Loop through the histograms, draw them and compute ratios
-    for i, hist in enumerate(histograms):
-        syst_type = get_systematic_type(hist.GetName())
-        is_up = 'Up' in hist.GetName()
-        hist.SetLineColor(color_list[i])
-        hist.SetMarkerColor(color_list[i])
-        hist.SetMarkerStyle(24 if is_up else 25)
-        hist.Draw("HIST SAME")
-        legend.AddEntry(hist, hist.GetName().rsplit("_gt")[1], "l")
-
-        yield_variation = hist.Integral() / Nominal_hist.Integral()
-        print("Systematic varied yield (%s): %.3f" % (hist.GetName(), yield_variation))
-
-    legend.Draw()
-
-    # Bottom pad for the ratio plot
-    canvas.cd(2)
-
-    # Create the ratio histograms
-    ratio_histograms = []
-    min_ratio = float('inf')  # Initialize minimum ratio
-    max_ratio = -float('inf')  # Initialize maximum ratio
-
-    # Create variables to track the range considering error bars
-    min_ratio_with_error = float('inf')
-    max_ratio_with_error = -float('inf')
-
-    for i, hist in enumerate(histograms):
-        ratio_hist = hist.Clone(hist.GetName() + "_ratio")
-        ratio_hist.Divide(Nominal_hist)
-        ratio_hist.SetLineColor(color_list[i])
-        ratio_hist.SetMarkerColor(color_list[i])
-        ratio_hist.SetMarkerStyle(24 if 'Up' in hist.GetName() else 25)
-        ratio_histograms.append(ratio_hist)
-
-        # Find min and max ratio values to set y-axis range later
-        for bin in range(1, ratio_hist.GetNbinsX() + 1):
-            ratio_value = ratio_hist.GetBinContent(bin)
-            ratio_error = ratio_hist.GetBinError(bin)
-
-            # Consider the ratio and its error to adjust the range
-            min_ratio_with_error = min(min_ratio_with_error, ratio_value - ratio_error)
-            max_ratio_with_error = max(max_ratio_with_error, ratio_value + ratio_error)
-
-            # Update the min and max ratio without considering the error
-            if ratio_value < min_ratio:
-                min_ratio = ratio_value
-            if ratio_value > max_ratio:
-                max_ratio = ratio_value
-
-    # Set up ratio plot
-    ratio_histograms[0].SetTitle("")  # Remove the title
-    ratio_histograms[0].GetYaxis().SetTitle("Ratio")
-    
-    # Dynamically adjust the y-axis range based on the ratio values and error bars
-    # Add some padding to the min/max ratio
-    padding = 0.1  # 10% padding for both min and max
-    ratio_range_min = min_ratio_with_error - padding * (max_ratio_with_error - min_ratio_with_error) if min_ratio_with_error > 0 else 0
-    ratio_range_max = max_ratio_with_error + padding * (max_ratio_with_error - min_ratio_with_error)
-
-    # If the ratio values are too small or too large, adjust the range manually
-    if ratio_range_min < 0:
-        ratio_range_min = 0
-    if ratio_range_max < 0:
-        ratio_range_max = 2  # Default to 2 for ratios
-
-    ratio_histograms[0].GetYaxis().SetRangeUser(ratio_range_min, ratio_range_max)
-    ratio_histograms[0].GetXaxis().SetTitle(Nominal_hist.GetXaxis().GetTitle())
-    ratio_histograms[0].Draw("E1")  # Draw first ratio histogram
-
-    # Draw the remaining ratio histograms
-    for i in range(1, len(ratio_histograms)):
-        ratio_histograms[i].Draw("E1 SAME")
-
-    # Save the canvas
-    canvas.SaveAs(output_path)
-    canvas.Close()
-
+    for batch_index in range(num_batches):
+        # Determine the subset (batch) of histograms to draw.
+        batch_histograms = histograms[batch_index * batch_size : (batch_index + 1) * batch_size]
+        
+        # Create the canvas with two pads (top for histograms, bottom for ratio)
+        canvas = ROOT.TCanvas(f"{canvas_name}_{batch_index}", canvas_title, 800, 800)
+        canvas.Divide(1, 2)
+        
+        ## Top pad: draw the histograms
+        canvas.cd(1)
+        ROOT.gStyle.SetOptStat(0)
+        legend = ROOT.TLegend(0.7, 0.9 - min(len(batch_histograms) * 0.05, 0.8), 0.9, 0.9)
+        legend.SetTextSize(0.03)
+        
+        # Draw the nominal histogram first
+        Nominal_hist.Draw("HIST")
+        legend.AddEntry(Nominal_hist, "Nominal", "l")
+        
+        # Draw each systematic histogram from the current batch
+        for i, hist in enumerate(batch_histograms):
+            syst_type = get_systematic_type(hist.GetName())
+            is_up = 'Up' in hist.GetName()
+            # Adjust the color index if needed.
+            color_index = batch_index * batch_size + i
+            hist.SetLineColor(color_list[color_index])
+            hist.SetMarkerColor(color_list[color_index])
+            hist.SetMarkerStyle(24 if is_up else 25)
+            hist.Draw("HIST SAME")
+            legend.AddEntry(hist, hist.GetName().rsplit("_gt")[1], "l")
+            yield_variation = hist.Integral() / Nominal_hist.Integral()
+            print("Systematic varied yield (%s): %.3f" % (hist.GetName(), yield_variation))
+        
+        legend.Draw()
+        
+        ## Bottom pad: create the ratio plot
+        canvas.cd(2)
+        ratio_histograms = []
+        
+        # Create the nominal ratio histogram: Nominal/ Nominal (all ones)
+        nominal_ratio = Nominal_hist.Clone("Nominal_ratio")
+        nominal_ratio.Divide(Nominal_hist)
+        # Remove error bars for the nominal ratio histogram
+        for bin in range(1, nominal_ratio.GetNbinsX() + 1):
+            nominal_ratio.SetBinError(bin, 0)
+        nominal_ratio.SetLineColor(ROOT.kBlack)
+        nominal_ratio.SetMarkerColor(ROOT.kBlack)
+        nominal_ratio.SetLineWidth(2)
+        ratio_histograms.append(nominal_ratio)
+        
+        # Initialize range variables including the nominal (which is 1)
+        min_ratio = 1.0
+        max_ratio = 1.0
+        min_ratio_with_error = 1.0
+        max_ratio_with_error = 1.0
+        
+        # Create ratio histograms for each systematic histogram
+        for i, hist in enumerate(batch_histograms):
+            ratio_hist = hist.Clone(hist.GetName() + "_ratio")
+            ratio_hist.Divide(Nominal_hist)
+            color_index = batch_index * batch_size + i
+            ratio_hist.SetLineColor(color_list[color_index])
+            ratio_hist.SetMarkerColor(color_list[color_index])
+            ratio_hist.SetMarkerStyle(24 if 'Up' in hist.GetName() else 25)
+            ratio_histograms.append(ratio_hist)
+            
+            # Update y-axis range based on bin values and their errors.
+            for bin in range(1, ratio_hist.GetNbinsX() + 1):
+                ratio_value = ratio_hist.GetBinContent(bin)
+                ratio_error = ratio_hist.GetBinError(bin)
+                min_ratio_with_error = min(min_ratio_with_error, ratio_value - ratio_error)
+                max_ratio_with_error = max(max_ratio_with_error, ratio_value + ratio_error)
+                min_ratio = min(min_ratio, ratio_value)
+                max_ratio = max(max_ratio, ratio_value)
+        
+        # Setup the ratio plot using the nominal ratio histogram as baseline.
+        nominal_ratio.SetTitle("")
+        nominal_ratio.GetYaxis().SetTitle("Ratio")
+        # Add padding to the computed range.
+        padding = 0.1
+        range_span = max_ratio_with_error - min_ratio_with_error
+        ratio_range_min = (min_ratio_with_error - padding * range_span) if min_ratio_with_error > 0 else 0
+        ratio_range_max = max_ratio_with_error + padding * range_span
+        if ratio_range_min < 0:
+            ratio_range_min = 0
+        if ratio_range_max < 0:
+            ratio_range_max = 2
+        
+        nominal_ratio.GetYaxis().SetRangeUser(ratio_range_min, ratio_range_max)
+        nominal_ratio.GetXaxis().SetTitle(Nominal_hist.GetXaxis().GetTitle())
+        # Draw the nominal ratio histogram without error bars (errors have been set to zero)
+        nominal_ratio.Draw("E1")
+        
+        # Draw each systematic ratio histogram (skip the first which is nominal)
+        for ratio_hist in ratio_histograms[1:]:
+            ratio_hist.Draw("E1 SAME")
+        
+        # Save the canvas; each batch gets its own file (e.g., plot_0.pdf, plot_1.pdf, etc.)
+        batch_output_path = output_path.replace(".png", f"_{batch_index}.png")
+        canvas.SaveAs(batch_output_path)
+        canvas.Close()
 
 
 # Create dictionaries to store histograms based on the criteria

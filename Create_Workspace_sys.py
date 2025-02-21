@@ -14,7 +14,7 @@ parser.add_argument('-w', '--width', dest='width_sample', default=[None], type=s
 #parser.add_argument('-d', '--isdata', dest='isRealData', default=[False], type=bool, nargs=1, help="run over real data ['True', 'False']")
 parser.add_argument('-y', '--year', dest='Year', default=['UL2017'], type=str, nargs=1, help="Year of Data collection [ UL2016preVFP  UL2016postVFP  UL2017  UL2018 ]")
 parser.add_argument('-f', '--localfit', dest='local_fit', default=[None], type=str, nargs=1, help="Local fit run for  ['sig','top_bkg','ewk_bkg','final', 'final_mu', 'final_el']")
-parser.add_argument('-s', '--sys', dest='sys', default=[''], type=str, nargs=1, help='systematic sample replace the sig and background  ["PSWeight_ISR_Up", "PSWeight_ISR_Down", "PSWeight_FSR_Up", "PSWeight_FSR_Down","hdamp_Up", "hdamp_Down"]')
+parser.add_argument('-s', '--sys', dest='sys', default=[''], type=str, nargs=1, help='systematic sample replace the sig and background  ["top_weight_sys","bWeight", "JES_JER", "lep_SF"]')
 parser.add_argument( '--DropFixParam', action="store_true", help=" call if you dont want use optimized paramters  [--DropFixParam]")
 args = parser.parse_args()
 
@@ -24,6 +24,7 @@ width = args.width_sample[0]
 dataYear = args.Year[0]
 local_fit = args.local_fit[0]
 sys = args.sys[0]
+print(f"{sys = }")
 date   = datetime.datetime.now()
 DropFixParam = args.DropFixParam
 
@@ -80,8 +81,8 @@ if __name__ == "__main__":
     #read the file to get the hustogrms
     File_Dir = "/feynman/home/dphp/mk277705/work/HiggsCombine/CMSSW_12_3_4/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/"
     File_Dir ="/eos/home-m/mikumar/Higgs_Combine/CMSSW_14_1_0_pre4/src/HiggsAnalysis/Hist_for_workspace/"
-    Filename_mu = File_Dir+"Combine_Input_lntopMass_histograms_"+dataYear+"_mu_gteq0p7_withoutDNNfit_rebin.root"
-    Filename_el = File_Dir+"Combine_Input_lntopMass_histograms_"+dataYear+"_el_gteq0p7_withoutDNNfit_rebin.root"
+    Filename_mu = File_Dir+"Combine_Input_lntopMass_histograms_"+dataYear+"_mu_gteq0p7_withoutDNNfit_rebin_JES.root"
+    Filename_el = File_Dir+"Combine_Input_lntopMass_histograms_"+dataYear+"_el_gteq0p7_withoutDNNfit_rebin_JES.root"
     Filename_mu_cont = File_Dir+"Combine_Input_lntopMass_histograms_"+dataYear+"_mu_gteq0p3_withoutDNNfit_rebin.root"
     Filename_el_cont = File_Dir+"Combine_Input_lntopMass_histograms_"+dataYear+"_el_gteq0p3_withoutDNNfit_rebin.root"
 
@@ -100,11 +101,11 @@ if __name__ == "__main__":
     dir_mu_cont = File_mu_cont.GetDirectory("mujets")
     #Get Mc histograms for muon final state
     if(mass!= None):
-        top_sig_mu = dir_mu.Get("top_sig_"+mass+tag+gt_or_lt_tag+sys)
+        top_sig_mu = dir_mu.Get("top_sig_"+mass+tag+gt_or_lt_tag)
     if(width!= None):
-        top_sig_mu = dir_mu.Get("top_sig_"+width+tag+gt_or_lt_tag+sys)
+        top_sig_mu = dir_mu.Get("top_sig_"+width+tag+gt_or_lt_tag)
         
-    top_bkg_mu = dir_mu.Get("top_bkg_1725"+tag+gt_or_lt_tag+sys)
+    top_bkg_mu = dir_mu.Get("top_bkg_1725"+tag+gt_or_lt_tag)
     EWK_bkg_mu = dir_mu.Get("EWK_bkg"+tag+gt_or_lt_tag)
     EWK_bkg_mu_cont = dir_mu_cont.Get("EWK_bkg"+tag+"_gt")
     QCD_DD = dir_mu.Get("QCD_DD"+tag+gt_or_lt_tag)
@@ -133,11 +134,11 @@ if __name__ == "__main__":
     dir_el_cont = File_el_cont.GetDirectory("eljets")
     #Get Mc histograms for electron final state
     if(mass!= None):
-        top_sig_el = dir_el.Get("top_sig_"+mass+tag+gt_or_lt_tag+sys)
+        top_sig_el = dir_el.Get("top_sig_"+mass+tag+gt_or_lt_tag)
     if(width!= None):
-        top_sig_el = dir_el.Get("top_sig_"+width+tag+gt_or_lt_tag+sys)
+        top_sig_el = dir_el.Get("top_sig_"+width+tag+gt_or_lt_tag)
 
-    top_bkg_el = dir_el.Get("top_bkg_1725"+tag+gt_or_lt_tag+sys)
+    top_bkg_el = dir_el.Get("top_bkg_1725"+tag+gt_or_lt_tag)
     EWK_bkg_el = dir_el.Get("EWK_bkg"+tag+gt_or_lt_tag)
     EWK_bkg_el_cont = dir_el_cont.Get("EWK_bkg"+tag+"_gt")
     QCD_DD = dir_mu.Get("QCD_DD"+tag+gt_or_lt_tag)
@@ -173,9 +174,14 @@ if __name__ == "__main__":
     sigmaG = R.RooRealVar("sigmaG","sigmaG",0.15098,0.01,5)
 
 
-    json_file = "Sys_fit_results_"+dataYear+".json"  # Replace with your actual JSON file path
-    systematic = ["bWeight_lf"] #,"bWeight_hf"]#,"bWeight_cferr1","bWeight_cferr2"]       # The systematic you want to analyze
+    
+    # Get the systematic you want to analyze
+    with open("Sys_list.json", "r") as f:
+        systematics = json.load(f)
+    systematic = systematics[sys]
+    print(systematic)
 
+    json_file = "Sys_fit_results_"+dataYear+".json"  # Replace with your actual JSON file path
     # = = = = = = = = = = = = = = 
     # Update systematic nuisance parameter in datacards
     # = = = = = = = = = = = = = = 
@@ -186,8 +192,7 @@ if __name__ == "__main__":
     Nuisance_values= {dataYear:{}}
     for sys in systematic:
         _,Nuisance_values[dataYear][sys] = compute_variations(json_file, sys)
-    print("\n",Nuisance_values,"\n")
-   
+    print(f"\n{Nuisance_values = }\n")
 
     # = = = = = = = = = = = = = = 
     # Nuisance parameters for syst.
@@ -210,6 +215,9 @@ if __name__ == "__main__":
     mean_formula_expr = "@0"  # Initial mean value
     sigmaG_formula_expr = "@0"  # Initial sigmaG value
 
+    #mean_formula_expr = "@0*(1"  # Initial mean value
+    #sigmaG_formula_expr = "@0*(1"  # Initial sigmaG value
+
     arg_list_mean = [mean]
     arg_list_sigmaG = [sigmaG]
     arg_list_mean_str = ["mean"]
@@ -218,6 +226,9 @@ if __name__ == "__main__":
     for i, sys in enumerate(systematic, start=1):
         mean_formula_expr += f"*(1+@{i*2-1}*@{i*2})"
         sigmaG_formula_expr += f"*(1+@{i*2-1}*@{i*2})"
+
+        #mean_formula_expr += f"+(@{i*2-1}*@{i*2})"
+        #sigmaG_formula_expr += f"+(@{i*2-1}*@{i*2})"
         
         arg_list_mean.append(nuisance_vars_mean[sys])
         arg_list_mean.append(R.RooFit.RooConst(Nuisance_values[dataYear][sys]["mean_mu"]))
@@ -228,6 +239,9 @@ if __name__ == "__main__":
         arg_list_sigmaG.append(R.RooFit.RooConst(Nuisance_values[dataYear][sys]["sigmaG_mu"]))
         arg_list_sigmaG_str.append(sys+"_Roovar_SigmaG")
         arg_list_sigmaG_str.append(sys+"_variation_SigmaG_mu")
+
+    #mean_formula_expr += f")"
+    #sigmaG_formula_expr += f")"
 
     print(f"{mean_formula_expr = }")
     print(f"{arg_list_mean_str = }")
@@ -287,7 +301,7 @@ if __name__ == "__main__":
 
     # Vaiable fit param
     # ====================  #
-    çsigmaL_topbkg_mu = R.RooRealVar("sigmaL_topbkg_mu","sigmaL_topbkg_mu",0.15098,0.01,1)
+    sigmaL_topbkg_mu = R.RooRealVar("sigmaL_topbkg_mu","sigmaL_topbkg_mu",0.15098,0.01,1)
     sigmaL_topbkg_el = R.RooRealVar("sigmaL_topbkg_el","sigmaL_topbkg_el",0.15098,0.01,1)
     mean_top_bkg_mu = R.RooRealVar("mean_top_bkg_mu","mean_top_bkg_mu",5.1,4.5,5.5)
     mean_top_bkg_el = R.RooRealVar("mean_top_bkg_el","mean_top_bkg_el",5.1,4.5,5.5)    

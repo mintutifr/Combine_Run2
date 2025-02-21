@@ -20,12 +20,12 @@ cons_top_sig            lnN     1.134     -        -
 cons_top_bkg            lnN     -        -        1.089
 
 
+
+
+# ===== sys  ====
+
 #SF_Iso_ID_el               lnN     0.993/1.007     0.993/1.007   0.993/1.007
 
-
-#nuisance_bWeight_lf_sigmaG     param    0.0    1.0
-#nuisance_bWeight_lf_mean       param    0.0    1.0
- 
 #rate_topbkg   rateParam mujets top_bkg 1 [-1.0,5.0] 
 #rate_sig      rateParam mujets top_sig 1 [-1.0,5.0] 
 #rate_EWKbkg   rateParam mujets EWK_bkg 1 [-1.0,5.0] 

@@ -7,7 +7,7 @@ parser.add_argument('-m', '--mass', dest='mass_sample', default=[None], type=str
 parser.add_argument('-w', '--width', dest='width_sample', default=[None], type=str, nargs=1, help="is Altrnate MC top width sample used ['data','190','170','150','130','090','075']")
 #parser.add_argument('-d', '--isdata', dest='isRealData', default=[False], type=bool, nargs=1, help="run over real data ['True', 'False']")
 parser.add_argument('-y', '--year', dest='Year', default=['2016'], type=str, nargs=1, help="Year of Data collection ['2016', 'UL2017', 'UL2018','Run2']")
-parser.add_argument('-s', '--sys', dest='sys', default=[''], type=str, nargs=1, help='systematic sample replace the sig and background  ["PSWeight_ISR_Up", "PSWeight_ISR_Down", "PSWeight_FSR_Up", "PSWeight_FSR_Down","hdamp_Up", "hdamp_Down"]')
+parser.add_argument('-s', '--sys', dest='sys', default=[''], type=str, nargs=1, help='systematic sample replace the sig and background  ["top_weight_sys","bWeight", "JES_JER", "lep_SF"]')
 args = parser.parse_args()
 
 Combine_year_tag={
@@ -38,11 +38,11 @@ for Mass in mass_point:
     #os.system(scp_file)
     if(year=="Run2"):
         for yearloop in ['UL2016preVFP', 'UL2016postVFP','UL2017', 'UL2018']:
-            cmd_createWorkspace = "python3 Create_Workspace_sys.py -m "+Mass+" -y  "+yearloop
+            cmd_createWorkspace = "python3 Create_Workspace_sys.py -m "+Mass+" -y  "+yearloop + " -s " + sys
             os.system(cmd_createWorkspace)
         cmd_adddatacards = "combineCards.py mujets_UL18=datacard_top_shape_mu_para_UL18.txt eljets_UL18=datacard_top_shape_el_para_UL18.txt mujets_UL17=datacard_top_shape_mu_para_UL17.txt eljets_UL17=datacard_top_shape_el_para_UL17.txt  mujets_ULpre16=datacard_top_shape_mu_para_ULpre16.txt eljets_ULpre16=datacard_top_shape_el_para_ULpre16.txt mujets_ULpost16=datacard_top_shape_mu_para_ULpost16.txt eljets_ULpost16=datacard_top_shape_el_para_ULpost16.txt > datacard_top_shape_comb_para.txt"
     else:
-        cmd_createWorkspace = "python3 Create_Workspace_sys.py -m "+Mass+" -y  "+year #+ " -s " + sys
+        cmd_createWorkspace = "python3 Create_Workspace_sys.py -m "+Mass+" -y  "+year + " -s " + sys
         print(cmd_createWorkspace)
         os.system(cmd_createWorkspace)
         cmd_adddatacards = "combineCards.py mujets"+tag+"=datacard_top_shape_mu_para"+tag+".txt eljets"+tag+"=datacard_top_shape_el_para"+tag+".txt > datacard_top_shape_comb_para.txt"

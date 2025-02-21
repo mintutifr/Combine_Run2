@@ -1,0 +1,68 @@
+{
+  "Nomi":[],
+  "top_weight_sys": [
+    "ISR", 
+    "FSR", 
+    "hdamp", 
+    "puWeight"
+  ],
+  "bWeight": [
+    "bWeight_lf",
+    "bWeight_hf",
+    "bWeight_cferr1",
+    "bWeight_cferr2",
+    "bWeight_lfstats1",
+    "bWeight_lfstats2",
+    "bWeight_hfstats1",
+    "bWeight_hfstats2",
+    "bWeight_jes"
+  ],
+  "JES_JER": [
+    "jer",
+    "jesAbsoluteStat",
+    "jesAbsoluteMPFBias",
+    "jesFragmentation",
+    "jesSinglePionECAL",
+    "jesSinglePionHCAL",
+    "jesTimePtEta",
+    "jesRelativeJEREC1",
+    "jesRelativeJEREC2",
+    "jesRelativeJERHF",
+    "jesRelativePtBB",
+    "jesRelativePtEC1",
+    "jesRelativePtEC2",
+    "jesRelativePtHF",
+    "jesRelativeBal",
+    "jesRelativeSample",
+    "jesRelativeFSR",
+    "jesRelativeStatEC",
+    "jesRelativeStatHF",
+    "jesPileUpDataMC",
+    "jesPileUpPtRef",
+    "jesPileUpPtBB",
+    "jesPileUpPtEC1",
+    "jesPileUpPtEC2",
+    "jesPileUpPtHF"
+  ],
+  "lep_SF": {
+    "el": [
+      "SF_Iso_IDUp",
+      "SF_Iso_IDDown",
+      "SF_Iso_TrigUp",
+      "SF_Iso_TrigDown",
+      "SF_Veto_IDUp",
+      "SF_Veto_IDDown",
+      "SF_Veto_TrigUp",
+      "SF_Veto_TrigDown"
+    ],
+    "mu": [
+      "SF_IsoUp",
+      "SF_IsoDown",
+      "SF_Iso_IDUp",
+      "SF_Iso_IDDown",
+      "SF_Iso_TrigUp",
+      "SF_Iso_TrigDown"
+    ]
+  }
+}
+

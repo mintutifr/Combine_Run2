@@ -15,13 +15,61 @@ process                         top_sig  EWK_bkg  top_bkg
 process                          0         1          2          
 rate                             1         1         1           
 ----------------------------------------------------------------------------------------------------------------------------------
-#cons_EWK_bkg            lnN      -        1.1        - 
-#cons_top_sig            lnN     1.138     -        -
-#cons_top_bkg            lnN     -        -        1.091
+cons_EWK_bkg            lnN      -        1.1        - 
+cons_top_sig            lnN     1.138     -        -
+cons_top_bkg            lnN     -        -        1.091
 
 # ===== sys  ====
-nuisance_bWeight_lf_mean   param   0.0   1.0
-nuisance_bWeight_lf_sigmaG   param   0.0   1.0
+nuisance_jer_mean                  param   0.0   1.0
+nuisance_jer_sigmaG                param   0.0   1.0
+nuisance_jesAbsoluteStat_mean      param   0.0   1.0
+nuisance_jesAbsoluteStat_sigmaG    param   0.0   1.0
+nuisance_jesAbsoluteMPFBias_mean   param   0.0   1.0
+nuisance_jesAbsoluteMPFBias_sigmaG   param   0.0   1.0
+nuisance_jesFragmentation_mean     param   0.0   1.0
+nuisance_jesFragmentation_sigmaG   param   0.0   1.0
+nuisance_jesSinglePionECAL_mean    param   0.0   1.0
+nuisance_jesSinglePionECAL_sigmaG   param   0.0   1.0
+nuisance_jesSinglePionHCAL_mean    param   0.0   1.0
+nuisance_jesSinglePionHCAL_sigmaG   param   0.0   1.0
+nuisance_jesTimePtEta_mean         param   0.0   1.0
+nuisance_jesTimePtEta_sigmaG       param   0.0   1.0
+nuisance_jesRelativeJEREC1_mean    param   0.0   1.0
+nuisance_jesRelativeJEREC1_sigmaG   param   0.0   1.0
+nuisance_jesRelativeJEREC2_mean    param   0.0   1.0
+nuisance_jesRelativeJEREC2_sigmaG   param   0.0   1.0
+nuisance_jesRelativeJERHF_mean     param   0.0   1.0
+nuisance_jesRelativeJERHF_sigmaG   param   0.0   1.0
+nuisance_jesRelativePtBB_mean      param   0.0   1.0
+nuisance_jesRelativePtBB_sigmaG    param   0.0   1.0
+nuisance_jesRelativePtEC1_mean     param   0.0   1.0
+nuisance_jesRelativePtEC1_sigmaG   param   0.0   1.0
+nuisance_jesRelativePtEC2_mean     param   0.0   1.0
+nuisance_jesRelativePtEC2_sigmaG   param   0.0   1.0
+nuisance_jesRelativePtHF_mean      param   0.0   1.0
+nuisance_jesRelativePtHF_sigmaG    param   0.0   1.0
+nuisance_jesRelativeBal_mean       param   0.0   1.0
+nuisance_jesRelativeBal_sigmaG     param   0.0   1.0
+nuisance_jesRelativeSample_mean    param   0.0   1.0
+nuisance_jesRelativeSample_sigmaG   param   0.0   1.0
+nuisance_jesRelativeFSR_mean       param   0.0   1.0
+nuisance_jesRelativeFSR_sigmaG     param   0.0   1.0
+nuisance_jesRelativeStatEC_mean    param   0.0   1.0
+nuisance_jesRelativeStatEC_sigmaG   param   0.0   1.0
+nuisance_jesRelativeStatHF_mean    param   0.0   1.0
+nuisance_jesRelativeStatHF_sigmaG   param   0.0   1.0
+nuisance_jesPileUpDataMC_mean      param   0.0   1.0
+nuisance_jesPileUpDataMC_sigmaG    param   0.0   1.0
+nuisance_jesPileUpPtRef_mean       param   0.0   1.0
+nuisance_jesPileUpPtRef_sigmaG     param   0.0   1.0
+nuisance_jesPileUpPtBB_mean        param   0.0   1.0
+nuisance_jesPileUpPtBB_sigmaG      param   0.0   1.0
+nuisance_jesPileUpPtEC1_mean       param   0.0   1.0
+nuisance_jesPileUpPtEC1_sigmaG     param   0.0   1.0
+nuisance_jesPileUpPtEC2_mean       param   0.0   1.0
+nuisance_jesPileUpPtEC2_sigmaG     param   0.0   1.0
+nuisance_jesPileUpPtHF_mean        param   0.0   1.0
+nuisance_jesPileUpPtHF_sigmaG      param   0.0   1.0
 
 #SF_Iso_ID_el               lnN     0.993/1.007     0.993/1.007   0.993/1.007 
 #SF_Iso_Trig_el          lnN     0.993/0.993   -      -     

@@ -58,8 +58,8 @@ def Get_fit_param(mass,width,RealData,dataYear,local_fit,sys):
     #read the file to get the hustogrms
     File_Dir = "/feynman/home/dphp/mk277705/work/HiggsCombine/CMSSW_12_3_4/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/"
     File_Dir ="/eos/home-m/mikumar/Higgs_Combine/CMSSW_14_1_0_pre4/src/HiggsAnalysis/Hist_for_workspace/"
-    Filename_mu = File_Dir+"Combine_Input_lntopMass_histograms_"+dataYear+"_mu_gteq0p7_withoutDNNfit_rebin.root"
-    Filename_el = File_Dir+"Combine_Input_lntopMass_histograms_"+dataYear+"_el_gteq0p7_withoutDNNfit_rebin.root"
+    Filename_mu = File_Dir+"Combine_Input_lntopMass_histograms_"+dataYear+"_mu_gteq0p7_withoutDNNfit_rebin_JES.root"
+    Filename_el = File_Dir+"Combine_Input_lntopMass_histograms_"+dataYear+"_el_gteq0p7_withoutDNNfit_rebin_JES.root"
     Filename_mu_cont = File_Dir+"Combine_Input_lntopMass_histograms_"+dataYear+"_mu_gteq0p3_withoutDNNfit_rebin.root"
     Filename_el_cont = File_Dir+"Combine_Input_lntopMass_histograms_"+dataYear+"_el_gteq0p3_withoutDNNfit_rebin.root"
 
@@ -937,7 +937,7 @@ def save_fit_results_json(mass, width, isRealData, dataYear, local_fit, systemat
     - output_filename (str): Name of the JSON output file
     """
     fit_results = {}
-
+    print(systematics)
     mean_fit,sigmaG_fit = Get_fit_param(mass = mass,width = width,RealData = isRealData,dataYear = dataYear,local_fit = local_fit,sys='')
 
     print("\n%s : mean = %.5f +- %.5f GeV, sigmaG = %.5f +- %.5f GeV"%('mu',mean_fit['mean_mu'][0],mean_fit['mean_mu'][1],sigmaG_fit['sigmaG_mu'][0],sigmaG_fit['sigmaG_mu'][1]))
@@ -948,7 +948,7 @@ def save_fit_results_json(mass, width, isRealData, dataYear, local_fit, systemat
         }
 
     for sys in systematics:
-        print(sys)
+        print("\n=======   ", sys, "   ========= \n>")
         mean_fit_Up,sigmaG_fit_Up = Get_fit_param(mass = mass,width = width,RealData = isRealData,dataYear = dataYear,local_fit = local_fit,sys = sys+"Up")
         mean_fit_Down,sigmaG_fit_Down = Get_fit_param(mass = mass,width = width,RealData = isRealData,dataYear = dataYear,local_fit = local_fit,sys = sys+"Down")
 
@@ -959,7 +959,7 @@ def save_fit_results_json(mass, width, isRealData, dataYear, local_fit, systemat
 
     # Write results to JSON file
     with open(output_filename, "w") as json_file:
-        json.dump(fit_results, json_file, indent=4)
+         json.dump(fit_results, json_file, indent=4)
 
     print(f"JSON file '{output_filename}' saved successfully!")
 
@@ -975,7 +975,7 @@ if __name__ == "__main__":
     #parser.add_argument('-d', '--isdata', dest='isRealData', default=[False], type=bool, nargs=1, help="run over real data ['True', 'False']")
     parser.add_argument('-y', '--year', dest='Year', default=['UL2017'], type=str, nargs=1, help="Year of Data collection [ UL2016preVFP  UL2016postVFP  UL2017  UL2018 ]")
     parser.add_argument('-f', '--localfit', dest='local_fit', default=[None], type=str, nargs=1, help="Local fit run for  ['sig','top_bkg','ewk_bkg','final', 'final_mu', 'final_el']")
-    parser.add_argument('-s', '--sys', dest='sys', default=[''], type=str, nargs=1, help='systematic sample replace the sig and background  ["bWeight", "hdamp"]')
+    parser.add_argument('-s', '--sys', dest='sys', default=[''], type=str, nargs=1, help='systematic sample replace the sig and background  ["top_weight_sys","bWeight", "JES_JER", "lep_SF"]')
     parser.add_argument( '--DropFixParam', action="store_true", help=" call if you dont want use optimized paramters  [--DropFixParam]")
     args = parser.parse_args()
     
@@ -1004,16 +1004,18 @@ if __name__ == "__main__":
     
 
     if(sys!=''):
-        print(sys)
-        if(sys=="bWeight"): 
-            systematics = ["bWeight_hf","bWeight_lf","bWeight_cferr1","bWeight_cferr2"]
+        print(sys,"========>")
+        with open("Sys_list.json", "r") as f:
+            systematics = json.load(f)
+        systematic = systematics[sys]
+        print(systematic)
         save_fit_results_json(
             mass=mass,
             width=width,
             isRealData=isRealData,
             dataYear=dataYear,
             local_fit=local_fit,
-            systematics=systematics,
+            systematics=systematic,
             output_filename="Sys_fit_results_"+dataYear+".json")
         # mean_fit_Up,sigmaG_fit_Up = Get_fit_param(mass = mass,width = width,RealData = isRealData,dataYear = dataYear,local_fit = local_fit,sys = sys+"Up")
         # mean_fit_Down,sigmaG_fit_Down = Get_fit_param(mass = mass,width = width,RealData = isRealData,dataYear = dataYear,local_fit = local_fit,sys = sys+"Down")
