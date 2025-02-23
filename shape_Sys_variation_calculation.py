@@ -1,5 +1,112 @@
 import json
 
+
+def compute_variations_simultanous_fit(json_filename, systematic_key):
+    """
+    Reads a JSON file and computes percentage variations for a given systematic.
+    
+    The JSON file is expected to have a structure like:
+    
+    {
+        "Nomi": {
+            "Nomi": {
+                "mean_fit": {
+                    "mean": [<nominal_mu_mean>, <error>]
+                },
+                "sigmaG_fit": {
+                    "sigmaG": [<nominal_mu_sigma>, <error>]
+                }
+            }
+        },
+        "<systematic_key>": {
+            "Up": {
+                "mean_fit": {
+                    "mean": [<up_mu_mean>, <error>]
+                },
+                "sigmaG_fit": {
+                    "sigmaG": [<up_mu_sigma>, <error>
+                }
+            },
+            "Down": {
+                "mean_fit": {
+                    "mean": [<down_mu_mean>, <error>]
+                },
+                "sigmaG_fit": {
+                    "sigmaG": [<down_mu_sigma>, <error>]
+                }
+            }
+        }
+    }
+    
+    For each variation ("Up" and "Down") the percentage variation is calculated as:
+      (1 - systematic_value / nominal_value) * 100
+      
+    Parameters:
+      json_filename (str): Path to the JSON file.
+      systematic_key (str): The key for the systematic (e.g., "bWeight_hf").
+    
+    Returns:
+      dict: A dictionary with the computed percentage variations.
+    """
+    # Read the JSON file
+    with open(json_filename, "r") as f:
+        data = json.load(f)
+    
+    # Extract nominal values from the "Nomi" key
+    nomi = data.get("Nomi", {}).get("Nomi", {})
+    nominal_mean   = nomi.get("mean_fit", {}).get("mean", [None])[0]
+    nominal_sigmaG = nomi.get("sigmaG_fit", {}).get("sigmaG", [None])[0]
+    
+    # Ensure nominal values are found
+    if None in [nominal_mean,nominal_sigmaG]:
+        raise ValueError("Nominal values under 'Nomi' are missing or not formatted correctly.")
+    
+    # Get systematic data
+    sys_data = data.get(systematic_key)
+    if sys_data is None:
+        raise ValueError(f"Systematic '{systematic_key}' not found in the JSON file.")
+    
+    # Dictionary to store the variations
+    variations = {}
+    
+    # Loop over the two variations: "Up" and "Down"
+    for variation in ["Up", "Down"]:
+        #print(f"{variation = }")
+        variation_data = sys_data.get(variation)
+        if variation_data is None:
+            print(f"Warning: '{variation}' variation not found for systematic '{systematic_key}'.")
+            continue
+        
+        variations[variation] = {}
+        
+        # Mean values for mu and el
+        sys_mean = variation_data.get("mean_fit", {}).get("mean", [None])[0]
+        #print(f"{sys_mean= }")
+        # SigmaG values for mu and el
+        sys_sigmaG = variation_data.get("sigmaG_fit", {}).get("sigmaG", [None])[0]
+        
+        # Check that the values are present before computing
+        if sys_mean is None :
+            raise ValueError(f"Mean values missing in {systematic_key} -> {variation}")
+        if sys_sigmaG is None :
+            raise ValueError(f"SigmaG values missing in {systematic_key} -> {variation}")
+
+        # Calculate variations:
+        var_mean = (1 - sys_mean / nominal_mean )
+        var_sigmaG = (1 - sys_sigmaG / nominal_sigmaG)
+        
+        # Save the variations in the dictionary
+        variations[variation]["mean"]   = var_mean
+        variations[variation]["sigmaG"] = var_sigmaG
+
+    maxi_variations = {}
+    maxi_variations["mean"] = variations["Up"]["mean"] if abs(variations["Up"]["mean"]) > abs(variations["Down"]["mean"]) else variations["Down"]["mean"]
+    maxi_variations["sigmaG"] = variations["Up"]["sigmaG"] if abs(variations["Up"]["sigmaG"]) > abs(variations["Down"]["sigmaG"]) else variations["Down"]["sigmaG"]
+
+    print(f"{maxi_variations}")
+    return variations, maxi_variations
+
+
 def compute_variations(json_filename, systematic_key):
     """
     Reads a JSON file and computes percentage variations for a given systematic.

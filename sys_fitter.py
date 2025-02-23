@@ -1,9 +1,10 @@
-import json
+import json, os
 import ROOT as R
 from ROOT import RooFit 
 import sys, datetime
 import argparse as arg
 import json
+from Add_sys_parameter_to_datacard import write_datacard_for_systematic
 #from TOY_local_fit import Toy_Mc 
 
 def PrintPar(x1=0.385, y1=0.86, x2=0.495, y2=0.88,name="#chi^2/NDF",val=0.0):
@@ -289,10 +290,39 @@ def Get_fit_param(mass,width,RealData,dataYear,local_fit,sys):
         # S a v e   w o r k s p a c e   i n   f i l e
         # -------------------------------------------
         # Save the workspace into a ROOT file
-        w.writeToFile("workspace"+tag+".root")
+        w.writeToFile("Per_sys_datacards/workspace"+tag+sys+".root")
         # Workspace will remain in memory after macro finishes
         R.gDirectory.Add(w)
+        
+        write_datacard_for_systematic("datacard_top_shape_mu_para"+Combine_year_tag[dataYear]+".txt",sys,"mu")
+        write_datacard_for_systematic("datacard_top_shape_el_para"+Combine_year_tag[dataYear]+".txt",sys,"el")
 
+        cmd_adddatacards = F"combineCards.py mujets{tag}=Per_sys_datacards/datacard_top_shape_mu_para{tag}{sys}.txt eljets{tag}=Per_sys_datacards/datacard_top_shape_el_para{tag}{sys}.txt > Per_sys_datacards/datacard_top_shape_comb_para{tag}{sys}.txt"
+        print("\n",cmd_adddatacards)
+        os.system(cmd_adddatacards)
+    
+        cmd_Runtext2workspace = f"env PYTHONNOUSERSITE=1 text2workspace.py Per_sys_datacards/datacard_top_shape_comb_para{tag}{sys}.txt -o Per_sys_datacards/workspace_top_Mass_1725_shape_comb_para{tag}{sys}.root"
+        print("\n",cmd_Runtext2workspace)
+        os.system(cmd_Runtext2workspace)
+
+        cmd_RunCombine_fit = f"combine -M FitDiagnostics Per_sys_datacards/workspace_top_Mass_1725_shape_comb_para{tag}{sys}.root -n _M1725{sys}  --redefineSignalPOIs sigmaG,mean  --setParameters mean=5.1,r=1,sigmaG=0.11 --setParameterRanges mean=5.08,5.12:sigmaG=0.10,0.12 --freezeParameters  r  --X-rtd ADDNLL_CBNLL=0  --trackParameters r,mean,sigmaG --trackErrors r,mean,sigmaG --X-rtd TMCSO_PseudoAsimov=0 --saveShapes --saveWithUncertainties --saveWorkspace" #-t -1 --saveToys"# --plots"
+        print("\n",cmd_RunCombine_fit)
+        os.system(cmd_RunCombine_fit)
+
+        os.system(f"mv fitDiagnostics_M1725{sys}.root Per_sys_datacards/fitDiagnostics_M1725{sys}.root")
+        os.system(f"mv Combine_Run2/higgsCombine_M1725{sys}.FitDiagnostics.mH120.root Per_sys_datacards/Combine_Run2/higgsCombine_M1725{sys}.FitDiagnostics.mH120.root")
+        
+        fitfile = R.TFile.Open(f"Per_sys_datacards/fitDiagnostics_M1725{sys}.root")
+        roofitResults = fitfile.Get("fit_s")
+
+        print
+        print("results from one fit_s from ",fitfile.GetName()," file is (do not qoute this results from toy results) : ")
+
+        Mean = (roofitResults.floatParsFinal()).find("mean")
+        SigmaG = (roofitResults.floatParsFinal()).find("sigmaG")
+
+        mean_fit["mean"] = [Mean.getVal(), Mean.getError()]
+        sigmaG_fit["sigmaG"] = [SigmaG.getVal(), SigmaG.getError()]
 
 
 
@@ -923,7 +953,7 @@ def Get_fit_param(mass,width,RealData,dataYear,local_fit,sys):
 
 
 
-def save_fit_results_json(mass, width, isRealData, dataYear, local_fit, systematics, output_filename="fit_results.json"):
+def save_fit_results_json(mass, width, isRealData, dataYear, local_fit, systematics, output_sys_json_file="fit_results.json"):
     """
     Runs over multiple systematic variations, retrieves fit parameters, and writes them to a JSON file.
 
@@ -934,7 +964,7 @@ def save_fit_results_json(mass, width, isRealData, dataYear, local_fit, systemat
     - dataYear (int): Year of data
     - local_fit (bool): Local fit flag
     - systematics (list): List of systematic variations (e.g., ["JES", "JER", "PDF"])
-    - output_filename (str): Name of the JSON output file
+    - output_sys_json_file (str): Name of the JSON output file
     """
     fit_results = {}
     print(systematics)
@@ -958,10 +988,59 @@ def save_fit_results_json(mass, width, isRealData, dataYear, local_fit, systemat
         }
 
     # Write results to JSON file
-    with open(output_filename, "w") as json_file:
+    with open(output_sys_json_file, "w") as json_file:
          json.dump(fit_results, json_file, indent=4)
 
-    print(f"JSON file '{output_filename}' saved successfully!")
+    print(f"JSON file '{output_sys_json_file}' saved successfully!")
+
+def save_fit_results_json_combine(mass, width, isRealData, dataYear, local_fit, systematics, output_sys_json_file="fit_results.json"):
+    """
+    Runs over multiple systematic variations, retrieves fit parameters, and writes them to a JSON file.
+
+    Parameters:
+    - mass (float): Mass value
+    - width (float): Width value
+    - isRealData (bool): Flag for real or simulated data
+    - dataYear (int): Year of data
+    - local_fit (bool): Local fit flag
+    - systematics (list): List of systematic variations (e.g., ["JES", "JER", "PDF"])
+    - output_sys_json_file (str): Name of the JSON output file
+    """
+    fit_results = {}
+    print(f"\n{systematics = }")
+    mean_fit,sigmaG_fit = Get_fit_param(mass = mass,width = width,RealData = isRealData,dataYear = dataYear,local_fit = local_fit,sys='')
+
+    print("\n=====================================")
+    print(" %s Fit results : mean = %.5f +- %.5f GeV, sigmaG = %.5f +- %.5f GeV"%("Nominal",mean_fit['mean'][0],mean_fit['mean'][1],sigmaG_fit['sigmaG'][0],sigmaG_fit['sigmaG'][1]))
+    print("=====================================\n")
+
+    fit_results["Nomi"] = {
+            "Nomi": {"mean_fit": mean_fit, "sigmaG_fit": sigmaG_fit}
+        }
+
+    for sys in systematics:
+        print("\n=======   ", sys, "   ========= \n>")
+        mean_fit_Up,sigmaG_fit_Up = Get_fit_param(mass = mass,width = width,RealData = isRealData,dataYear = dataYear,local_fit = local_fit,sys = sys+"Up")
+        print("\n=====================================")
+        print(" %s Fit results : mean = %.5f +- %.5f GeV, sigmaG = %.5f +- %.5f GeV"%(f"{sys}Up",mean_fit_Up['mean'][0],mean_fit_Up['mean'][1],sigmaG_fit_Up['sigmaG'][0],sigmaG_fit_Up['sigmaG'][1]))
+        print("=====================================\n")
+
+        mean_fit_Down,sigmaG_fit_Down = Get_fit_param(mass = mass,width = width,RealData = isRealData,dataYear = dataYear,local_fit = local_fit,sys = sys+"Down")
+        print("\n=====================================")
+        print(" %s Fit results : mean = %.5f +- %.5f GeV, sigmaG = %.5f +- %.5f GeV"%(f"{sys}Down",mean_fit_Down['mean'][0],mean_fit_Down['mean'][1],sigmaG_fit_Down['sigmaG'][0],sigmaG_fit_Down['sigmaG'][1]))
+        print("=====================================\n")
+        
+        fit_results[sys] = {
+            "Up": {"mean_fit": mean_fit_Up, "sigmaG_fit": sigmaG_fit_Up},
+            "Down": {"mean_fit": mean_fit_Down, "sigmaG_fit": sigmaG_fit_Down},
+        }
+
+    # Write results to JSON file
+    with open(output_sys_json_file, "w") as json_file:
+         json.dump(fit_results, json_file, indent=4)
+
+    print(f"JSON file '{output_sys_json_file}' saved successfully!")
+    
 
 
 
@@ -1016,7 +1095,8 @@ if __name__ == "__main__":
             dataYear=dataYear,
             local_fit=local_fit,
             systematics=systematic,
-            output_filename="Sys_fit_results_"+dataYear+".json")
+            output_sys_json_file="Sys_fit_results_"+dataYear+".json")
+
         # mean_fit_Up,sigmaG_fit_Up = Get_fit_param(mass = mass,width = width,RealData = isRealData,dataYear = dataYear,local_fit = local_fit,sys = sys+"Up")
         # mean_fit_Down,sigmaG_fit_Down = Get_fit_param(mass = mass,width = width,RealData = isRealData,dataYear = dataYear,local_fit = local_fit,sys = sys+"Down")
 

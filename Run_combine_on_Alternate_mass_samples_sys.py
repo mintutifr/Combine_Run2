@@ -2,6 +2,7 @@ import fileinput, string, sys, os, time, subprocess
 import argparse as arg
 import ROOT as rt
 import numpy
+from Add_sys_parameter_to_datacard import update_sys_parameters_to_datacard_simultanous_fit
 parser = arg.ArgumentParser(description='Run Higgs combine Tool')
 parser.add_argument('-m', '--mass', dest='mass_sample', default=[None], type=str, nargs=1, help="is Alternate MC top mass sample used ['data','1695', '1715', '1725', '1735', '1755']")
 parser.add_argument('-w', '--width', dest='width_sample', default=[None], type=str, nargs=1, help="is Altrnate MC top width sample used ['data','190','170','150','130','090','075']")
@@ -38,23 +39,28 @@ for Mass in mass_point:
     #os.system(scp_file)
     if(year=="Run2"):
         for yearloop in ['UL2016preVFP', 'UL2016postVFP','UL2017', 'UL2018']:
-            cmd_createWorkspace = "python3 Create_Workspace_sys.py -m "+Mass+" -y  "+yearloop + " -s " + sys
+            cmd_add_datacards = f"combineCards.py mujets{tag}=datacard_top_shape_mu_para{tag}.txt eljets{tag}=datacard_top_shape_el_para{tag}.txt > datacard_top_shape_comb_para{tag}.txt"
+            print("\n",cmd_add_datacards)
+            os.system(cmd_add_datacards)
+            update_sys_parameters_to_datacard_simultanous_fit(f"datacard_top_shape_comb_para{tag}.txt",sys)
+            cmd_createWorkspace = f"python3 Create_Workspace_sys.py -m {Mass} -y  {yearloop} -s {sys}"
             os.system(cmd_createWorkspace)
-        cmd_adddatacards = "combineCards.py mujets_UL18=datacard_top_shape_mu_para_UL18.txt eljets_UL18=datacard_top_shape_el_para_UL18.txt mujets_UL17=datacard_top_shape_mu_para_UL17.txt eljets_UL17=datacard_top_shape_el_para_UL17.txt  mujets_ULpre16=datacard_top_shape_mu_para_ULpre16.txt eljets_ULpre16=datacard_top_shape_el_para_ULpre16.txt mujets_ULpost16=datacard_top_shape_mu_para_ULpost16.txt eljets_ULpost16=datacard_top_shape_el_para_ULpost16.txt > datacard_top_shape_comb_para.txt"
+        #cmd_adddatacards = "combineCards.py mujets_UL18=datacard_top_shape_mu_para_UL18.txt eljets_UL18=datacard_top_shape_el_para_UL18.txt mujets_UL17=datacard_top_shape_mu_para_UL17.txt eljets_UL17=datacard_top_shape_el_para_UL17.txt  mujets_ULpre16=datacard_top_shape_mu_para_ULpre16.txt eljets_ULpre16=datacard_top_shape_el_para_ULpre16.txt mujets_ULpost16=datacard_top_shape_mu_para_ULpost16.txt eljets_ULpost16=datacard_top_shape_el_para_ULpost16.txt > datacard_top_shape_comb_para.txt"
     else:
-        cmd_createWorkspace = "python3 Create_Workspace_sys.py -m "+Mass+" -y  "+year + " -s " + sys
+        cmd_add_datacards = f"combineCards.py mujets{tag}=datacard_top_shape_mu_para{tag}.txt eljets{tag}=datacard_top_shape_el_para{tag}.txt > datacard_top_shape_comb_para{tag}.txt"
+        print("\n",cmd_add_datacards)
+        os.system(cmd_add_datacards)
+        # Update systematic nuisance parameter in datacards
+        update_sys_parameters_to_datacard_simultanous_fit(f"datacard_top_shape_comb_para{tag}.txt",sys)
+        # crete Workshpace with modified physics model
+        cmd_createWorkspace = f"python3 Create_Workspace_sys.py -m {Mass} -y  {year} -s {sys}"
         print(cmd_createWorkspace)
         os.system(cmd_createWorkspace)
-        cmd_adddatacards = "combineCards.py mujets"+tag+"=datacard_top_shape_mu_para"+tag+".txt eljets"+tag+"=datacard_top_shape_el_para"+tag+".txt > datacard_top_shape_comb_para.txt"
-
-    print("\n",cmd_adddatacards)
-    os.system(cmd_adddatacards)
     
-    cmd_Runtext2workspace = "env PYTHONNOUSERSITE=1 text2workspace.py datacard_top_shape_comb_para.txt -o workspace_top_Mass_"+Mass+"_shape_comb_para.root"
+    cmd_Runtext2workspace = f"env PYTHONNOUSERSITE=1 text2workspace.py datacard_top_shape_comb_para{tag}.txt -o workspace_top_Mass_"+Mass+"_shape_comb_para.root"
     print("\n",cmd_Runtext2workspace)
     os.system(cmd_Runtext2workspace)
-    
-    
+
     cmd_GoodnessOfFit = "combine -M GoodnessOfFit workspace_top_Mass_"+Mass+"_shape_comb_para.root -n .goodnessOfFit_data --freezeParameters r --redefineSignalPOIs sigmaG,mean --setParameters mean=5.1,r=1,sigmaG=0.15  --X-rtd ADDNLL_CBNLL=0 --algo saturated  --expectSignal 1 -m 172.5"
     
     print("\n",cmd_GoodnessOfFit)
@@ -172,13 +178,4 @@ def getparams(mass,width,parms=[]):
     for par in parms:
        var = (roofitResults.floatParsFinal()).find(par)
        print(par," : ",var.getVal()," Error : ",var.getError())
-
-    #r = (roofitResults.floatParsFinal()).find("r")
-    #print("r : ",r.getVal()," Error : ",r.getError())
-
-    #Sigma = (roofitResults.floatParsFinal()).find("sigmaG")
-    #print("Sigma : ",Sigma.getVal()," Error : ",Sigma.getError())
-    
-
-#if(len(mass_point)==1 and len(width_point)==0): getparams(mass_point[0],None,["mean","sigmaG","cons_top_sig","cons_top_bkg","cons_EWK_bkg"]) # "sigmaG2Frac_mu","sigmaG2Frac_el"
-#if(len(mass_point)==0 and len(width_point)==1): getparams(None,width_point[0],["mean","sigmaG","sigmaG2Frac_mu","sigmaG2Frac_el","cons_top_sig","cons_top_bkg","cons_EWK_bkg"])
+       

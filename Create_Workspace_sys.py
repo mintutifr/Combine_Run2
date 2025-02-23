@@ -4,8 +4,9 @@ from ROOT import RooFit
 import sys, datetime
 from Hist_style import *
 import argparse as arg
+from shape_Sys_variation_calculation import compute_variations_simultanous_fit
 from shape_Sys_variation_calculation import compute_variations
-from Add_sys_parameter_to_datacard import update_sys_parameters_to_datacard
+
 
 #from TOY_local_fit import Toy_Mc 
 parser = arg.ArgumentParser(description='Create workspace for higgs combine')
@@ -174,7 +175,6 @@ if __name__ == "__main__":
     sigmaG = R.RooRealVar("sigmaG","sigmaG",0.15098,0.01,5)
 
 
-    
     # Get the systematic you want to analyze
     with open("Sys_list.json", "r") as f:
         systematics = json.load(f)
@@ -182,16 +182,12 @@ if __name__ == "__main__":
     print(systematic)
 
     json_file = "Sys_fit_results_"+dataYear+".json"  # Replace with your actual JSON file path
-    # = = = = = = = = = = = = = = 
-    # Update systematic nuisance parameter in datacards
-    # = = = = = = = = = = = = = = 
 
-    update_sys_parameters_to_datacard("datacard_top_shape_mu_para"+Combine_year_tag[dataYear]+".txt",systematic)
-    update_sys_parameters_to_datacard("datacard_top_shape_el_para"+Combine_year_tag[dataYear]+".txt",systematic)
 
     Nuisance_values= {dataYear:{}}
     for sys in systematic:
         _,Nuisance_values[dataYear][sys] = compute_variations(json_file, sys)
+       #_,Nuisance_values[dataYear][sys] = compute_variations_simultanous_fit(json_file, sys)
     print(f"\n{Nuisance_values = }\n")
 
     # = = = = = = = = = = = = = = 
@@ -268,7 +264,7 @@ if __name__ == "__main__":
 
     mean_formula_el = R.RooFormulaVar("mean_form_el", "mean_form_el", mean_formula_expr, R.RooArgList(*arg_list_mean))
     sigmaG_formula_el = R.RooFormulaVar("sigmaG_form_el", "sigmaG_form_el", sigmaG_formula_expr, R.RooArgList(*arg_list_sigmaG))
-    
+        
     # C r e a t e   m o d e l 
     # -----------------------------------------------
 
@@ -413,7 +409,7 @@ if __name__ == "__main__":
         # Workspace will remain in memory after macro finishes
         R.gDirectory.Add(w)
 
-        
+        print(f"\nworkspace w_{tag} written in workspace{tag}{gt_or_lt_tag}")
         
         
         
