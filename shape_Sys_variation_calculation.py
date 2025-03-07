@@ -93,6 +93,8 @@ def compute_variations_simultanous_fit(json_filename, systematic_key):
 
         # Calculate variations:
         var_mean = (1 - sys_mean / nominal_mean )
+        ratio = sys_sigmaG / nominal_sigmaG
+        # print(f" sys_sigmaG : {sys_sigmaG}   nominal_sigmaG {nominal_sigmaG}  ratio : {sys_sigmaG / nominal_sigmaG}")
         var_sigmaG = (1 - sys_sigmaG / nominal_sigmaG)
         
         # Save the variations in the dictionary
@@ -100,8 +102,9 @@ def compute_variations_simultanous_fit(json_filename, systematic_key):
         variations[variation]["sigmaG"] = var_sigmaG
 
     maxi_variations = {}
-    maxi_variations["mean"] = variations["Up"]["mean"] if abs(variations["Up"]["mean"]) > abs(variations["Down"]["mean"]) else variations["Down"]["mean"]
-    maxi_variations["sigmaG"] = variations["Up"]["sigmaG"] if abs(variations["Up"]["sigmaG"]) > abs(variations["Down"]["sigmaG"]) else variations["Down"]["sigmaG"]
+    #print(variations["Up"]["sigmaG"],variations["Down"]["sigmaG"])
+    maxi_variations["Nui_mean"] = variations["Up"]["mean"] if abs(variations["Up"]["mean"]) > abs(variations["Down"]["mean"]) else variations["Down"]["mean"]
+    maxi_variations["Nui_sigmaG"] = variations["Up"]["sigmaG"] if abs(variations["Up"]["sigmaG"]) > abs(variations["Down"]["sigmaG"]) else variations["Down"]["sigmaG"]
 
     print(f"{maxi_variations}")
     return variations, maxi_variations
@@ -226,11 +229,11 @@ def compute_variations(json_filename, systematic_key):
         variations[variation]["sigmaG_el"] = var_sigmaG_el
 
     maxi_variations = {}
-    maxi_variations["mean_mu"] = variations["Up"]["mean_mu"] if abs(variations["Up"]["mean_mu"]) > abs(variations["Down"]["mean_mu"]) else variations["Down"]["mean_mu"]
-    maxi_variations["mean_el"] = variations["Up"]["mean_el"] if abs(variations["Up"]["mean_el"]) > abs(variations["Down"]["mean_el"]) else variations["Down"]["mean_el"]
+    maxi_variations["Nui_mean_mu"] = round(variations["Up"]["mean_mu"],5) if abs(variations["Up"]["mean_mu"]) > abs(variations["Down"]["mean_mu"]) else round(variations["Down"]["mean_mu"],5)
+    maxi_variations["Nui_mean_el"] = round(variations["Up"]["mean_el"],5) if abs(variations["Up"]["mean_el"]) > abs(variations["Down"]["mean_el"]) else round(variations["Down"]["mean_el"],5)
 
-    maxi_variations["sigmaG_mu"] = variations["Up"]["sigmaG_mu"] if abs(variations["Up"]["sigmaG_mu"]) > abs(variations["Down"]["sigmaG_mu"]) else variations["Down"]["sigmaG_mu"]
-    maxi_variations["sigmaG_el"] = variations["Up"]["sigmaG_el"] if abs(variations["Up"]["sigmaG_el"]) > abs(variations["Down"]["sigmaG_el"]) else variations["Down"]["sigmaG_el"]
+    maxi_variations["Nui_sigmaG_mu"] = variations["Up"]["sigmaG_mu"] if abs(variations["Up"]["sigmaG_mu"]) > abs(variations["Down"]["sigmaG_mu"]) else variations["Down"]["sigmaG_mu"]
+    maxi_variations["Nui_sigmaG_el"] = variations["Up"]["sigmaG_el"] if abs(variations["Up"]["sigmaG_el"]) > abs(variations["Down"]["sigmaG_el"]) else variations["Down"]["sigmaG_el"]
 
     return variations, maxi_variations
 

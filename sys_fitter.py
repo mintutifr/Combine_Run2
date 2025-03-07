@@ -24,6 +24,12 @@ def propagate_rate_uncertainity(hist, uncert):
         if hist.GetBinContent(i) != 0:
             hist.SetBinError(i, hist.GetBinContent(i) * uncert * 0.01)
 
+def run_cmd(command = "root -l -q"):
+    exit_code = os.system(command)
+    if exit_code != 0:
+        print(f"\n ERROR: {command} failed with exit code: {exit_code}. Please try running the command locally.")
+        exit(0)
+
 Combine_year_tag={
                 'UL2016preVFP' :  "_ULpre16",
                 'UL2016postVFP' : "_ULpost16",
@@ -59,15 +65,12 @@ def Get_fit_param(mass,width,RealData,dataYear,local_fit,sys):
     #read the file to get the hustogrms
     File_Dir = "/feynman/home/dphp/mk277705/work/HiggsCombine/CMSSW_12_3_4/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/"
     File_Dir ="/eos/home-m/mikumar/Higgs_Combine/CMSSW_14_1_0_pre4/src/HiggsAnalysis/Hist_for_workspace/"
-    Filename_mu = File_Dir+"Combine_Input_lntopMass_histograms_"+dataYear+"_mu_gteq0p7_withoutDNNfit_rebin_JES.root"
-    Filename_el = File_Dir+"Combine_Input_lntopMass_histograms_"+dataYear+"_el_gteq0p7_withoutDNNfit_rebin_JES.root"
-    Filename_mu_cont = File_Dir+"Combine_Input_lntopMass_histograms_"+dataYear+"_mu_gteq0p3_withoutDNNfit_rebin.root"
-    Filename_el_cont = File_Dir+"Combine_Input_lntopMass_histograms_"+dataYear+"_el_gteq0p3_withoutDNNfit_rebin.root"
+    Filename_mu = File_Dir+"Combine_Input_lntopMass_histograms_"+dataYear+"_mu_gteq0p7_withoutDNNfit_rebin.root"
+    Filename_el = File_Dir+"Combine_Input_lntopMass_histograms_"+dataYear+"_el_gteq0p7_withoutDNNfit_rebin.root"
+
 
     File_mu = R.TFile(Filename_mu,"Read")
     File_el = R.TFile(Filename_el,"Read")
-    File_mu_cont = R.TFile(Filename_mu_cont,"Read")
-    File_el_cont = R.TFile(Filename_el_cont,"Read")
     #Data Vs Mc Condition
 
     gt_or_lt_tag = ''
@@ -76,28 +79,23 @@ def Get_fit_param(mass,width,RealData,dataYear,local_fit,sys):
 
     #Get the file and director where historgrams are stored for muon final state
     dir_mu = File_mu.GetDirectory("mujets")
-    dir_mu_cont = File_mu_cont.GetDirectory("mujets")
     #Get Mc histograms for muon final state
     if(mass!= None):
         top_sig_mu = dir_mu.Get("top_sig_"+mass+tag+gt_or_lt_tag+sys)
     if(width!= None):
         top_sig_mu = dir_mu.Get("top_sig_"+width+tag+gt_or_lt_tag+sys)
 
-    top_bkg_mu = dir_mu.Get("top_bkg_1725"+tag+gt_or_lt_tag)#+sys)
-    EWK_bkg_mu = dir_mu.Get("EWK_bkg"+tag+gt_or_lt_tag)
-    EWK_bkg_mu_cont = dir_mu_cont.Get("EWK_bkg"+tag+"_gt")
+    top_bkg_mu = dir_mu.Get("top_bkg_1725"+tag+gt_or_lt_tag+sys)
+    EWK_bkg_mu = dir_mu.Get("EWK_bkg"+tag+gt_or_lt_tag+sys)
     QCD_DD = dir_mu.Get("QCD_DD"+tag+gt_or_lt_tag)
 
     print( "top_sig_mu Integral : ",top_sig_mu.Integral() )
     print( " top_bkg_mu Integral : ",top_bkg_mu.Integral())
     print( " EWK_bkg_mu Integral : ",EWK_bkg_mu.Integral())
-    print( " EWK_bkg_mu_cont Integral : ",EWK_bkg_mu_cont.Integral())
     if(RealData==False):
         #Add all Mc histogram to creat full MC hisogram for muon final state
         histData_mu=top_sig_mu.Clone()
         histData_mu.Add(top_bkg_mu)  # for a cross check i have commented this line. i uncommented it before pushing the code. so !!warning!!
-        EWK_bkg_mu_cont.Scale(EWK_bkg_mu.Integral()/EWK_bkg_mu_cont.Integral())
-        EWK_bkg_mu=EWK_bkg_mu_cont #replace the sig region template with control region template
         histData_mu.Add(EWK_bkg_mu)
         print( "Total MC",histData_mu.Integral())
         #get real data
@@ -109,7 +107,6 @@ def Get_fit_param(mass,width,RealData,dataYear,local_fit,sys):
     print( R.TMath.Exp(histData_mu.GetBinLowEdge(15)+histData_mu.GetBinWidth(15)))
     #Get the file and director where historgrams are stored for electron final state
     dir_el = File_el.GetDirectory("eljets")
-    dir_el_cont = File_el_cont.GetDirectory("eljets")
     #Get Mc histograms for electron final state
     if(mass!= None):
         top_sig_el = dir_el.Get("top_sig_"+mass+tag+gt_or_lt_tag+sys)
@@ -118,19 +115,15 @@ def Get_fit_param(mass,width,RealData,dataYear,local_fit,sys):
 
     top_bkg_el = dir_el.Get("top_bkg_1725"+tag+gt_or_lt_tag)#+sys)
     EWK_bkg_el = dir_el.Get("EWK_bkg"+tag+gt_or_lt_tag)
-    EWK_bkg_el_cont = dir_el_cont.Get("EWK_bkg"+tag+"_gt")
     QCD_DD = dir_mu.Get("QCD_DD"+tag+gt_or_lt_tag)
 
     print( "top_sig_el Integral : ",top_sig_el.Integral() )
     print( " top_bkg_el Integral : ",top_bkg_el.Integral() )
     print( " EWK_bkg_el Integral : ",EWK_bkg_el.Integral())
-    print( " EWK_bkg_el_cont Integral : ",EWK_bkg_el_cont.Integral())
     if(RealData==False):
         #Add all Mc histogram to creat full MC hisogram for electron final state
         histData_el = top_sig_el.Clone()
         histData_el.Add(top_bkg_el) # for a cross check i have commented this line. i uncommented it before pushing the code. so !!warning!!
-        EWK_bkg_el_cont.Scale(EWK_bkg_el.Integral()/EWK_bkg_el_cont.Integral())
-        EWK_bkg_el=EWK_bkg_el_cont #replace the sig region template with control region template
         histData_el.Add(EWK_bkg_el)
         print("Totle MC : ",histData_el.Integral(), )
     #get real data
@@ -150,7 +143,44 @@ def Get_fit_param(mass,width,RealData,dataYear,local_fit,sys):
 
     mean = R.RooRealVar("mean","mean",5.1,4.5,5.5)
     sigmaG = R.RooRealVar("sigmaG","sigmaG",0.15098,0.01,5)
+    # Construct the formula dynamically
+    mean_formula_expr = "@0"  # Initial mean value
+    sigmaG_formula_expr = "@0"  # Initial sigmaG value
 
+
+    arg_list_mean = [mean]
+    arg_list_sigmaG = [sigmaG]
+    arg_list_mean_str = ["mean"]
+    arg_list_sigmaG_str = ["sigmaG"]
+
+    for i, sys in enumerate(systematic, start=1):
+        mean_formula_expr += f"*(1+@{i*2-1}*@{i*2})"
+        sigmaG_formula_expr += f"*(1+@{i*2-1}*@{i*2})"
+
+        
+        arg_list_mean.append(nuisance_vars_mean[sys])
+        const_mean = R.RooRealVar(f"const_mean_{sys}", f"const_mean_{sys}", Nuisance_values[dataYear][sys]["Nui_mean"])
+        arg_list_mean.append(const_mean)
+
+        arg_list_sigmaG.append(nuisance_vars_sigmaG[sys])
+        const_sigmaG = R.RooRealVar(f"const_sigmaG_{sys}", f"const_sigmaG_{sys}", Nuisance_values[dataYear][sys]["Nui_sigmaG"])
+        arg_list_sigmaG.append(const_sigmaG)
+
+    print(f"{mean_formula_expr = }")
+
+    print(f"\n{sigmaG_formula_expr = }")
+
+
+    # Create RooFormulaVar for mu and el
+    mean_formula_mu = R.RooFormulaVar("mean_form_mu", "mean_form_mu", mean_formula_expr, R.RooArgList(*arg_list_mean))
+    sigmaG_formula_mu = R.RooFormulaVar("sigmaG_form_mu", "sigmaG_form_mu", sigmaG_formula_expr, R.RooArgList(*arg_list_sigmaG))
+
+    print(sigmaG_formula_mu.Print())
+
+
+    mean_formula_el = R.RooFormulaVar("mean_form_el", "mean_form_el", mean_formula_expr, R.RooArgList(*arg_list_mean))
+    sigmaG_formula_el = R.RooFormulaVar("sigmaG_form_el", "sigmaG_form_el", sigmaG_formula_expr, R.RooArgList(*arg_list_sigmaG))
+    
     # = = = = = = = = = = = = = =
     # Nuisance parameters for syst.
     # = = = = = = = = = = = = = =
@@ -164,12 +194,22 @@ def Get_fit_param(mass,width,RealData,dataYear,local_fit,sys):
 
     sigmaG2Frac_mu = R.RooRealVar("sigmaG2Frac_mu","sigmaG2Frac_mu",0.1,0.0,5.0) #Best Fit Value
     sigmaG2Frac_el = R.RooRealVar("sigmaG2Frac_el","sigmaG2Frac_el",0.1,0.0,5.0) #Best Fit Value
+
+     # ====================  #
+    # Best fit param
+    # ====================  #
+    if(DropFixParam==False):
+        sigmaG2Frac_mu = R.RooFit.RooConst(FixParam["top_sig"][dataYear]["sigmaG2Frac_mu"])
+        sigmaG2Frac_el = R.RooFit.RooConst(FixParam["top_sig"][dataYear]["sigmaG2Frac_el"])
+    # ====================  #
     sigmaG2_mu = R.RooFormulaVar("sigmaG2_mu","sigmaG2_mu","@0/@1",R.RooArgList(sigmaG,	sigmaG2Frac_mu))
     sigmaG2_el = R.RooFormulaVar("sigmaG2_el","sigmaG2_el","@0/@1",R.RooArgList(sigmaG,sigmaG2Frac_el))
     
     #signal Bifrac gaussian pdf
-    sig_pdf_mu = R.RooBifurGauss("sig_pdf_mu","gauss_mu",logM,mean,sigmaG,sigmaG2_mu)
-    sig_pdf_el = R.RooBifurGauss("sig_pdf_el","gauss_el",logM,mean,sigmaG,sigmaG2_el)
+    # sig_pdf_mu = R.RooBifurGauss("sig_pdf_mu","gauss_mu",logM,mean,sigmaG,sigmaG2_mu)
+    # sig_pdf_el = R.RooBifurGauss("sig_pdf_el","gauss_el",logM,mean,sigmaG,sigmaG2_el)
+    sig_pdf_mu = R.RooBifurGauss("sig_pdf_mu","gauss_mu",logM,mean_formula_mu,sigmaG_formula_mu,sigmaG2_mu)
+    sig_pdf_el = R.RooBifurGauss("sig_pdf_el","gauss_el",logM,mean_formula_el,sigmaG_formula_el,sigmaG2_el)
 
 
 
@@ -294,35 +334,35 @@ def Get_fit_param(mass,width,RealData,dataYear,local_fit,sys):
         # Workspace will remain in memory after macro finishes
         R.gDirectory.Add(w)
         
-        write_datacard_for_systematic("datacard_top_shape_mu_para"+Combine_year_tag[dataYear]+".txt",sys,"mu")
-        write_datacard_for_systematic("datacard_top_shape_el_para"+Combine_year_tag[dataYear]+".txt",sys,"el")
+        write_datacard_for_systematic("datacard_top_shape_mu_para"+Combine_year_tag[dataYear]+".txt",sys,"mu",tag)
+        write_datacard_for_systematic("datacard_top_shape_el_para"+Combine_year_tag[dataYear]+".txt",sys,"el",tag)
 
         cmd_adddatacards = F"combineCards.py mujets{tag}=Per_sys_datacards/datacard_top_shape_mu_para{tag}{sys}.txt eljets{tag}=Per_sys_datacards/datacard_top_shape_el_para{tag}{sys}.txt > Per_sys_datacards/datacard_top_shape_comb_para{tag}{sys}.txt"
         print("\n",cmd_adddatacards)
-        os.system(cmd_adddatacards)
+        run_cmd(cmd_adddatacards)
     
         cmd_Runtext2workspace = f"env PYTHONNOUSERSITE=1 text2workspace.py Per_sys_datacards/datacard_top_shape_comb_para{tag}{sys}.txt -o Per_sys_datacards/workspace_top_Mass_1725_shape_comb_para{tag}{sys}.root"
         print("\n",cmd_Runtext2workspace)
-        os.system(cmd_Runtext2workspace)
+        run_cmd(cmd_Runtext2workspace)
 
-        cmd_RunCombine_fit = f"combine -M FitDiagnostics Per_sys_datacards/workspace_top_Mass_1725_shape_comb_para{tag}{sys}.root -n _M1725{sys}  --redefineSignalPOIs sigmaG,mean  --setParameters mean=5.1,r=1,sigmaG=0.11 --setParameterRanges mean=5.08,5.12:sigmaG=0.10,0.12 --freezeParameters  r  --X-rtd ADDNLL_CBNLL=0  --trackParameters r,mean,sigmaG --trackErrors r,mean,sigmaG --X-rtd TMCSO_PseudoAsimov=0 --saveShapes --saveWithUncertainties --saveWorkspace" #-t -1 --saveToys"# --plots"
+        cmd_RunCombine_fit = f"combine -M FitDiagnostics Per_sys_datacards/workspace_top_Mass_1725_shape_comb_para{tag}{sys}.root -n _M1725{sys}{tag}  --redefineSignalPOIs mean,sigmaG  --setParameters mean=5.1,r=1,sigmaG=0.11 --setParameterRanges mean=5.0,5.3:sigmaG=0.05,0.5 --freezeParameters  r  --X-rtd ADDNLL_CBNLL=0  --trackParameters r,mean,sigmaG --trackErrors r,mean,sigmaG --X-rtd TMCSO_PseudoAsimov=0 --saveShapes --saveWithUncertainties --saveWorkspace" #-t -1 --saveToys"# --plots"
         print("\n",cmd_RunCombine_fit)
-        os.system(cmd_RunCombine_fit)
+        run_cmd(cmd_RunCombine_fit)
 
-        os.system(f"mv fitDiagnostics_M1725{sys}.root Per_sys_datacards/fitDiagnostics_M1725{sys}.root")
-        os.system(f"mv Combine_Run2/higgsCombine_M1725{sys}.FitDiagnostics.mH120.root Per_sys_datacards/Combine_Run2/higgsCombine_M1725{sys}.FitDiagnostics.mH120.root")
-        
-        fitfile = R.TFile.Open(f"Per_sys_datacards/fitDiagnostics_M1725{sys}.root")
+        fitfile = R.TFile.Open(f"fitDiagnostics_M1725{sys}{tag}.root")
         roofitResults = fitfile.Get("fit_s")
 
-        print
-        print("results from one fit_s from ",fitfile.GetName()," file is (do not qoute this results from toy results) : ")
+        print(f"\nresults from one fit_s from {fitfile.GetName()}")
 
         Mean = (roofitResults.floatParsFinal()).find("mean")
         SigmaG = (roofitResults.floatParsFinal()).find("sigmaG")
 
         mean_fit["mean"] = [Mean.getVal(), Mean.getError()]
         sigmaG_fit["sigmaG"] = [SigmaG.getVal(), SigmaG.getError()]
+
+        run_cmd(f"mv fitDiagnostics_M1725{sys}{tag}.root Per_sys_datacards/fitDiagnostics_M1725{sys}{tag}.root")
+        run_cmd(f"mv higgsCombine_M1725{sys}{tag}.FitDiagnostics.mH120.root Per_sys_datacards/higgsCombine_M1725{sys}{tag}.FitDiagnostics.mH120.root")
+        #os.system(f"mv higgsCombine_paramFit__M1725_InitialFit_cons_EWK_bkg.MultiDimFit.mH172.5.root")
 
 
 
@@ -337,7 +377,7 @@ def Get_fit_param(mass,width,RealData,dataYear,local_fit,sys):
         data_el_sig = R.RooDataHist("data_el_sig","data_el_sig",R.RooArgList(logM),top_sig_el)
         #define Canvas
         can_mu = R.TCanvas("ln_mtop_mu","ln_mtop_mu",1300,600); 
-        can_mu.Divide(2,1);
+        can_mu.Divide(2,1)
         can_mu.cd(1)
         R.gPad.SetPad(xpad[0],ypad[0],xpad[1],ypad[1])
         R.gPad.SetTicky()
@@ -1019,21 +1059,32 @@ def save_fit_results_json_combine(mass, width, isRealData, dataYear, local_fit, 
         }
 
     for sys in systematics:
-        print("\n=======   ", sys, "   ========= \n>")
-        mean_fit_Up,sigmaG_fit_Up = Get_fit_param(mass = mass,width = width,RealData = isRealData,dataYear = dataYear,local_fit = local_fit,sys = sys+"Up")
-        print("\n=====================================")
-        print(" %s Fit results : mean = %.5f +- %.5f GeV, sigmaG = %.5f +- %.5f GeV"%(f"{sys}Up",mean_fit_Up['mean'][0],mean_fit_Up['mean'][1],sigmaG_fit_Up['sigmaG'][0],sigmaG_fit_Up['sigmaG'][1]))
-        print("=====================================\n")
+        if(sys in ["erdON","Gluonmove","QCDinspired","TuneCP5up","TuneCP5down"]):
+            print("\n=======   ", sys, "   ========= \n>")
+            mean_fit_Up,sigmaG_fit_Up = Get_fit_param(mass = mass,width = width,RealData = isRealData,dataYear = dataYear,local_fit = local_fit,sys = sys)
+            print("\n=====================================")
+            print(" %s Fit results : mean = %.5f +- %.5f GeV, sigmaG = %.5f +- %.5f GeV"%(f"{sys}",mean_fit_Up['mean'][0],mean_fit_Up['mean'][1],sigmaG_fit_Up['sigmaG'][0],sigmaG_fit_Up['sigmaG'][1]))
+            print("=====================================\n")
+            fit_results[sys] = {
+                "Up": {"mean_fit": mean_fit_Up, "sigmaG_fit": sigmaG_fit_Up},
+                "Down": {"mean_fit": mean_fit_Up, "sigmaG_fit": sigmaG_fit_Up},
+            }
+        else:
+            print("\n=======   ", sys, "   ========= \n>")
+            mean_fit_Up,sigmaG_fit_Up = Get_fit_param(mass = mass,width = width,RealData = isRealData,dataYear = dataYear,local_fit = local_fit,sys = sys+"Up")
+            print("\n=====================================")
+            print(" %s Fit results : mean = %.5f +- %.5f GeV, sigmaG = %.5f +- %.5f GeV"%(f"{sys}Up",mean_fit_Up['mean'][0],mean_fit_Up['mean'][1],sigmaG_fit_Up['sigmaG'][0],sigmaG_fit_Up['sigmaG'][1]))
+            print("=====================================\n")
 
-        mean_fit_Down,sigmaG_fit_Down = Get_fit_param(mass = mass,width = width,RealData = isRealData,dataYear = dataYear,local_fit = local_fit,sys = sys+"Down")
-        print("\n=====================================")
-        print(" %s Fit results : mean = %.5f +- %.5f GeV, sigmaG = %.5f +- %.5f GeV"%(f"{sys}Down",mean_fit_Down['mean'][0],mean_fit_Down['mean'][1],sigmaG_fit_Down['sigmaG'][0],sigmaG_fit_Down['sigmaG'][1]))
-        print("=====================================\n")
-        
-        fit_results[sys] = {
-            "Up": {"mean_fit": mean_fit_Up, "sigmaG_fit": sigmaG_fit_Up},
-            "Down": {"mean_fit": mean_fit_Down, "sigmaG_fit": sigmaG_fit_Down},
-        }
+            mean_fit_Down,sigmaG_fit_Down = Get_fit_param(mass = mass,width = width,RealData = isRealData,dataYear = dataYear,local_fit = local_fit,sys = sys+"Down")
+            print("\n=====================================")
+            print(" %s Fit results : mean = %.5f +- %.5f GeV, sigmaG = %.5f +- %.5f GeV"%(f"{sys}Down",mean_fit_Down['mean'][0],mean_fit_Down['mean'][1],sigmaG_fit_Down['sigmaG'][0],sigmaG_fit_Down['sigmaG'][1]))
+            print("=====================================\n")
+            
+            fit_results[sys] = {
+                "Up": {"mean_fit": mean_fit_Up, "sigmaG_fit": sigmaG_fit_Up},
+                "Down": {"mean_fit": mean_fit_Down, "sigmaG_fit": sigmaG_fit_Down},
+            }
 
     # Write results to JSON file
     with open(output_sys_json_file, "w") as json_file:
@@ -1086,9 +1137,12 @@ if __name__ == "__main__":
         print(sys,"========>")
         with open("Sys_list.json", "r") as f:
             systematics = json.load(f)
-        systematic = systematics[sys]
+        if(sys=="all_sys"):
+            systematic = systematics["sample"] + systematics["top_weight_sys"] + systematics["JES_JER"]
+        else:
+            systematic = systematics[sys]
         print(systematic)
-        save_fit_results_json(
+        save_fit_results_json_combine(
             mass=mass,
             width=width,
             isRealData=isRealData,

@@ -1,6 +1,6 @@
 import ROOT
 from ROOT import TColor
-import os
+import os, json
 import argparse as arg
 parser = arg.ArgumentParser(description='Run Higgs combine Tool')
 parser.add_argument('-y', '--year', dest='Year', default=['2016'], type=str, nargs=1, help="Year of Data collection ['2016', 'UL2017', 'UL2018','Run2']")
@@ -12,7 +12,7 @@ year = args.Year[0]
 lep = args.lepton[0]
 
 # Open the root file
-file_path = "/eos/home-m/mikumar/Higgs_Combine/CMSSW_14_1_0_pre4/src/HiggsAnalysis/Hist_for_workspace/Combine_Input_lntopMass_histograms_"+year+"_"+lep+"_gteq0p7_withoutDNNfit_rebin_JES.root"
+file_path = "/eos/home-m/mikumar/Higgs_Combine/CMSSW_14_1_0_pre4/src/HiggsAnalysis/Hist_for_workspace/Combine_Input_lntopMass_histograms_"+year+"_"+lep+"_gteq0p7_withoutDNNfit_rebin.root"
 print(f'{file_path  = }')
 root_file = ROOT.TFile(file_path, "READ")
 
@@ -48,37 +48,9 @@ Combine_year_tag={
                 'UL2017' : "_UL17",
                 'UL2018' : "_UL18"}
 
-# Convert hex colors to ROOT color codes
-# def hex_to_rgb(hex_color):
-#     hex_color = hex_color.lstrip("#")
-#     return int(hex_color[0:2], 16), int(hex_color[2:4], 16), int(hex_color[4:6], 16)
-
-# def hex_to_root_color(hex_color):
-#     r, g, b = hex_to_rgb(hex_color)
-#     return ROOT.TColor.GetColor(r, g, b)
-
-# Assign systematic types to color
-systematic_colors = {}
-
-# List of systematics by category
-systematics = ["jes","gtbWeight_lf", "gtbWeight_hf", "gtbWeight_cferr1", "gtbWeight_cferr2", 
-               "ISR", "FSR", "hdamp", "SF_Iso"]
-
-# Assign each systematic type a unique color from the hex color list
-# for i, syst in enumerate(systematics):
-#     systematic_colors[syst] = hex_to_root_color(hex_colors[i % len(hex_colors)])
-
-# Function to determine the systematic name from the histogram name
-def get_systematic_type(hist_name):
-    for syst in systematics:
-        if syst in hist_name:
-            return syst
-    return None
 
 # Function to set histogram style based on systematic type and whether it's Up or Down
 def set_histogram_style(hist, syst_type, is_up):
-    color = systematic_colors.get(syst_type, ROOT.kBlack)
-    print(f"{color = }")
     hist.SetLineColor(color)
     hist.SetMarkerColor(color)
     hist.SetMarkerStyle(24 if is_up else 25)  # Arrow up for Up, arrow down for Down
@@ -88,7 +60,7 @@ def draw_histograms(Nominal_hist, histograms, canvas_name, canvas_title, output_
     # Set batch size to 15 histograms per canvas.
     batch_size = 15
     num_batches = (len(histograms) + batch_size - 1) // batch_size
-
+    weight_sys_variation={}
     for batch_index in range(num_batches):
         # Determine the subset (batch) of histograms to draw.
         batch_histograms = histograms[batch_index * batch_size : (batch_index + 1) * batch_size]
@@ -105,24 +77,36 @@ def draw_histograms(Nominal_hist, histograms, canvas_name, canvas_title, output_
         
         # Draw the nominal histogram first
         Nominal_hist.Draw("HIST")
+        #Nominal_hist.Print()
         legend.AddEntry(Nominal_hist, "Nominal", "l")
         
         # Draw each systematic histogram from the current batch
         for i, hist in enumerate(batch_histograms):
-            syst_type = get_systematic_type(hist.GetName())
             is_up = 'Up' in hist.GetName()
             # Adjust the color index if needed.
             color_index = batch_index * batch_size + i
             hist.SetLineColor(color_list[color_index])
             hist.SetMarkerColor(color_list[color_index])
             hist.SetMarkerStyle(24 if is_up else 25)
+            # hist.Print()
             hist.Draw("HIST SAME")
             legend.AddEntry(hist, hist.GetName().rsplit("_gt")[1], "l")
             yield_variation = hist.Integral() / Nominal_hist.Integral()
-            print("Systematic varied yield (%s): %.3f" % (hist.GetName(), yield_variation))
-        
+            #print("Systematic varied yield (%s): %.3f" % (hist.GetName(), yield_variation))
+            sample = hist.GetName().rsplit("_")[0]+hist.GetName().rsplit("_")[1]
+            key = hist.GetName().rsplit("_")[-1]
+            if("bWeight" in  hist.GetName()):
+                #print("%s: %s: %.3f" % (sample,key, yield_variation))
+                weight_sys_variation[f'bWeight_'+key] = round(yield_variation,3)
+            if("puWeight" in  hist.GetName()):
+                #print("%s: %s: %.3f" % (sample,key, yield_variation))
+                weight_sys_variation[key.rsplit("gt")[-1]] = round(yield_variation,3)
+            if("SF_Iso" in  hist.GetName()):
+                #print(hist.GetName())
+                weight_sys_variation[key] = round(yield_variation,3)
         legend.Draw()
-        
+        #print(f"{weight_sys_variation = }")
+
         ## Bottom pad: create the ratio plot
         canvas.cd(2)
         ratio_histograms = []
@@ -188,15 +172,21 @@ def draw_histograms(Nominal_hist, histograms, canvas_name, canvas_title, output_
         # Save the canvas; each batch gets its own file (e.g., plot_0.pdf, plot_1.pdf, etc.)
         batch_output_path = output_path.replace(".png", f"_{batch_index}.png")
         canvas.SaveAs(batch_output_path)
+        batch_output_path = output_path.replace(".png", f"_{batch_index}.pdf")
+        canvas.SaveAs(batch_output_path)
         canvas.Close()
-
+    print(f"{weight_sys_variation = }")
+    return weight_sys_variation
 
 # Create dictionaries to store histograms based on the criteria
 # Create dictionaries to store histograms based on the criteria for topSig, topBkg, and ewkBkg
 histogram_categories = {
     'topSig': {
         'jes': [],
+        'sample':[],
+        'jer':[],
         'bweight': [],
+        'puweight': [],
         'sf_iso': [],
         'isr_fsr': [],
         'hdamp': [],
@@ -204,7 +194,10 @@ histogram_categories = {
     },
     'topBkg': {
         'jes':[],
+        'sample':[],
+        'jer':[],
         'bweight': [],
+        'puweight': [],
         'sf_iso': [],
         'isr_fsr': [],
         'hdamp': [],
@@ -212,7 +205,10 @@ histogram_categories = {
     },
     'ewkBkg': {
         'jes':[],
+        'sample':[],
+        'jer':[],
         'bweight': [],
+        'puweight': [],
         'sf_iso': [],
         'isr_fsr': [],
         'hdamp': [],
@@ -239,6 +235,8 @@ for key in root_dir.GetListOfKeys():
             # Categorize based on histogram name for each category
             if substring + "bWeight" in hist_name:
                 histogram_categories[category]['bweight'].append(hist)
+            if substring + "puWeight" in hist_name:
+                histogram_categories[category]['puweight'].append(hist)
             elif substring + "SF_Iso" in hist_name:
                 histogram_categories[category]['sf_iso'].append(hist)
             elif substring + "ISR" in hist_name or substring +"FSR" in hist_name:
@@ -247,11 +245,16 @@ for key in root_dir.GetListOfKeys():
                 histogram_categories[category]['hdamp'].append(hist)
             elif substring + "jes" in hist_name:
                 histogram_categories[category]['jes'].append(hist)
+            elif substring + "jer" in hist_name:
+                histogram_categories[category]['jer'].append(hist)
+            elif (substring + "erdON" in hist_name or substring + "Gluonmove" in hist_name or substring + "QCDinspired" in hist_name or substring + "TuneCP5up" in hist_name or substring + "TuneCP5down" in hist_name):
+                histogram_categories[category]['sample'].append(hist)
             elif substring == hist_name:
                 histogram_categories[category]['nominal'] = hist
 
 # Function to draw histograms based on the categories
 def plot_variations(category, year, lep, output_dir):
+    weight_sys = {}
     nominal_hist = histogram_categories[category]['nominal']
     nominal_hist.SetLineColor(ROOT.kBlack)
 
@@ -261,13 +264,27 @@ def plot_variations(category, year, lep, output_dir):
 
     if histogram_categories[category]['bweight']:
         print("\n  = = = = = = = = =  =      "+ category +" bweight       = = = = = = = =  = = = \n")
-        draw_histograms(nominal_hist, histogram_categories[category]['bweight'],
+        if ('bWeight' not in weight_sys.keys()):
+            weight_sys['bWeight'] = {}
+        weight_sys['bWeight'] = draw_histograms(nominal_hist, histogram_categories[category]['bweight'],
                         f"canvas_{category}_bweight", f"{category} bWeight Variations",
                         os.path.join(output_dir, f"{category}_bweight_variations_{year}_{lep}.png"))
+        #print(f'{weight_sys_btag = }')
+
+    if histogram_categories[category]['puweight']:
+        print("\n  = = = = = = = = =  =      "+ category +" puweight       = = = = = = = =  = = = \n")
+        if ('puWeight' not in weight_sys.keys()):
+            weight_sys['puWeight'] = {}
+        weight_sys['puWeight'] = draw_histograms(nominal_hist, histogram_categories[category]['puweight'],
+                        f"canvas_{category}_puweight", f"{category} puWeight Variations",
+                        os.path.join(output_dir, f"{category}_puweight_variations_{year}_{lep}.png"))
+        #print(f'{weight_sys_btag = }')
 
     if histogram_categories[category]['sf_iso']:
         print("\n  = = = = = = = = =  =      "+ category +" sf_iso       = = = = = = = =  = = = \n")
-        draw_histograms(nominal_hist, histogram_categories[category]['sf_iso'],
+        if ('sf_iso' not in weight_sys.keys()):
+            weight_sys['sf_iso'] = {}
+        weight_sys['sf_iso'] = draw_histograms(nominal_hist, histogram_categories[category]['sf_iso'],
                         f"canvas_{category}_sf_iso", f"{category} SF Iso Variations",
                         os.path.join(output_dir, f"{category}_sf_iso_variations_{year}_{lep}.png"))
 
@@ -288,12 +305,32 @@ def plot_variations(category, year, lep, output_dir):
         draw_histograms(nominal_hist, histogram_categories[category]['jes'],
                         f"canvas_{category}_jes", f"{category} jes Variations",
                         os.path.join(output_dir, f"{category}_jes_variations_{year}_{lep}.png"))
+    
+    if histogram_categories[category]['jer']:
+        print("\n  = = = = = = = = =  =      "+ category +" jer       = = = = = = = =  = = = \n")
+        draw_histograms(nominal_hist, histogram_categories[category]['jer'],
+                        f"canvas_{category}_jer", f"{category} jer Variations",
+                        os.path.join(output_dir, f"{category}_jer_variations_{year}_{lep}.png"))
 
+    if histogram_categories[category]['sample']:
+        print("\n  = = = = = = = = =  =      "+ category +" sample       = = = = = = = =  = = = \n")
+        draw_histograms(nominal_hist, histogram_categories[category]['sample'],
+                        f"canvas_{category}_sample", f"{category} jer Variations",
+                        os.path.join(output_dir, f"{category}_sample_variations_{year}_{lep}.png"))
 
+    return weight_sys
 # Plot histograms for all categories
+weight_sys = {}
 for category in categories.keys():
-    plot_variations(category, year, lep, output_dir)
+    if (category not in weight_sys.keys()):
+        weight_sys[category] = {}
+    weight_sys[category] = plot_variations(category, year, lep, output_dir)
+print(f"\n{weight_sys = }")
+json_file_name = f'Weight_sys_{year}_{lep}.json'
+with open(json_file_name, "w") as json_file:
+        json.dump(weight_sys, json_file, indent=4)
+
+print(f"\nJSON file {json_file_name} saved successfully!")
 
 # Close the root file
 root_file.Close()
-

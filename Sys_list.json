@@ -1,10 +1,16 @@
 {
   "Nomi":[],
+  "sample":[
+    "erdON",
+    "Gluonmove",
+    "QCDinspired",
+    "TuneCP5up",
+    "TuneCP5down"
+  ],
   "top_weight_sys": [
     "ISR", 
     "FSR", 
-    "hdamp", 
-    "puWeight"
+    "hdamp"
   ],
   "bWeight": [
     "bWeight_lf",
@@ -16,6 +22,9 @@
     "bWeight_hfstats1",
     "bWeight_hfstats2",
     "bWeight_jes"
+  ],
+  "puWeight": [
+    "puWeight"
   ],
   "JES_JER": [
     "jer",
@@ -45,6 +54,17 @@
     "jesPileUpPtHF"
   ],
   "lep_SF": {
+    "el": [
+      "ID",
+      "Trig"
+    ],
+    "mu": [
+      "Iso",
+      "ID",
+      "Trig"
+    ]
+  },
+  "lep_SF_dummy_backup": {
     "el": [
       "SF_Iso_IDUp",
       "SF_Iso_IDDown",

@@ -82,15 +82,12 @@ if __name__ == "__main__":
     #read the file to get the hustogrms
     File_Dir = "/feynman/home/dphp/mk277705/work/HiggsCombine/CMSSW_12_3_4/src/PhysicsTools/NanoAODTools/crab/WorkSpace/Hist_for_workspace/"
     File_Dir ="/eos/home-m/mikumar/Higgs_Combine/CMSSW_14_1_0_pre4/src/HiggsAnalysis/Hist_for_workspace/"
-    Filename_mu = File_Dir+"Combine_Input_lntopMass_histograms_"+dataYear+"_mu_gteq0p7_withoutDNNfit_rebin_JES.root"
-    Filename_el = File_Dir+"Combine_Input_lntopMass_histograms_"+dataYear+"_el_gteq0p7_withoutDNNfit_rebin_JES.root"
-    Filename_mu_cont = File_Dir+"Combine_Input_lntopMass_histograms_"+dataYear+"_mu_gteq0p3_withoutDNNfit_rebin.root"
-    Filename_el_cont = File_Dir+"Combine_Input_lntopMass_histograms_"+dataYear+"_el_gteq0p3_withoutDNNfit_rebin.root"
+    Filename_mu = File_Dir+"Combine_Input_lntopMass_histograms_"+dataYear+"_mu_gteq0p7_withoutDNNfit_rebin.root"
+    Filename_el = File_Dir+"Combine_Input_lntopMass_histograms_"+dataYear+"_el_gteq0p7_withoutDNNfit_rebin.root"
+    
 
     File_mu = R.TFile(Filename_mu,"Read")
     File_el = R.TFile(Filename_el,"Read")
-    File_mu_cont = R.TFile(Filename_mu_cont,"Read")
-    File_el_cont = R.TFile(Filename_el_cont,"Read")
     #Data Vs Mc Condition
 
     gt_or_lt_tag = ''
@@ -99,8 +96,7 @@ if __name__ == "__main__":
 
     #Get the file and director where historgrams are stored for muon final state
     dir_mu = File_mu.GetDirectory("mujets")
-    dir_mu_cont = File_mu_cont.GetDirectory("mujets")
-    #Get Mc histograms for muon final state
+    
     if(mass!= None):
         top_sig_mu = dir_mu.Get("top_sig_"+mass+tag+gt_or_lt_tag)
     if(width!= None):
@@ -108,19 +104,15 @@ if __name__ == "__main__":
         
     top_bkg_mu = dir_mu.Get("top_bkg_1725"+tag+gt_or_lt_tag)
     EWK_bkg_mu = dir_mu.Get("EWK_bkg"+tag+gt_or_lt_tag)
-    EWK_bkg_mu_cont = dir_mu_cont.Get("EWK_bkg"+tag+"_gt")
     QCD_DD = dir_mu.Get("QCD_DD"+tag+gt_or_lt_tag)
 
     print( "top_sig_mu Integral : ",top_sig_mu.Integral() )
     print( " top_bkg_mu Integral : ",top_bkg_mu.Integral())
     print( " EWK_bkg_mu Integral : ",EWK_bkg_mu.Integral())
-    print( " EWK_bkg_mu_cont Integral : ",EWK_bkg_mu_cont.Integral())
     if(RealData==False):
         #Add all Mc histogram to creat full MC hisogram for muon final state
         histData_mu=top_sig_mu.Clone()
         histData_mu.Add(top_bkg_mu)  # for a cross check i have commented this line. i uncommented it before pushing the code. so !!warning!!
-        EWK_bkg_mu_cont.Scale(EWK_bkg_mu.Integral()/EWK_bkg_mu_cont.Integral())
-        EWK_bkg_mu=EWK_bkg_mu_cont #replace the sig region template with control region template
         histData_mu.Add(EWK_bkg_mu)
         print( "Total MC",histData_mu.Integral())
         #get real data
@@ -132,7 +124,6 @@ if __name__ == "__main__":
     print( R.TMath.Exp(histData_mu.GetBinLowEdge(15)+histData_mu.GetBinWidth(15)))
     #Get the file and director where historgrams are stored for electron final state
     dir_el = File_el.GetDirectory("eljets")
-    dir_el_cont = File_el_cont.GetDirectory("eljets")
     #Get Mc histograms for electron final state
     if(mass!= None):
         top_sig_el = dir_el.Get("top_sig_"+mass+tag+gt_or_lt_tag)
@@ -141,19 +132,15 @@ if __name__ == "__main__":
 
     top_bkg_el = dir_el.Get("top_bkg_1725"+tag+gt_or_lt_tag)
     EWK_bkg_el = dir_el.Get("EWK_bkg"+tag+gt_or_lt_tag)
-    EWK_bkg_el_cont = dir_el_cont.Get("EWK_bkg"+tag+"_gt")
     QCD_DD = dir_mu.Get("QCD_DD"+tag+gt_or_lt_tag)
 
     print( "top_sig_el Integral : ",top_sig_el.Integral() )
     print( " top_bkg_el Integral : ",top_bkg_el.Integral() )
     print( " EWK_bkg_el Integral : ",EWK_bkg_el.Integral())
-    print( " EWK_bkg_el_cont Integral : ",EWK_bkg_el_cont.Integral())
     if(RealData==False):
         #Add all Mc histogram to creat full MC hisogram for electron final state
         histData_el = top_sig_el.Clone()
         histData_el.Add(top_bkg_el) # for a cross check i have commented this line. i uncommented it before pushing the code. so !!warning!!
-        EWK_bkg_el_cont.Scale(EWK_bkg_el.Integral()/EWK_bkg_el_cont.Integral())
-        EWK_bkg_el=EWK_bkg_el_cont #replace the sig region template with control region template
         histData_el.Add(EWK_bkg_el)
         print("Totle MC : ",histData_el.Integral(), )
     #get real data
@@ -178,7 +165,10 @@ if __name__ == "__main__":
     # Get the systematic you want to analyze
     with open("Sys_list.json", "r") as f:
         systematics = json.load(f)
-    systematic = systematics[sys]
+    if(sys=="all_sys"):
+            systematic = systematics["sample"]+systematics["top_weight_sys"] + systematics["JES_JER"]
+    else:
+        systematic = systematics[sys]
     print(systematic)
 
     json_file = "Sys_fit_results_"+dataYear+".json"  # Replace with your actual JSON file path
@@ -186,7 +176,7 @@ if __name__ == "__main__":
 
     Nuisance_values= {dataYear:{}}
     for sys in systematic:
-        _,Nuisance_values[dataYear][sys] = compute_variations(json_file, sys)
+        _,Nuisance_values[dataYear][sys] = compute_variations_simultanous_fit(json_file, sys)
        #_,Nuisance_values[dataYear][sys] = compute_variations_simultanous_fit(json_file, sys)
     print(f"\n{Nuisance_values = }\n")
 
@@ -211,8 +201,6 @@ if __name__ == "__main__":
     mean_formula_expr = "@0"  # Initial mean value
     sigmaG_formula_expr = "@0"  # Initial sigmaG value
 
-    #mean_formula_expr = "@0*(1"  # Initial mean value
-    #sigmaG_formula_expr = "@0*(1"  # Initial sigmaG value
 
     arg_list_mean = [mean]
     arg_list_sigmaG = [sigmaG]
@@ -223,21 +211,21 @@ if __name__ == "__main__":
         mean_formula_expr += f"*(1+@{i*2-1}*@{i*2})"
         sigmaG_formula_expr += f"*(1+@{i*2-1}*@{i*2})"
 
-        #mean_formula_expr += f"+(@{i*2-1}*@{i*2})"
-        #sigmaG_formula_expr += f"+(@{i*2-1}*@{i*2})"
         
         arg_list_mean.append(nuisance_vars_mean[sys])
-        arg_list_mean.append(R.RooFit.RooConst(Nuisance_values[dataYear][sys]["mean_mu"]))
+        const_mean = R.RooRealVar(f"const_mean_{sys}", f"const_mean_{sys}", Nuisance_values[dataYear][sys]["Nui_mean"])
+        arg_list_mean.append(const_mean)
+        #arg_list_mean.append(R.RooFit.RooConst(Nuisance_values[dataYear][sys]["Nui_mean_mu"]))
         arg_list_mean_str.append(sys+"_Roovar_mean")
-        arg_list_mean_str.append(sys+"_variation_mean_mu")
+        arg_list_mean_str.append(f"const_mean_{sys}")
 
         arg_list_sigmaG.append(nuisance_vars_sigmaG[sys])
-        arg_list_sigmaG.append(R.RooFit.RooConst(Nuisance_values[dataYear][sys]["sigmaG_mu"]))
+        const_sigmaG = R.RooRealVar(f"const_sigmaG_{sys}", f"const_sigmaG_{sys}", Nuisance_values[dataYear][sys]["Nui_sigmaG"])
+        arg_list_sigmaG.append(const_sigmaG)
+        #arg_list_sigmaG.append(R.RooFit.RooConst(Nuisance_values[dataYear][sys]["Nui_sigmaG_mu"]))
         arg_list_sigmaG_str.append(sys+"_Roovar_SigmaG")
-        arg_list_sigmaG_str.append(sys+"_variation_SigmaG_mu")
+        arg_list_sigmaG_str.append(f"const_sigmaG_{sys}")
 
-    #mean_formula_expr += f")"
-    #sigmaG_formula_expr += f")"
 
     print(f"{mean_formula_expr = }")
     print(f"{arg_list_mean_str = }")
@@ -245,21 +233,16 @@ if __name__ == "__main__":
     print(f"\n{sigmaG_formula_expr = }")
     print(f"{arg_list_sigmaG_str = }")
 
+
     # Create RooFormulaVar for mu and el
     mean_formula_mu = R.RooFormulaVar("mean_form_mu", "mean_form_mu", mean_formula_expr, R.RooArgList(*arg_list_mean))
     sigmaG_formula_mu = R.RooFormulaVar("sigmaG_form_mu", "sigmaG_form_mu", sigmaG_formula_expr, R.RooArgList(*arg_list_sigmaG))
 
-    arg_list_mean[2::2] = [R.RooFit.RooConst(Nuisance_values[dataYear][sys]["mean_el"]) for sys in systematic]
-    arg_list_sigmaG[2::2] = [R.RooFit.RooConst(Nuisance_values[dataYear][sys]["sigmaG_el"]) for sys in systematic]
+    print(sigmaG_formula_mu.Print())
 
-    arg_list_mean_str[2::2] = [ sys+"_variation_SigmaG_el" for sys in systematic]
-    arg_list_sigmaG_str[2::2] = [ sys+"_variation_mean_el" for sys in systematic]
 
-    print(f"\n{mean_formula_expr = }")
-    print(f"{arg_list_mean_str = }")
-
-    print(f"\n{sigmaG_formula_expr = }")
-    print(f"{arg_list_sigmaG_str = }")
+    #arg_list_mean[2::2] = [R.RooFit.RooConst(Nuisance_values[dataYear][sys]["Nui_mean_el"]) for sys in systematic]
+    #arg_list_sigmaG[2::2] = [R.RooFit.RooConst(Nuisance_values[dataYear][sys]["Nui_sigmaG_el"]) for sys in systematic]
 
 
     mean_formula_el = R.RooFormulaVar("mean_form_el", "mean_form_el", mean_formula_expr, R.RooArgList(*arg_list_mean))
@@ -285,8 +268,10 @@ if __name__ == "__main__":
     #signal Bifrac gaussian pdf
     sig_pdf_mu = R.RooBifurGauss("sig_pdf_mu","gauss_mu",logM,mean_formula_mu,sigmaG_formula_mu,sigmaG2_mu)
     sig_pdf_el = R.RooBifurGauss("sig_pdf_el","gauss_el",logM,mean_formula_el,sigmaG_formula_el,sigmaG2_el)
-    print(f"{sig_pdf_mu.Print() = }")
-    print(f"{sig_pdf_el.Print() = }")
+
+    # print(f"{sig_pdf_mu.Print() = }")
+    # print(f"{sig_pdf_el.Print() = }")
+
     
     #sig_pdf_mu = R.RooBifurGauss("sig_pdf_mu","gauss_mu",logM,mean,sigmaG,sigmaG2_mu)
     #sig_pdf_el = R.RooBifurGauss("sig_pdf_el","gauss_el",logM,mean,sigmaG,sigmaG2_el)
@@ -409,7 +394,7 @@ if __name__ == "__main__":
         # Workspace will remain in memory after macro finishes
         R.gDirectory.Add(w)
 
-        print(f"\nworkspace w_{tag} written in workspace{tag}{gt_or_lt_tag}")
+        print(f"\nworkspace w{tag} written in workspace{tag}{gt_or_lt_tag}")
         
         
         

@@ -2,28 +2,21 @@ imax 1 number of bins
 jmax 2 number of processes minus 1
 kmax * number of nuisance parameters
 ----------------------------------------------------------------------------------------------------------------------------------
-shapes EWK_bkg   mujets    workspace_ULpost16.root w_ULpost16:EWKbkg_pdf_mu
-shapes data_obs  mujets    workspace_ULpost16.root w_ULpost16:data_mu
-shapes top_bkg   mujets    workspace_ULpost16.root w_ULpost16:topbkg_pdf_mu
-shapes top_sig   mujets    workspace_ULpost16.root w_ULpost16:sig_pdf_mu
+shapes EWK_bkg   eljets    workspace_UL17.root w_UL17:EWKbkg_pdf_el
+shapes data_obs  eljets    workspace_UL17.root w_UL17:data_el
+shapes top_bkg   eljets    workspace_UL17.root w_UL17:topbkg_pdf_el
+shapes top_sig   eljets    workspace_UL17.root w_UL17:sig_pdf_el
 ----------------------------------------------------------------------------------------------------------------------------------
-bin          mujets 
-observation  -1       
+bin           eljets
+observation    -1    
 ----------------------------------------------------------------------------------------------------------------------------------
-bin                             mujets   mujets   mujets   
+bin                             eljets   eljets   eljets   
 process                         top_sig  EWK_bkg  top_bkg 
 process                         0        1        2          
 rate                            1        1        1           
 ----------------------------------------------------------------------------------------------------------------------------------
 cons_EWK_bkg            lnN     -        1.1      -             
 cons_top_sig            lnN     1.136     -        -
-cons_top_bkg            lnN     -        -        1.088
+cons_top_bkg            lnN     -        -        1.090
 
 # ===== sys  ====
-
-#SF_IsoUp_mu                    lnN     0.995/1.005   0.995/1.005   0.995/1.005
- 
-#rate_topbkg   rateParam mujets top_bkg 1 [-1.0,5.0] 
-#rate_sig      rateParam mujets top_sig 1 [-1.0,5.0] 
-#rate_EWKbkg   rateParam mujets EWK_bkg 1 [-1.0,5.0] 
- 

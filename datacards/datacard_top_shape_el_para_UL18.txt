@@ -1,0 +1,22 @@
+imax 1 number of bins
+jmax 2 number of processes minus 1
+kmax * number of nuisance parameters
+----------------------------------------------------------------------------------------------------------------------------------
+shapes EWK_bkg   eljets    workspace_UL18.root w_UL18:EWKbkg_pdf_el
+shapes data_obs  eljets    workspace_UL18.root w_UL18:data_el
+shapes top_bkg   eljets    workspace_UL18.root w_UL18:topbkg_pdf_el
+shapes top_sig   eljets    workspace_UL18.root w_UL18:sig_pdf_el
+----------------------------------------------------------------------------------------------------------------------------------
+bin           eljets
+observation    -1    
+----------------------------------------------------------------------------------------------------------------------------------
+bin                             eljets   eljets   eljets   
+process                         top_sig  EWK_bkg  top_bkg 
+process                          0         1          2          
+rate                             1         1         1           
+----------------------------------------------------------------------------------------------------------------------------------
+cons_EWK_bkg            lnN      -        1.1        - 
+cons_top_sig            lnN     1.138     -        -
+cons_top_bkg            lnN     -        -        1.091
+
+# ===== sys  ====
