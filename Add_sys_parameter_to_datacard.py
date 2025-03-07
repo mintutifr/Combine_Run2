@@ -180,4 +180,5 @@ def write_datacard_for_systematic(file_path, systematic,lep,year_tag):
     print(f"Created modified datacard at {new_file_path}.")
 
 if __name__ == "__main__":
-    update_sys_parameters_to_datacard_simultanous_fit(f"datacard_top_shape_comb_para_UL17.txt","all_sys","UL2017")
+    #update_sys_parameters_to_datacard_simultanous_fit(f"datacard_top_shape_comb_para_UL17.txt","all_sys","UL2017")
+    write_datacard_for_systematic("datacards/datacard_top_shape_mu_para_UL18.txt", "jer","mu","_UL18")

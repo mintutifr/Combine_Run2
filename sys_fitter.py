@@ -143,51 +143,7 @@ def Get_fit_param(mass,width,RealData,dataYear,local_fit,sys):
 
     mean = R.RooRealVar("mean","mean",5.1,4.5,5.5)
     sigmaG = R.RooRealVar("sigmaG","sigmaG",0.15098,0.01,5)
-    # Construct the formula dynamically
-    mean_formula_expr = "@0"  # Initial mean value
-    sigmaG_formula_expr = "@0"  # Initial sigmaG value
-
-
-    arg_list_mean = [mean]
-    arg_list_sigmaG = [sigmaG]
-    arg_list_mean_str = ["mean"]
-    arg_list_sigmaG_str = ["sigmaG"]
-
-    for i, sys in enumerate(systematic, start=1):
-        mean_formula_expr += f"*(1+@{i*2-1}*@{i*2})"
-        sigmaG_formula_expr += f"*(1+@{i*2-1}*@{i*2})"
-
-        
-        arg_list_mean.append(nuisance_vars_mean[sys])
-        const_mean = R.RooRealVar(f"const_mean_{sys}", f"const_mean_{sys}", Nuisance_values[dataYear][sys]["Nui_mean"])
-        arg_list_mean.append(const_mean)
-
-        arg_list_sigmaG.append(nuisance_vars_sigmaG[sys])
-        const_sigmaG = R.RooRealVar(f"const_sigmaG_{sys}", f"const_sigmaG_{sys}", Nuisance_values[dataYear][sys]["Nui_sigmaG"])
-        arg_list_sigmaG.append(const_sigmaG)
-
-    print(f"{mean_formula_expr = }")
-
-    print(f"\n{sigmaG_formula_expr = }")
-
-
-    # Create RooFormulaVar for mu and el
-    mean_formula_mu = R.RooFormulaVar("mean_form_mu", "mean_form_mu", mean_formula_expr, R.RooArgList(*arg_list_mean))
-    sigmaG_formula_mu = R.RooFormulaVar("sigmaG_form_mu", "sigmaG_form_mu", sigmaG_formula_expr, R.RooArgList(*arg_list_sigmaG))
-
-    print(sigmaG_formula_mu.Print())
-
-
-    mean_formula_el = R.RooFormulaVar("mean_form_el", "mean_form_el", mean_formula_expr, R.RooArgList(*arg_list_mean))
-    sigmaG_formula_el = R.RooFormulaVar("sigmaG_form_el", "sigmaG_form_el", sigmaG_formula_expr, R.RooArgList(*arg_list_sigmaG))
     
-    # = = = = = = = = = = = = = =
-    # Nuisance parameters for syst.
-    # = = = = = = = = = = = = = =
-
-
-
-
     # C r e a t e   m o d e l 
     # -----------------------------------------------
     # Declare observable mean and data
@@ -208,8 +164,8 @@ def Get_fit_param(mass,width,RealData,dataYear,local_fit,sys):
     #signal Bifrac gaussian pdf
     # sig_pdf_mu = R.RooBifurGauss("sig_pdf_mu","gauss_mu",logM,mean,sigmaG,sigmaG2_mu)
     # sig_pdf_el = R.RooBifurGauss("sig_pdf_el","gauss_el",logM,mean,sigmaG,sigmaG2_el)
-    sig_pdf_mu = R.RooBifurGauss("sig_pdf_mu","gauss_mu",logM,mean_formula_mu,sigmaG_formula_mu,sigmaG2_mu)
-    sig_pdf_el = R.RooBifurGauss("sig_pdf_el","gauss_el",logM,mean_formula_el,sigmaG_formula_el,sigmaG2_el)
+    sig_pdf_mu = R.RooBifurGauss("sig_pdf_mu","gauss_mu",logM,mean,sigmaG,sigmaG2_mu)
+    sig_pdf_el = R.RooBifurGauss("sig_pdf_el","gauss_el",logM,mean,sigmaG,sigmaG2_el)
 
 
 
@@ -334,8 +290,8 @@ def Get_fit_param(mass,width,RealData,dataYear,local_fit,sys):
         # Workspace will remain in memory after macro finishes
         R.gDirectory.Add(w)
         
-        write_datacard_for_systematic("datacard_top_shape_mu_para"+Combine_year_tag[dataYear]+".txt",sys,"mu",tag)
-        write_datacard_for_systematic("datacard_top_shape_el_para"+Combine_year_tag[dataYear]+".txt",sys,"el",tag)
+        write_datacard_for_systematic(f"datacards/datacard_top_shape_mu_para{tag}.txt",sys,"mu",tag) # this move the data crad to Per_sys_datacards and also update the name of the workspace for given systematic in the datacrad
+        write_datacard_for_systematic(f"datacards/datacard_top_shape_el_para{tag}.txt",sys,"el",tag) # must bedone for both lepton before adding the card for comabie fit
 
         cmd_adddatacards = F"combineCards.py mujets{tag}=Per_sys_datacards/datacard_top_shape_mu_para{tag}{sys}.txt eljets{tag}=Per_sys_datacards/datacard_top_shape_el_para{tag}{sys}.txt > Per_sys_datacards/datacard_top_shape_comb_para{tag}{sys}.txt"
         print("\n",cmd_adddatacards)
