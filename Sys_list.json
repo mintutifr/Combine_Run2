@@ -1,58 +1,86 @@
 {
-  "Nomi":[],
-  "sample":[
-    "erdON",
-    "Gluonmove",
-    "QCDinspired",
-    "TuneCP5up",
-    "TuneCP5down"
-  ],
-  "top_weight_sys": [
-    "ISR", 
-    "FSR", 
-    "hdamp"
-  ],
-  "bWeight": [
-    "bWeight_lf",
-    "bWeight_hf",
-    "bWeight_cferr1",
-    "bWeight_cferr2",
-    "bWeight_lfstats1",
-    "bWeight_lfstats2",
-    "bWeight_hfstats1",
-    "bWeight_hfstats2",
-    "bWeight_jes"
-  ],
-  "puWeight": [
-    "puWeight"
-  ],
-  "JES_JER": [
-    "jer",
-    "jesAbsoluteStat",
-    "jesAbsoluteMPFBias",
-    "jesFragmentation",
-    "jesSinglePionECAL",
-    "jesSinglePionHCAL",
-    "jesTimePtEta",
-    "jesRelativeJEREC1",
-    "jesRelativeJEREC2",
-    "jesRelativeJERHF",
-    "jesRelativePtBB",
-    "jesRelativePtEC1",
-    "jesRelativePtEC2",
-    "jesRelativePtHF",
-    "jesRelativeBal",
-    "jesRelativeSample",
-    "jesRelativeFSR",
-    "jesRelativeStatEC",
-    "jesRelativeStatHF",
-    "jesPileUpDataMC",
-    "jesPileUpPtRef",
-    "jesPileUpPtBB",
-    "jesPileUpPtEC1",
-    "jesPileUpPtEC2",
-    "jesPileUpPtHF"
-  ],
+  "Nomi":{"correlated":[],"decorrelated":[]},
+  "sample":{
+    "correlated":[
+        "erdON",
+        "Gluonmove",
+        "QCDinspired",
+        "TuneCP5up",
+        "TuneCP5down"
+    ],
+    "decorrelated":[]
+  },
+
+
+  "top_weight_sys": {
+    "correlated":[
+      "ISR", 
+      "FSR", 
+      "hdamp"
+    ],
+    "decorrelated":[]
+  },
+
+
+  "bWeight": {
+    "correlated":[
+      "bWeight_lf",
+      "bWeight_hf",
+      "bWeight_cferr1",
+      "bWeight_cferr2"
+    ],
+    "decorrelated":[
+      "bWeight_lfstats1",
+      "bWeight_lfstats2",
+      "bWeight_hfstats1",
+      "bWeight_hfstats2",
+      "bWeight_jes"
+    ]
+  },
+
+
+  "puWeight": {
+     "correlated":["puWeight"],
+     "decorrelated":[]
+  },
+
+
+  "JES_JER": {
+    "correlated":[
+      "jer",
+      "jesAbsoluteMPFBias",
+      "jesAbsoluteScale",
+      "jesFlavorQCD",
+      "jesFragmentation",
+      "jesPileUpDataMC",
+      "jesPileUpPtBB",
+      "jesPileUpPtEC1",
+      "jesPileUpPtEC2",
+      "jesPileUpPtHF",
+      "jesPileUpPtRef",
+      "jesRelativeFSR",
+      "jesRelativeJERHF",
+      "jesRelativePtBB",
+      "jesRelativePtHF",
+      "jesRelativeBal",
+      "jesSinglePionECAL",
+      "jesSinglePionHCAL"
+    ],
+    "decorrelated":[
+      "jesAbsoluteStat",
+      "jesRelativeJEREC1",
+      "jesRelativeJEREC2",
+      "jesRelativePtEC1",
+      "jesRelativePtEC2",
+      "jesRelativeSample",
+      "jesRelativeStatEC",
+      "jesRelativeStatFSR",
+      "jesRelativeStatHF",
+      "jesTimePtEta"
+    ]
+  },
+
+
   "lep_SF": {
     "el": [
       "ID",
@@ -64,6 +92,8 @@
       "Trig"
     ]
   },
+
+
   "lep_SF_dummy_backup": {
     "el": [
       "SF_Iso_IDUp",

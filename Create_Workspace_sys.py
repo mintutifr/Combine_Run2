@@ -166,17 +166,22 @@ if __name__ == "__main__":
     with open("Sys_list.json", "r") as f:
         systematics = json.load(f)
     if(sys=="all_sys"):
-            systematic = systematics["sample"]+systematics["top_weight_sys"] + systematics["JES_JER"]
+        systematic_correlated = []
+        systematic_decorrelated = []
+        for sys_loop in ["sample","top_weight_sys","JES_JER"]:
+            systematic_correlated += systematics[f'{sys_loop}']["correlated"]
+            systematic_decorrelated += systematics[f'{sys_loop}']["decorrelated"]
     else:
-        systematic = systematics[sys]
-    print(systematic)
+        systematic_correlated = systematics[sys]["correlated"]
+        systematic_decorrelated = systematics[sys]["decorrelated"]
+    print(systematic_correlated, systematic_decorrelated)
 
     json_file = "Sys_fit_results_"+dataYear+".json"  # Replace with your actual JSON file path
 
 
     Nuisance_values= {dataYear:{}}
-    for sys in systematic:
-        _,Nuisance_values[dataYear][sys] = compute_variations_simultanous_fit(json_file, sys)
+    for sys_loop in systematic_correlated+systematic_decorrelated:
+        _,Nuisance_values[dataYear][sys_loop] = compute_variations_simultanous_fit(json_file, sys_loop)
        #_,Nuisance_values[dataYear][sys] = compute_variations_simultanous_fit(json_file, sys)
     print(f"\n{Nuisance_values = }\n")
 
@@ -185,16 +190,15 @@ if __name__ == "__main__":
     # = = = = = = = = = = = = = =
 
     # Define nuisance parameters for all systematics
-    nuisance_vars_mean = {}
-    nuisance_vars_sigmaG = {}
+    nuisance_vars = {}
 
-    for sys in systematic:
-        nuisance_vars_mean[sys] = R.RooRealVar(f"nuisance_{sys}_mean", f"nuisance_{sys}_mean", 0, -5, 5)
-        nuisance_vars_mean[sys].setConstant(True)
+    for sys_loop in systematic_correlated:
+        nuisance_vars[sys_loop] = R.RooRealVar(f"nuisance_{sys_loop}", f"nuisance_{sys_loop}", 0, -5, 5)
+        nuisance_vars[sys_loop].setConstant(True)
 
-        nuisance_vars_sigmaG[sys] = R.RooRealVar(f"nuisance_{sys}_sigmaG", f"nuisance_{sys}_sigmaG", 0, -5, 5)
-        nuisance_vars_sigmaG[sys].setConstant(True)
-
+    for sys_loop in systematic_decorrelated:
+        nuisance_vars[sys_loop] = R.RooRealVar(f"nuisance_{sys_loop}_{dataYear}", f"nuisance_{sys_loop}_{dataYear}", 0, -5, 5)
+        nuisance_vars[sys_loop].setConstant(True)
 
     
     # Construct the formula dynamically
@@ -204,34 +208,22 @@ if __name__ == "__main__":
 
     arg_list_mean = [mean]
     arg_list_sigmaG = [sigmaG]
-    arg_list_mean_str = ["mean"]
-    arg_list_sigmaG_str = ["sigmaG"]
 
-    for i, sys in enumerate(systematic, start=1):
+    for i, sys_loop in enumerate(systematic_correlated+systematic_decorrelated, start=1):
         mean_formula_expr += f"*(1+@{i*2-1}*@{i*2})"
-        sigmaG_formula_expr += f"*(1+@{i*2-1}*@{i*2})"
-
-        
-        arg_list_mean.append(nuisance_vars_mean[sys])
-        const_mean = R.RooRealVar(f"const_mean_{sys}", f"const_mean_{sys}", Nuisance_values[dataYear][sys]["Nui_mean"])
+        arg_list_mean.append(nuisance_vars[sys_loop])
+        const_mean = R.RooRealVar(f"const_mean_{sys_loop}", f"const_mean_{sys_loop}", Nuisance_values[dataYear][sys_loop]["Nui_mean"])
         arg_list_mean.append(const_mean)
-        #arg_list_mean.append(R.RooFit.RooConst(Nuisance_values[dataYear][sys]["Nui_mean_mu"]))
-        arg_list_mean_str.append(sys+"_Roovar_mean")
-        arg_list_mean_str.append(f"const_mean_{sys}")
 
-        arg_list_sigmaG.append(nuisance_vars_sigmaG[sys])
-        const_sigmaG = R.RooRealVar(f"const_sigmaG_{sys}", f"const_sigmaG_{sys}", Nuisance_values[dataYear][sys]["Nui_sigmaG"])
+        sigmaG_formula_expr += f"*(1+@{i*2-1}*@{i*2})"
+        arg_list_sigmaG.append(nuisance_vars[sys_loop])
+        const_sigmaG = R.RooRealVar(f"const_sigmaG_{sys_loop}", f"const_sigmaG_{sys_loop}", Nuisance_values[dataYear][sys_loop]["Nui_sigmaG"])
         arg_list_sigmaG.append(const_sigmaG)
-        #arg_list_sigmaG.append(R.RooFit.RooConst(Nuisance_values[dataYear][sys]["Nui_sigmaG_mu"]))
-        arg_list_sigmaG_str.append(sys+"_Roovar_SigmaG")
-        arg_list_sigmaG_str.append(f"const_sigmaG_{sys}")
+
 
 
     print(f"{mean_formula_expr = }")
-    print(f"{arg_list_mean_str = }")
-
     print(f"\n{sigmaG_formula_expr = }")
-    print(f"{arg_list_sigmaG_str = }")
 
 
     # Create RooFormulaVar for mu and el

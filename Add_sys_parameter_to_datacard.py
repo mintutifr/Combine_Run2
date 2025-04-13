@@ -1,6 +1,6 @@
 import os, json
 
-def get_weight_sys(file_path_el, file_path_mu, systematic_dic,sys):
+def get_weight_sys(file_path_el, file_path_mu, systematic_dic,sys,year):
     with open(file_path_el, "r") as f:
         weight_sys_el = json.load(f)
     with open(file_path_mu, "r") as f:
@@ -10,8 +10,23 @@ def get_weight_sys(file_path_el, file_path_mu, systematic_dic,sys):
     weight_sys_lep["mu"] = weight_sys_mu
     del weight_sys_el, weight_sys_mu
     sys_lines = {}
-    for weight_sys in systematic_dic[sys]:
+    for weight_sys in systematic_dic[sys]["correlated"]:
         sys_line = f'CMS_{weight_sys}  lnN  '
+        for lep in ["mu","el"]:
+            for S_and_B in ['topSig','topBkg','ewkBkg']:
+                up_frac = weight_sys_lep[lep][S_and_B][sys][f"{weight_sys}Up"]
+                down_frac = weight_sys_lep[lep][S_and_B][sys][f"{weight_sys}Down"]
+                if(down_frac < up_frac): frac = f'{down_frac}/{up_frac}'
+                elif(down_frac > up_frac): frac = f'{up_frac}/{down_frac}'
+                elif(down_frac == up_frac and up_frac==1.00): frac = f'-'
+                elif(down_frac == up_frac and up_frac!=1.00): frac = f'{up_frac}'
+                sys_line = sys_line+f'  {frac}  '
+                #print(f'{lep} {S_and_B} sys : {weight_sys},  frac up : {up_frac} frac down : {down_frac}')
+        #print(sys_line)
+        sys_lines[weight_sys] = sys_line+f'\n'
+
+    for weight_sys in systematic_dic[sys]["decorrelated"]:
+        sys_line = f'CMS_{weight_sys}_{year}  lnN  '
         for lep in ["mu","el"]:
             for S_and_B in ['topSig','topBkg','ewkBkg']:
                 up_frac = weight_sys_lep[lep][S_and_B][sys][f"{weight_sys}Up"]
@@ -79,23 +94,30 @@ def update_sys_parameters_to_datacard_simultanous_fit(file_path, systematics,yea
     # Get the systematic you want to analyze
     with open("Sys_list.json", "r") as f:
         systematic_dic = json.load(f)
+    systematic_list_correlated = []
+    systematic_list_decorrelated = []
     if(systematics=="all_sys"):
-            systematic_list = systematic_dic["sample"]+systematic_dic["top_weight_sys"] + systematic_dic["JES_JER"]
+            for sys_loop in ["sample","top_weight_sys","JES_JER"]:
+                systematic_list_correlated += systematic_dic[f'{sys_loop}']["correlated"]
+                systematic_list_decorrelated += systematic_dic[f'{sys_loop}']["decorrelated"]
     else:
-        systematic_list = systematic_dic[systematics]
-    print(systematic_list)
+            systematic_list_correlated += systematic_dic[f'{systematics}']["correlated"]
+            systematic_list_decorrelated += systematic_dic[f'{systematics}']["decorrelated"]
+
+    print(f'{systematic_list_correlated = }')
+    print(f'{systematic_list_decorrelated = }')
 
     # Compute maximum width among both "nuisance_<sys>_mean" and "nuisance_<sys>_sigmaG"
-    if(len(systematic_list)>0):
-        max_length = max(len(f"nuisance_{sys}_mean") for sys in systematic_list)
+    if(len(systematic_list_correlated)>0 or len(systematic_list_decorrelated)>0):
+        max_length = max(len(f"nuisance_{sys_loop}_mean") for sys_loop in systematic_list_correlated+systematic_list_decorrelated)
 
     # Generate parameter lines for each systematic with aligned formatting
     param_lines = []
     param_lines.append(f"\n# ==============   sys   ===============\n")
-    for sys in systematic_list:
-        param_lines.append(f"{f'nuisance_{sys}_mean':<{max_length}}   param   0.0   1.0\n")
-        param_lines.append(f"{f'nuisance_{sys}_sigmaG':<{max_length}}   param   0.0   1.0\n")
-
+    for sys_loop in systematic_list_correlated:
+        param_lines.append(f"{f'nuisance_{sys_loop}':<{max_length}}   param   0.0   1.0\n")
+    for sys_loop in systematic_list_decorrelated:
+        param_lines.append(f"{f'nuisance_{sys_loop}_{year}':<{max_length}}   param   0.0   1.0\n")
     # add sustematic for scales and weights
     Num_weight_sys = 0
     if(systematics=="all_sys"):
@@ -111,13 +133,13 @@ def update_sys_parameters_to_datacard_simultanous_fit(file_path, systematics,yea
             #print(sys_lines_mu_SF[key])
             param_lines.append(sys_lines_mu_SF[key])
 
-        sys_lines_bweight = get_weight_sys(f'Weight_sys_{year}_el.json', f'Weight_sys_{year}_mu.json', systematic_dic,"bWeight")
+        sys_lines_bweight = get_weight_sys(f'Weight_sys_{year}_el.json', f'Weight_sys_{year}_mu.json', systematic_dic,"bWeight",year)
         Num_weight_sys += len(sys_lines_bweight.keys())
         for key in sys_lines_bweight.keys():
             #print(sys_lines_bweight[key])
             param_lines.append(sys_lines_bweight[key])
 
-        sys_lines_puweight = get_weight_sys(f'Weight_sys_{year}_el.json', f'Weight_sys_{year}_mu.json', systematic_dic,"puWeight")
+        sys_lines_puweight = get_weight_sys(f'Weight_sys_{year}_el.json', f'Weight_sys_{year}_mu.json', systematic_dic,"puWeight",year)
         Num_weight_sys += len(sys_lines_puweight.keys())
         for key in sys_lines_puweight.keys():
             #print(sys_lines_bweight[key])
@@ -131,7 +153,7 @@ def update_sys_parameters_to_datacard_simultanous_fit(file_path, systematics,yea
     updated_lines = []
     for line in new_lines:
         updated_lines.append(
-            line.replace("kmax 3 number of nuisance parameters", f"kmax {3+2*len(systematic_list)+Num_weight_sys} number of nuisance parameters")
+            line.replace("kmax 3 number of nuisance parameters", f"kmax {3+len(systematic_list_correlated)+len(systematic_list_decorrelated)+Num_weight_sys} number of nuisance parameters")
         )
     
     with open(file_path, "w") as file:

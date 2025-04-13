@@ -1,24 +1,30 @@
 #!/bin/bash
 
 # Define the arrays
-YEARS=("UL2018") # "UL2017") #"UL2016preVFP" "UL2016postVFP")
-Sys=("Nomi") #("all_sys") #("top_weight_sys") #("JES_JER")
-
-# Loop through each combination
-# for year in "${YEARS[@]}"; do
-#     for lepton in "${LEP[@]}"; do
-#         echo "Running for Year: $year, Lepton: $lepton"
-#         python3 Compiare_shapes_and_getRation_sys_hists.py -y "$year" -l "$lepton" &> "sys_hist_Integral_ratios/sys_ratio_${lepton}_${year}.txt"
-#     done
-# done
+YEARS=('UL2016postVFP') #'Run2') # "UL2018" "UL2016postVFP" "UL2017" "UL2016preVFP") # "UL2016postVFP")
+Sys=("all_sys") #("all_sys") #("top_weight_sys") #("JES_JER") # bWeight
 
 for year in "${YEARS[@]}"; do
     echo "Running for Year: $year"
     # Pull the systematic comparision plots
-    # python3 Compaire_shapes_and_getRation_sys_hists.py -y "$year" -l mu
-    # python3 Compaire_shapes_and_getRation_sys_hists.py -y "$year" -l el
-    # estimate the davation im mean and isgma due to systematic samples
-    python3 sys_fitter.py  -y "$year" -m 1725  -s "$Sys"
-    # python3 Create_Workspace_sys.py -y "$year" -m 1725  -s "$Sys" # model will be rewritten with sys
-    #python3 Run_combine_on_Alternate_mass_samples_sys.py  -m 1725 -y "$year" -s "$Sys"
+    if [ "$year" == "Run2" ]; then
+        for subyear in "UL2018" "UL2017" "UL2016postVFP" "UL2016preVFP"; do
+            echo "pass"
+            #python3 Compaire_shapes_and_getRation_sys_hists.py -y "$subyear" -l mu
+            #python3 Compaire_shapes_and_getRation_sys_hists.py -y "$subyear" -l el
+
+            # Estimate the deviation in mean and sigma due to systematic samples
+            #python3 sys_fitter.py -y "$subyear" -m 1725 -s "$Sys"
+        done
+    else
+        echo "pass"
+        #python3 Compaire_shapes_and_getRation_sys_hists.py -y "$year" -l mu
+        #python3 Compaire_shapes_and_getRation_sys_hists.py -y "$year" -l el
+
+        # # Estimate the deviation in mean and sigma due to systematic samples
+        #python3 sys_fitter.py -y "$year" -m 1725 -s "$Sys"
+    fi
+
+    #python3 Create_Workspace_sys.py -y "$year" -m 1725  -s "$Sys" # model will be rewritten with sys
+    python3 Run_combine_on_Alternate_mass_samples_sys.py  -m 1725 -y "$year" -s "$Sys"
 done

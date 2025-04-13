@@ -973,12 +973,12 @@ def save_fit_results_json(mass, width, isRealData, dataYear, local_fit, systemat
             "Nomi": {"mean_fit": mean_fit, "sigmaG_fit": sigmaG_fit}
         }
 
-    for sys in systematics:
-        print("\n=======   ", sys, "   ========= \n>")
-        mean_fit_Up,sigmaG_fit_Up = Get_fit_param(mass = mass,width = width,RealData = isRealData,dataYear = dataYear,local_fit = local_fit,sys = sys+"Up")
-        mean_fit_Down,sigmaG_fit_Down = Get_fit_param(mass = mass,width = width,RealData = isRealData,dataYear = dataYear,local_fit = local_fit,sys = sys+"Down")
+    for sys_loop in systematics:
+        print("\n=======   ", sys_loop, "   ========= \n>")
+        mean_fit_Up,sigmaG_fit_Up = Get_fit_param(mass = mass,width = width,RealData = isRealData,dataYear = dataYear,local_fit = local_fit,sys = sys_loop+"Up")
+        mean_fit_Down,sigmaG_fit_Down = Get_fit_param(mass = mass,width = width,RealData = isRealData,dataYear = dataYear,local_fit = local_fit,sys = sys_loop+"Down")
 
-        fit_results[sys] = {
+        fit_results[sys_loop] = {
             "Up": {"mean_fit": mean_fit_Up, "sigmaG_fit": sigmaG_fit_Up},
             "Down": {"mean_fit": mean_fit_Down, "sigmaG_fit": sigmaG_fit_Down},
         }
@@ -1014,30 +1014,30 @@ def save_fit_results_json_combine(mass, width, isRealData, dataYear, local_fit, 
             "Nomi": {"mean_fit": mean_fit, "sigmaG_fit": sigmaG_fit}
         }
 
-    for sys in systematics:
-        if(sys in ["erdON","Gluonmove","QCDinspired","TuneCP5up","TuneCP5down"]):
-            print("\n=======   ", sys, "   ========= \n>")
-            mean_fit_Up,sigmaG_fit_Up = Get_fit_param(mass = mass,width = width,RealData = isRealData,dataYear = dataYear,local_fit = local_fit,sys = sys)
+    for sys_loop in systematics:
+        if(sys_loop in ["erdON","Gluonmove","QCDinspired","TuneCP5up","TuneCP5down"]):
+            print("\n=======   ", sys_loop, "   ========= \n>")
+            mean_fit_Up,sigmaG_fit_Up = Get_fit_param(mass = mass,width = width,RealData = isRealData,dataYear = dataYear,local_fit = local_fit,sys = sys_loop)
             print("\n=====================================")
-            print(" %s Fit results : mean = %.5f +- %.5f GeV, sigmaG = %.5f +- %.5f GeV"%(f"{sys}",mean_fit_Up['mean'][0],mean_fit_Up['mean'][1],sigmaG_fit_Up['sigmaG'][0],sigmaG_fit_Up['sigmaG'][1]))
+            print(" %s Fit results : mean = %.5f +- %.5f GeV, sigmaG = %.5f +- %.5f GeV"%(f"{sys_loop}",mean_fit_Up['mean'][0],mean_fit_Up['mean'][1],sigmaG_fit_Up['sigmaG'][0],sigmaG_fit_Up['sigmaG'][1]))
             print("=====================================\n")
-            fit_results[sys] = {
+            fit_results[sys_loop] = {
                 "Up": {"mean_fit": mean_fit_Up, "sigmaG_fit": sigmaG_fit_Up},
                 "Down": {"mean_fit": mean_fit_Up, "sigmaG_fit": sigmaG_fit_Up},
             }
         else:
-            print("\n=======   ", sys, "   ========= \n>")
-            mean_fit_Up,sigmaG_fit_Up = Get_fit_param(mass = mass,width = width,RealData = isRealData,dataYear = dataYear,local_fit = local_fit,sys = sys+"Up")
+            print("\n=======   ", sys_loop, "   ========= \n>")
+            mean_fit_Up,sigmaG_fit_Up = Get_fit_param(mass = mass,width = width,RealData = isRealData,dataYear = dataYear,local_fit = local_fit,sys = sys_loop+"Up")
             print("\n=====================================")
-            print(" %s Fit results : mean = %.5f +- %.5f GeV, sigmaG = %.5f +- %.5f GeV"%(f"{sys}Up",mean_fit_Up['mean'][0],mean_fit_Up['mean'][1],sigmaG_fit_Up['sigmaG'][0],sigmaG_fit_Up['sigmaG'][1]))
+            print(" %s Fit results : mean = %.5f +- %.5f GeV, sigmaG = %.5f +- %.5f GeV"%(f"{sys_loop}Up",mean_fit_Up['mean'][0],mean_fit_Up['mean'][1],sigmaG_fit_Up['sigmaG'][0],sigmaG_fit_Up['sigmaG'][1]))
             print("=====================================\n")
 
-            mean_fit_Down,sigmaG_fit_Down = Get_fit_param(mass = mass,width = width,RealData = isRealData,dataYear = dataYear,local_fit = local_fit,sys = sys+"Down")
+            mean_fit_Down,sigmaG_fit_Down = Get_fit_param(mass = mass,width = width,RealData = isRealData,dataYear = dataYear,local_fit = local_fit,sys = sys_loop+"Down")
             print("\n=====================================")
-            print(" %s Fit results : mean = %.5f +- %.5f GeV, sigmaG = %.5f +- %.5f GeV"%(f"{sys}Down",mean_fit_Down['mean'][0],mean_fit_Down['mean'][1],sigmaG_fit_Down['sigmaG'][0],sigmaG_fit_Down['sigmaG'][1]))
+            print(" %s Fit results : mean = %.5f +- %.5f GeV, sigmaG = %.5f +- %.5f GeV"%(f"{sys_loop}Down",mean_fit_Down['mean'][0],mean_fit_Down['mean'][1],sigmaG_fit_Down['sigmaG'][0],sigmaG_fit_Down['sigmaG'][1]))
             print("=====================================\n")
             
-            fit_results[sys] = {
+            fit_results[sys_loop] = {
                 "Up": {"mean_fit": mean_fit_Up, "sigmaG_fit": sigmaG_fit_Up},
                 "Down": {"mean_fit": mean_fit_Down, "sigmaG_fit": sigmaG_fit_Down},
             }
@@ -1094,9 +1094,11 @@ if __name__ == "__main__":
         with open("Sys_list.json", "r") as f:
             systematics = json.load(f)
         if(sys=="all_sys"):
-            systematic = systematics["sample"] + systematics["top_weight_sys"] + systematics["JES_JER"]
+            systematic = []
+            for sys_loop in ["sample","top_weight_sys","JES_JER"]:
+                systematic += systematics[f'{sys_loop}']["correlated"]+systematics[f'{sys_loop}']["decorrelated"]
         else:
-            systematic = systematics[sys]
+            systematic = systematics[sys]["correlated"]+systematics[sys]["decorrelated"]
         print(systematic)
         save_fit_results_json_combine(
             mass=mass,
@@ -1106,22 +1108,3 @@ if __name__ == "__main__":
             local_fit=local_fit,
             systematics=systematic,
             output_sys_json_file="Sys_fit_results_"+dataYear+".json")
-
-        # mean_fit_Up,sigmaG_fit_Up = Get_fit_param(mass = mass,width = width,RealData = isRealData,dataYear = dataYear,local_fit = local_fit,sys = sys+"Up")
-        # mean_fit_Down,sigmaG_fit_Down = Get_fit_param(mass = mass,width = width,RealData = isRealData,dataYear = dataYear,local_fit = local_fit,sys = sys+"Down")
-
-        # print("\n%s %s: mean = %.5f +- %.5f GeV, sigmaG = %.5f +- %.5f GeV"%('mu',sys,mean_fit['mean_mu'][0],mean_fit['mean_mu'][1],sigmaG_fit['sigmaG_mu'][0],sigmaG_fit['sigmaG_mu'][1]))
-        # print("%s %s: mean = %.5f +- %.5f GeV, sigmaG = %.5f +- %.5f GeV\n"%('el',sys,mean_fit['mean_el'][0],mean_fit['mean_el'][1],sigmaG_fit['sigmaG_el'][0],sigmaG_fit['sigmaG_el'][1]))
-
-        # print("\n%s %s: mean = %.5f +- %.5f GeV, sigmaG = %.5f +- %.5f GeV"%('mu',sys+"Up",mean_fit_Up['mean_mu'][0],mean_fit_Up['mean_mu'][1],sigmaG_fit_Up['sigmaG_mu'][0],sigmaG_fit_Up['sigmaG_mu'][1]))
-        # print("%s %s: mean = %.5f +- %.5f GeV, sigmaG = %.5f +- %.5f GeV\n"%('el',sys+"Down",mean_fit_Up['mean_el'][0],mean_fit_Up['mean_el'][1],sigmaG_fit_Up['sigmaG_el'][0],sigmaG_fit_Up['sigmaG_el'][1]))
-
-
-        # print("\n%s %s: mean = %.5f +- %.5f GeV, sigmaG = %.5f +- %.5f GeV"%('mu',sys+"Down",mean_fit_Down['mean_mu'][0],mean_fit_Down['mean_mu'][1],sigmaG_fit_Down['sigmaG_mu'][0],sigmaG_fit_Down['sigmaG_mu'][1]))
-        # print("%s %s: mean = %.5f +- %.5f GeV, sigmaG = %.5f +- %.5f GeV\n"%('el',sys+"Down",mean_fit_Down['mean_el'][0],mean_fit_Down['mean_el'][1],sigmaG_fit_Down['sigmaG_el'][0],sigmaG_fit_Down['sigmaG_el'][1]))
-        
-        # print("\n%s %s: mean variation= %.5f  sigmaG variation = %.5f "%('mu',sys+"Up",(1-(mean_fit_Up['mean_mu'][0]/mean_fit['mean_mu'][0]))*100,(1-(sigmaG_fit_Up['sigmaG_mu'][0]/sigmaG_fit['sigmaG_mu'][0]))*100))
-        # print("%s %s: mean variation= %.5f  sigmaG variation = %.5f "%('mu',sys+"Down",(1-(mean_fit_Down['mean_mu'][0]/mean_fit['mean_mu'][0]))*100,(1-(sigmaG_fit_Down['sigmaG_mu'][0]/sigmaG_fit['sigmaG_mu'][0]))*100))
-        # print("\n%s %s: mean variation= %.5f  sigmaG variation = %.5f "%('el',sys+"Up",(1-(mean_fit_Up['mean_el'][0]/mean_fit['mean_el'][0]))*100,(1-(sigmaG_fit_Up['sigmaG_el'][0]/sigmaG_fit['sigmaG_el'][0]))*100))
-        
-        # print("%s %s: mean variation= %.5f  sigmaG variation = %.5f "%('el',sys+"Down",(1-(mean_fit_Down['mean_el'][0]/mean_fit['mean_el'][0]))*100,(1-(sigmaG_fit_Down['sigmaG_el'][0]/sigmaG_fit['sigmaG_el'][0]))*100))

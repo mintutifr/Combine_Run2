@@ -38,7 +38,9 @@ color_list = [
     TColor.GetColor("#D2B48C"), TColor.GetColor("#00FF7F"), TColor.GetColor("#8B4513"),
     TColor.GetColor("#F4A460"), TColor.GetColor("#48D1CC"), TColor.GetColor("#C71585"),
     TColor.GetColor("#00FA9A"), TColor.GetColor("#708090"), TColor.GetColor("#FFB6C1"),
-    TColor.GetColor("#9370DB"), TColor.GetColor("#40E0D0")
+    TColor.GetColor("#FF5733"), TColor.GetColor("#33FF57"), TColor.GetColor("#3357FF"),
+    TColor.GetColor("#FF33A1"), TColor.GetColor("#A133FF"), TColor.GetColor("#FF8C33"),
+    TColor.GetColor("#33FFF2"), TColor.GetColor("#FF3380"), TColor.GetColor("#80FF33")
 ]
 # Dictionary to store custom ROOT color IDs
 

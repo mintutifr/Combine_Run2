@@ -68,7 +68,7 @@ for Mass in mass_point:
             run_cmd(cmd_createWorkspace)
         #cmd_adddatacards = "combineCards.py mujets_UL18=datacard_top_shape_mu_para_UL18.txt eljets_UL18=datacard_top_shape_el_para_UL18.txt mujets_UL17=datacard_top_shape_mu_para_UL17.txt eljets_UL17=datacard_top_shape_el_para_UL17.txt  mujets_ULpre16=datacard_top_shape_mu_para_ULpre16.txt eljets_ULpre16=datacard_top_shape_el_para_ULpre16.txt mujets_ULpost16=datacard_top_shape_mu_para_ULpost16.txt eljets_ULpost16=datacard_top_shape_el_para_ULpost16.txt > datacard_top_shape_comb_para.txt"
     else:
-        cmd_add_datacards = f"combineCards.py mujets{tag}=datacard_top_shape_mu_para{tag}.txt eljets{tag}=datacard_top_shape_el_para{tag}.txt > datacard_top_shape_comb_para{tag}.txt"
+        cmd_add_datacards = f"combineCards.py mujets{tag}=datacards/datacard_top_shape_mu_para{tag}.txt eljets{tag}=datacards/datacard_top_shape_el_para{tag}.txt > datacard_top_shape_comb_para{tag}.txt"
         print("\n",cmd_add_datacards)
         run_cmd(cmd_add_datacards)
         # Update systematic nuisance parameter in datacards
@@ -77,88 +77,90 @@ for Mass in mass_point:
         
         cmd_createWorkspace = f"python3 Create_Workspace_sys.py -m {Mass} -y  {year} -s {sys}"
         print(cmd_createWorkspace)
-        run_cmd(cmd_createWorkspace)
-    
+        #run_cmd(cmd_createWorkspace)
+
     cmd_Runtext2workspace = f"env PYTHONNOUSERSITE=1 text2workspace.py datacard_top_shape_comb_para{tag}.txt -o workspace_top_Mass_{Mass}_shape_comb_para{tag}.root"
     print("\n",cmd_Runtext2workspace)
     run_cmd(cmd_Runtext2workspace)
-    
-    cmd_GoodnessOfFit = f"combine -M GoodnessOfFit workspace_top_Mass_{Mass}_shape_comb_para{tag}.root -n .goodnessOfFit_data --freezeParameters r --redefineSignalPOIs mean,sigmaG --setParameters mean=5.1,r=1,sigmaG=0.15  --X-rtd ADDNLL_CBNLL=0 --algo saturated  --expectSignal 1 -m {Mass}"
-    #print("\n",cmd_GoodnessOfFit)
-    #os.system(cmd_GoodnessOfFit)
-    #os.system(cmd_GoodnessOfFit+" -t 1000")
-    
-    cms_create_json = f"combineTool.py -M CollectGoodnessOfFit --input higgsCombine.goodnessOfFit_data.GoodnessOfFit.mH172.5.root higgsCombine.goodnessOfFit_data.GoodnessOfFit.mH172.5.123456.root -m {Mass} -o gof.json"
-    #print("\n",cms_create_json)
-    #os.system(cms_create_json)
-    #os.system("plotGof.py gof.json --statistic saturated --mass 172.5 -o part2_gof")
-    
 
     #cmd_RunCombine = f"combine -M FitDiagnostics workspace_top_Mass_{Mass}_shape_comb_para{tag}.root -n _M{Mass}  --freezeParameters r --redefineSignalPOIs sigmaG,mean --setParameters mean=5.1,r=1,sigmaG=0.15  --X-rtd ADDNLL_CBNLL=0  --trackParameters mean,sigmaG --trackErrors mean,sigmaG --X-rtd TMCSO_AdaptivePseudoAsimov=0 --X-rtd TMCSO_PseudoAsimov=0 --plots  --saveShapes --saveWithUncertainties --saveWorkspace"# --expectSignal 1 -t -1 --saveToys" #--signalPdfNames='shapeSig_top_sig*' --backgroundPdfNames='shapeBkg_EWK_bkg*,shapeBkg_top_bkg*' 
     cmd_RunCombine = f"combine -M FitDiagnostics workspace_top_Mass_{Mass}_shape_comb_para{tag}.root -n _M{Mass}  --redefineSignalPOIs mean,sigmaG  --setParameters mean=5.1,r=1,sigmaG=0.11 --setParameterRanges mean=5.0,5.3:sigmaG=0.05,0.5 --freezeParameters  r  --X-rtd ADDNLL_CBNLL=0  --trackParameters r,mean,sigmaG --trackErrors r,mean,sigmaG --X-rtd TMCSO_PseudoAsimov=0 --saveShapes --saveWithUncertainties --saveWorkspace --plots" #-t -1 --saveToys"# --plots"
     run_cmd(cmd_RunCombine)
     
-    # MultiDimFit for stat with fix mean
-    #print("\n=================       runnig MultiDimFit     ======================== \n")
-    cmd_RunCombine = f"combine -M MultiDimFit workspace_top_Mass_{Mass}_shape_comb_para{tag}.root -m {Mass}  --redefineSignalPOIs mean,sigmaG --setParameters mean=5.1023,r=1,sigmaG=0.114 --setParameterRanges mean=5.0,5.3:sigmaG=0.05,0.5 --freezeParameters  r -n .scanformean.with_syst.statonly --algo grid --points 20     --X-rtd ADDNLL_CBNLL=0"
-    #print("\n",cmd_RunCombine)
-    #os.system(cmd_RunCombine)
+    if(sys != "Nomi"):
+        #for likelihood scans when using robustFit 1
+        cmd_doInitialFit = f"combineTool.py -M Impacts -d workspace_top_Mass_{Mass}_shape_comb_para{tag}.root -m {Mass}   -n _M{Mass}{tag}_Impacts --redefineSignalPOIs mean,sigmaG  --setParameters mean=5.1,r=1,sigmaG=0.11 --setParameterRanges mean=5.0,5.3:sigmaG=0.05,0.5 --freezeParameters r  --X-rtd ADDNLL_CBNLL=0 --robustFit 1 --doInitialFit" 
+        print("\n =====  doInitialFit   ",cmd_doInitialFit,"    ====\n")
+        run_cmd(cmd_doInitialFit)
 
-    # MultiDimFit for syst with fix mean
-    cmd_RunCombine = f"combine -M MultiDimFit workspace_top_Mass_{Mass}_shape_comb_para{tag}.root  -m {Mass} --redefineSignalPOIs mean  --setParameters mean=5.1023,r=1,sigmaG=0.114   --setParameterRanges mean=5.0,5.3:sigmaG=0.05,0.5 --freezeParameters r,sigmaG -n .scanformean.with_syst --algo grid --points 20  --X-rtd ADDNLL_CBNLL=0"
-    #print("\n",cmd_RunCombine)
-    #os.system(cmd_RunCombine)
 
-    #plot scan
-    #print("\n=================       scan plot     ======================== \n")
-    cms_scan_ploting = 'plot1DScan.py higgsCombine.scanformean.with_syst.MultiDimFit.mH125.root --main-label "With systematics" --main-color 1 --others higgsCombine.scanformean.with_syst.statonly.MultiDimFit.mH125.root:"Stat-only":2 -o Plots/mean_scan --POI mean'
-    cms_scan_ploting = 'plot1DScan.py higgsCombine.scanformean.with_syst.statonly.MultiDimFit.mH125.root --main-label "With systematics" --main-color 1  -o Plots/mean_scan --POI sigmaG  --y-max 3'
-    #os.system(cms_scan_ploting)
+        #nuisance parameter with the --doFits and -o impacts_mtop_"+year+".json options
+        cmd_Impact_doFit = f"combineTool.py -M Impacts -d workspace_top_Mass_{Mass}_shape_comb_para{tag}.root -m {Mass} -n _M{Mass}{tag}_Impacts  --redefineSignalPOIs mean,sigmaG --setParameters mean=5.1,r=1,sigmaG=0.11  --setParameterRanges mean=5.0,5.3:sigmaG=0.05,0.5 --freezeParameters r --X-rtd ADDNLL_CBNLL=0 --robustFit 1 --doFits -o impacts_mtop_{year}.json"
+        print("\n =====  do Impact Fits   ",cmd_Impact_doFit,"    ====\n")
+        run_cmd(cmd_Impact_doFit)
 
-    #MultiDimFit for stat with fix sigma
-    cmd_RunCombine = f"combine -M MultiDimFit workspace_top_Mass_{Mass}_shape_comb_para{tag}.root -m {Mass} --redefineSignalPOIs sigmaG --setParameters mean=5.1023,r=1,sigmaG=0.114 --setParameterRanges mean=5.0,5.3:sigmaG=0.05,0.5 --freezeParameters  r,mean,allConstrainedNuisances -n .scanforSigma.with_syst.statonly --algo grid --points 20 --setParameterRanges sigmaG=0.123,0.126 --setParameters mean=5.1023,r=1,sigmaG=0.114 --redefineSignalPOIs sigmaG  --X-rtd ADDNLL_CBNLL=0"
-    #print("\n",cmd_RunCombine)
-    #os.system(cmd_RunCombine)
 
-    #MultiDimFit for syst with fix Sigma
-    cmd_RunCombine = f"combine -M MultiDimFit workspace_top_Mass_{Mass}_shape_comb_para{tag}.root  -m {Mass} --freezeParameters r,sigmaG -n .scanforSigma.with_syst --algo grid --points 20 --setParameterRanges mean=5.0,5.3:sigmaG=0.05,0.5 --setParameters mean=5.1023,r=1,sigmaG=0.114 --redefineSignalPOIs sigmaG  --X-rtd ADDNLL_CBNLL=0"
-    #print("\n",cmd_RunCombine)
-    #os.system(cmd_RunCombine)
+        cmd_Impact_json = f"combineTool.py -M Impacts -d workspace_top_Mass_{Mass}_shape_comb_para{tag}.root -m {Mass}  -n _M{Mass}{tag}_Impacts --redefineSignalPOIs mean,sigmaG --setParameters mean=5.1,r=1,sigmaG=0.11 --setParameterRanges mean=5.0,5.3:sigmaG=0.05,0.5  --freezeParameters r --X-rtd ADDNLL_CBNLL=0  -o impacts_mtop_{year}.json"  #--named r, bWeight_lf, bWeight_hf , bWeight_cferr1, bWeight_cferr2, bWeight_lfstats1, bWeight_lfstats2, bWeight_hfstats1, bWeight_hfstats2, bWeight_jes"
+        print("\n =====  save json   ",cmd_Impact_json,"    ====\n")
+        run_cmd(cmd_Impact_json)
 
-    #plot scan
-    cms_scan_ploting = 'plot1DScan.py higgsCombine.scanforSigma.with_syst.MultiDimFit.mH125.root --main-label "With systematics" --main-color 1 --others higgsCombine.scanforSigma.with_syst.statonly.MultiDimFit.mH125.root:"Stat-only":2 -o Plots/Sigma_scan --POI sigmaG'
-    #print("\n",cms_scan_ploting)
-    #os.system(cms_scan_ploting)
+        # impact Plot for Mean
+        cmd_Impact_plot = f"plotImpacts.py -i impacts_mtop_{year}.json -o impacts_mtop_{year}_mean --POI mean"
+        print("\n",cmd_Impact_plot)
+        run_cmd(cmd_Impact_plot)
 
-    # Plot impact Plots
-    cmd_diffNuisances = f"python3 diffNuisances.py fitDiagnostics_M{Mass}.root -a -g higgsCombine_M{Mass}_{year}.FitDiagnostics_nuisance.mH120.root "
-    #print("\n",cmd_diffNuisances)
-    #os.system(cmd_diffNuisances)
+        # impact Plot for SigmaG
+        cmd_Impact_plot = f"plotImpacts.py -i impacts_mtop_{year}.json -o impacts_mtop_{year}_sigmaG --POI sigmaG"
+        print("\n",cmd_Impact_plot)
+        run_cmd(cmd_Impact_plot)
     
 
-    #for likelihood scans when using robustFit 1
-    cmd_doInitialFit = f"combineTool.py -M Impacts -d workspace_top_Mass_{Mass}_shape_comb_para{tag}.root -m {Mass}   -n _M{Mass}{tag}_Impacts --redefineSignalPOIs mean,sigmaG  --setParameters mean=5.1,r=1,sigmaG=0.11 --setParameterRanges mean=5.0,5.3:sigmaG=0.05,0.5 --freezeParameters r  --X-rtd ADDNLL_CBNLL=0 --robustFit 1 --doInitialFit" 
-    print("\n =====  doInitialFit   ",cmd_doInitialFit,"    ====\n")
-    run_cmd(cmd_doInitialFit)
 
+    if (sys=="Tried before"):
+        cmd_GoodnessOfFit = f"combine -M GoodnessOfFit workspace_top_Mass_{Mass}_shape_comb_para{tag}.root -n .goodnessOfFit_data --freezeParameters r --redefineSignalPOIs mean,sigmaG --setParameters mean=5.1,r=1,sigmaG=0.15  --X-rtd ADDNLL_CBNLL=0 --algo saturated  --expectSignal 1 -m {Mass}"
+        #print("\n",cmd_GoodnessOfFit)
+        #os.system(cmd_GoodnessOfFit)
+        #os.system(cmd_GoodnessOfFit+" -t 1000")
+        
+        cms_create_json = f"combineTool.py -M CollectGoodnessOfFit --input higgsCombine.goodnessOfFit_data.GoodnessOfFit.mH172.5.root higgsCombine.goodnessOfFit_data.GoodnessOfFit.mH172.5.123456.root -m {Mass} -o gof.json"
+        #print("\n",cms_create_json)
+        #os.system(cms_create_json)
+        #os.system("plotGof.py gof.json --statistic saturated --mass 172.5 -o part2_gof")
+        
+        # MultiDimFit for stat with fix mean
+        #print("\n=================       runnig MultiDimFit     ======================== \n")
+        cmd_RunCombine = f"combine -M MultiDimFit workspace_top_Mass_{Mass}_shape_comb_para{tag}.root -m {Mass}  --redefineSignalPOIs mean,sigmaG --setParameters mean=5.1023,r=1,sigmaG=0.114 --setParameterRanges mean=5.0,5.3:sigmaG=0.05,0.5 --freezeParameters  r -n .scanformean.with_syst.statonly --algo grid --points 20     --X-rtd ADDNLL_CBNLL=0"
+        #print("\n",cmd_RunCombine)
+        #os.system(cmd_RunCombine)
 
-    #nuisance parameter with the --doFits and -o impacts_mtop_"+year+".json options
-    cmd_Impact_doFit = f"combineTool.py -M Impacts -d workspace_top_Mass_{Mass}_shape_comb_para{tag}.root -m {Mass} -n _M{Mass}{tag}_Impacts  --redefineSignalPOIs mean,sigmaG --setParameters mean=5.1,r=1,sigmaG=0.11  --setParameterRanges mean=5.0,5.3:sigmaG=0.05,0.5 --freezeParameters r --X-rtd ADDNLL_CBNLL=0 --robustFit 1 --doFits -o impacts_mtop_{year}.json"
-    print("\n =====  do Impact Fits   ",cmd_Impact_doFit,"    ====\n")
-    run_cmd(cmd_Impact_doFit)
+        # MultiDimFit for syst with fix mean
+        cmd_RunCombine = f"combine -M MultiDimFit workspace_top_Mass_{Mass}_shape_comb_para{tag}.root  -m {Mass} --redefineSignalPOIs mean  --setParameters mean=5.1023,r=1,sigmaG=0.114   --setParameterRanges mean=5.0,5.3:sigmaG=0.05,0.5 --freezeParameters r,sigmaG -n .scanformean.with_syst --algo grid --points 20  --X-rtd ADDNLL_CBNLL=0"
+        #print("\n",cmd_RunCombine)
+        #os.system(cmd_RunCombine)
 
+        #plot scan
+        #print("\n=================       scan plot     ======================== \n")
+        cms_scan_ploting = 'plot1DScan.py higgsCombine.scanformean.with_syst.MultiDimFit.mH125.root --main-label "With systematics" --main-color 1 --others higgsCombine.scanformean.with_syst.statonly.MultiDimFit.mH125.root:"Stat-only":2 -o Plots/mean_scan --POI mean'
+        cms_scan_ploting = 'plot1DScan.py higgsCombine.scanformean.with_syst.statonly.MultiDimFit.mH125.root --main-label "With systematics" --main-color 1  -o Plots/mean_scan --POI sigmaG  --y-max 3'
+        #os.system(cms_scan_ploting)
 
-    cmd_Impact_json = f"combineTool.py -M Impacts -d workspace_top_Mass_{Mass}_shape_comb_para{tag}.root -m {Mass}  -n _M{Mass}{tag}_Impacts --redefineSignalPOIs mean,sigmaG --setParameters mean=5.1,r=1,sigmaG=0.11 --setParameterRanges mean=5.0,5.3:sigmaG=0.05,0.5  --freezeParameters r --X-rtd ADDNLL_CBNLL=0  -o impacts_mtop_{year}.json"  #--named r, bWeight_lf, bWeight_hf , bWeight_cferr1, bWeight_cferr2, bWeight_lfstats1, bWeight_lfstats2, bWeight_hfstats1, bWeight_hfstats2, bWeight_jes"
-    print("\n =====  save json   ",cmd_Impact_json,"    ====\n")
-    run_cmd(cmd_Impact_json)
+        #MultiDimFit for stat with fix sigma
+        cmd_RunCombine = f"combine -M MultiDimFit workspace_top_Mass_{Mass}_shape_comb_para{tag}.root -m {Mass} --redefineSignalPOIs sigmaG --setParameters mean=5.1023,r=1,sigmaG=0.114 --setParameterRanges mean=5.0,5.3:sigmaG=0.05,0.5 --freezeParameters  r,mean,allConstrainedNuisances -n .scanforSigma.with_syst.statonly --algo grid --points 20 --setParameterRanges sigmaG=0.123,0.126 --setParameters mean=5.1023,r=1,sigmaG=0.114 --redefineSignalPOIs sigmaG  --X-rtd ADDNLL_CBNLL=0"
+        #print("\n",cmd_RunCombine)
+        #os.system(cmd_RunCombine)
 
-    # impact Plot for Mean
-    cmd_Impact_plot = f"plotImpacts.py -i impacts_mtop_{year}.json -o impacts_mtop_{year}_mean --POI mean"
-    print("\n",cmd_Impact_plot)
-    run_cmd(cmd_Impact_plot)
+        #MultiDimFit for syst with fix Sigma
+        cmd_RunCombine = f"combine -M MultiDimFit workspace_top_Mass_{Mass}_shape_comb_para{tag}.root  -m {Mass} --freezeParameters r,sigmaG -n .scanforSigma.with_syst --algo grid --points 20 --setParameterRanges mean=5.0,5.3:sigmaG=0.05,0.5 --setParameters mean=5.1023,r=1,sigmaG=0.114 --redefineSignalPOIs sigmaG  --X-rtd ADDNLL_CBNLL=0"
+        #print("\n",cmd_RunCombine)
+        #os.system(cmd_RunCombine)
 
-    # impact Plot for SigmaG
-    cmd_Impact_plot = f"plotImpacts.py -i impacts_mtop_{year}.json -o impacts_mtop_{year}_sigmaG --POI sigmaG"
-    print("\n",cmd_Impact_plot)
-    run_cmd(cmd_Impact_plot)
-    
+        #plot scan
+        cms_scan_ploting = 'plot1DScan.py higgsCombine.scanforSigma.with_syst.MultiDimFit.mH125.root --main-label "With systematics" --main-color 1 --others higgsCombine.scanforSigma.with_syst.statonly.MultiDimFit.mH125.root:"Stat-only":2 -o Plots/Sigma_scan --POI sigmaG'
+        #print("\n",cms_scan_ploting)
+        #os.system(cms_scan_ploting)
+
+        # Plot impact Plots
+        cmd_diffNuisances = f"python3 diffNuisances.py fitDiagnostics_M{Mass}.root -a -g higgsCombine_M{Mass}_{year}.FitDiagnostics_nuisance.mH120.root "
+        #print("\n",cmd_diffNuisances)
+        #os.system(cmd_diffNuisances)
+        
