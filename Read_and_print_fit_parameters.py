@@ -20,6 +20,7 @@ def get_paramters(tag,mass_or_decay_width):
     sigmaG_fit["sigmaG"] = [SigmaG.getVal(), SigmaG.getError()]
 
     return mean_fit, sigmaG_fit
+
 if __name__ == "__main__":
     parser = arg.ArgumentParser(description='Create workspace for higgs combine')
     parser.add_argument('-m', '--mass', dest='mass_sample', default=[None], type=str, nargs=1, help="MC top mass sample [data , 1695, 1715, 1735, 1755]")
