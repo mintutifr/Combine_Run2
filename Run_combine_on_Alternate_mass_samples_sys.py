@@ -58,15 +58,21 @@ for Mass in mass_point:
     #os.system(scp_file)
     
     if(year=="Run2"):
-        for yearloop in ['UL2016preVFP', 'UL2016postVFP','UL2017', 'UL2018']:
-            cmd_add_datacards = f"combineCards.py mujets{tag}=datacard_top_shape_mu_para{tag}.txt eljets{tag}=datacard_top_shape_el_para{tag}.txt > datacard_top_shape_comb_para{tag}.txt"
+        for subyear in ['UL2016preVFP', 'UL2016postVFP','UL2017', 'UL2018']:
+            subtag = Combine_year_tag[subyear]
+            cmd_add_datacards = f"combineCards.py mujets{subtag}=datacards/datacard_top_shape_mu_para{subtag}.txt eljets{subtag}=datacards/datacard_top_shape_el_para{subtag}.txt > datacard_top_shape_comb_para{subtag}.txt"
             print("\n",cmd_add_datacards)
             run_cmd(cmd_add_datacards)
-            update_sys_parameters_to_datacard_simultanous_fit(f"datacard_top_shape_comb_para{tag}.txt",sys)
-            cmd_createWorkspace = f"python3 Create_Workspace_sys.py -m {Mass} -y  {yearloop} -s {sys}"
-            print("\n",cmd_add_datacards)
+            # Update systematic nuisance parameter in datacards
+            update_sys_parameters_to_datacard_simultanous_fit(f"datacard_top_shape_comb_para{subtag}.txt",sys,subyear)
+            # crete Workshpace with modified physics model
+            
+            cmd_createWorkspace = f"python3 Create_Workspace_sys.py -m {Mass} -y  {subyear} -s {sys}"
+            print(cmd_createWorkspace)
             run_cmd(cmd_createWorkspace)
-        #cmd_adddatacards = "combineCards.py mujets_UL18=datacard_top_shape_mu_para_UL18.txt eljets_UL18=datacard_top_shape_el_para_UL18.txt mujets_UL17=datacard_top_shape_mu_para_UL17.txt eljets_UL17=datacard_top_shape_el_para_UL17.txt  mujets_ULpre16=datacard_top_shape_mu_para_ULpre16.txt eljets_ULpre16=datacard_top_shape_el_para_ULpre16.txt mujets_ULpost16=datacard_top_shape_mu_para_ULpost16.txt eljets_ULpost16=datacard_top_shape_el_para_ULpost16.txt > datacard_top_shape_comb_para.txt"
+        cmd_add_datacards = f"combineCards.py _UL18=datacard_top_shape_comb_para_UL18.txt _UL17=datacard_top_shape_comb_para_UL17.txt _UL16preVFP=datacard_top_shape_comb_para_ULpre16.txt _UL16postVFP=datacard_top_shape_comb_para_ULpost16.txt > datacard_top_shape_comb_para.txt"
+        print(cmd_add_datacards)
+        run_cmd(cmd_add_datacards)
     else:
         cmd_add_datacards = f"combineCards.py mujets{tag}=datacards/datacard_top_shape_mu_para{tag}.txt eljets{tag}=datacards/datacard_top_shape_el_para{tag}.txt > datacard_top_shape_comb_para{tag}.txt"
         print("\n",cmd_add_datacards)
@@ -77,30 +83,30 @@ for Mass in mass_point:
         
         cmd_createWorkspace = f"python3 Create_Workspace_sys.py -m {Mass} -y  {year} -s {sys}"
         print(cmd_createWorkspace)
-        #run_cmd(cmd_createWorkspace)
+        run_cmd(cmd_createWorkspace)
 
     cmd_Runtext2workspace = f"env PYTHONNOUSERSITE=1 text2workspace.py datacard_top_shape_comb_para{tag}.txt -o workspace_top_Mass_{Mass}_shape_comb_para{tag}.root"
     print("\n",cmd_Runtext2workspace)
     run_cmd(cmd_Runtext2workspace)
 
     #cmd_RunCombine = f"combine -M FitDiagnostics workspace_top_Mass_{Mass}_shape_comb_para{tag}.root -n _M{Mass}  --freezeParameters r --redefineSignalPOIs sigmaG,mean --setParameters mean=5.1,r=1,sigmaG=0.15  --X-rtd ADDNLL_CBNLL=0  --trackParameters mean,sigmaG --trackErrors mean,sigmaG --X-rtd TMCSO_AdaptivePseudoAsimov=0 --X-rtd TMCSO_PseudoAsimov=0 --plots  --saveShapes --saveWithUncertainties --saveWorkspace"# --expectSignal 1 -t -1 --saveToys" #--signalPdfNames='shapeSig_top_sig*' --backgroundPdfNames='shapeBkg_EWK_bkg*,shapeBkg_top_bkg*' 
-    cmd_RunCombine = f"combine -M FitDiagnostics workspace_top_Mass_{Mass}_shape_comb_para{tag}.root -n _M{Mass}  --redefineSignalPOIs mean,sigmaG  --setParameters mean=5.1,r=1,sigmaG=0.11 --setParameterRanges mean=5.0,5.3:sigmaG=0.05,0.5 --freezeParameters  r  --X-rtd ADDNLL_CBNLL=0  --trackParameters r,mean,sigmaG --trackErrors r,mean,sigmaG --X-rtd TMCSO_PseudoAsimov=0 --saveShapes --saveWithUncertainties --saveWorkspace --plots" #-t -1 --saveToys"# --plots"
+    cmd_RunCombine = f"combine -M FitDiagnostics workspace_top_Mass_{Mass}_shape_comb_para{tag}.root -n _M{Mass}  --redefineSignalPOIs mean,sigmaG  --setParameters mean=5.1,r=1,sigmaG=0.11 --setParameterRanges mean=5.0,5.3:sigmaG=0.05,0.7 --freezeParameters  r  --X-rtd ADDNLL_CBNLL=0  --trackParameters r,mean,sigmaG --trackErrors r,mean,sigmaG --X-rtd TMCSO_PseudoAsimov=0 --saveShapes --saveWithUncertainties --saveWorkspace --plots" #-t -1 --saveToys"# --plots"
     run_cmd(cmd_RunCombine)
     
-    if(sys != "Nomi"):
+    if(sys == "Nomi"):
         #for likelihood scans when using robustFit 1
-        cmd_doInitialFit = f"combineTool.py -M Impacts -d workspace_top_Mass_{Mass}_shape_comb_para{tag}.root -m {Mass}   -n _M{Mass}{tag}_Impacts --redefineSignalPOIs mean,sigmaG  --setParameters mean=5.1,r=1,sigmaG=0.11 --setParameterRanges mean=5.0,5.3:sigmaG=0.05,0.5 --freezeParameters r  --X-rtd ADDNLL_CBNLL=0 --robustFit 1 --doInitialFit" 
+        cmd_doInitialFit = f"combineTool.py -M Impacts -d workspace_top_Mass_{Mass}_shape_comb_para{tag}.root -m {Mass}   -n _M{Mass}{tag}_Impacts --redefineSignalPOIs mean,sigmaG  --setParameters mean=5.1,r=1,sigmaG=0.11 --setParameterRanges mean=5.0,5.3:sigmaG=0.05,0.7 --freezeParameters r  --X-rtd ADDNLL_CBNLL=0 --robustFit 1 --doInitialFit" 
         print("\n =====  doInitialFit   ",cmd_doInitialFit,"    ====\n")
         run_cmd(cmd_doInitialFit)
 
 
         #nuisance parameter with the --doFits and -o impacts_mtop_"+year+".json options
-        cmd_Impact_doFit = f"combineTool.py -M Impacts -d workspace_top_Mass_{Mass}_shape_comb_para{tag}.root -m {Mass} -n _M{Mass}{tag}_Impacts  --redefineSignalPOIs mean,sigmaG --setParameters mean=5.1,r=1,sigmaG=0.11  --setParameterRanges mean=5.0,5.3:sigmaG=0.05,0.5 --freezeParameters r --X-rtd ADDNLL_CBNLL=0 --robustFit 1 --doFits -o impacts_mtop_{year}.json"
+        cmd_Impact_doFit = f"combineTool.py -M Impacts -d workspace_top_Mass_{Mass}_shape_comb_para{tag}.root -m {Mass} -n _M{Mass}{tag}_Impacts  --redefineSignalPOIs mean,sigmaG --setParameters mean=5.1,r=1,sigmaG=0.11  --setParameterRanges mean=5.0,5.3:sigmaG=0.05,0.7 --freezeParameters r --X-rtd ADDNLL_CBNLL=0 --robustFit 1 --doFits -o impacts_mtop_{year}.json"
         print("\n =====  do Impact Fits   ",cmd_Impact_doFit,"    ====\n")
         run_cmd(cmd_Impact_doFit)
 
 
-        cmd_Impact_json = f"combineTool.py -M Impacts -d workspace_top_Mass_{Mass}_shape_comb_para{tag}.root -m {Mass}  -n _M{Mass}{tag}_Impacts --redefineSignalPOIs mean,sigmaG --setParameters mean=5.1,r=1,sigmaG=0.11 --setParameterRanges mean=5.0,5.3:sigmaG=0.05,0.5  --freezeParameters r --X-rtd ADDNLL_CBNLL=0  -o impacts_mtop_{year}.json"  #--named r, bWeight_lf, bWeight_hf , bWeight_cferr1, bWeight_cferr2, bWeight_lfstats1, bWeight_lfstats2, bWeight_hfstats1, bWeight_hfstats2, bWeight_jes"
+        cmd_Impact_json = f"combineTool.py -M Impacts -d workspace_top_Mass_{Mass}_shape_comb_para{tag}.root -m {Mass}  -n _M{Mass}{tag}_Impacts --redefineSignalPOIs mean,sigmaG --setParameters mean=5.1,r=1,sigmaG=0.11 --setParameterRanges mean=5.0,5.3:sigmaG=0.05,0.7  --freezeParameters r --X-rtd ADDNLL_CBNLL=0  -o impacts_mtop_{year}.json"  #--named r, bWeight_lf, bWeight_hf , bWeight_cferr1, bWeight_cferr2, bWeight_lfstats1, bWeight_lfstats2, bWeight_hfstats1, bWeight_hfstats2, bWeight_jes"
         print("\n =====  save json   ",cmd_Impact_json,"    ====\n")
         run_cmd(cmd_Impact_json)
 
@@ -129,12 +135,12 @@ for Mass in mass_point:
         
         # MultiDimFit for stat with fix mean
         #print("\n=================       runnig MultiDimFit     ======================== \n")
-        cmd_RunCombine = f"combine -M MultiDimFit workspace_top_Mass_{Mass}_shape_comb_para{tag}.root -m {Mass}  --redefineSignalPOIs mean,sigmaG --setParameters mean=5.1023,r=1,sigmaG=0.114 --setParameterRanges mean=5.0,5.3:sigmaG=0.05,0.5 --freezeParameters  r -n .scanformean.with_syst.statonly --algo grid --points 20     --X-rtd ADDNLL_CBNLL=0"
+        cmd_RunCombine = f"combine -M MultiDimFit workspace_top_Mass_{Mass}_shape_comb_para{tag}.root -m {Mass}  --redefineSignalPOIs mean,sigmaG --setParameters mean=5.1023,r=1,sigmaG=0.114 --setParameterRanges mean=5.0,5.3:sigmaG=0.05,0.7 --freezeParameters  r -n .scanformean.with_syst.statonly --algo grid --points 20     --X-rtd ADDNLL_CBNLL=0"
         #print("\n",cmd_RunCombine)
         #os.system(cmd_RunCombine)
 
         # MultiDimFit for syst with fix mean
-        cmd_RunCombine = f"combine -M MultiDimFit workspace_top_Mass_{Mass}_shape_comb_para{tag}.root  -m {Mass} --redefineSignalPOIs mean  --setParameters mean=5.1023,r=1,sigmaG=0.114   --setParameterRanges mean=5.0,5.3:sigmaG=0.05,0.5 --freezeParameters r,sigmaG -n .scanformean.with_syst --algo grid --points 20  --X-rtd ADDNLL_CBNLL=0"
+        cmd_RunCombine = f"combine -M MultiDimFit workspace_top_Mass_{Mass}_shape_comb_para{tag}.root  -m {Mass} --redefineSignalPOIs mean  --setParameters mean=5.1023,r=1,sigmaG=0.114   --setParameterRanges mean=5.0,5.3:sigmaG=0.05,0.7 --freezeParameters r,sigmaG -n .scanformean.with_syst --algo grid --points 20  --X-rtd ADDNLL_CBNLL=0"
         #print("\n",cmd_RunCombine)
         #os.system(cmd_RunCombine)
 
@@ -145,12 +151,12 @@ for Mass in mass_point:
         #os.system(cms_scan_ploting)
 
         #MultiDimFit for stat with fix sigma
-        cmd_RunCombine = f"combine -M MultiDimFit workspace_top_Mass_{Mass}_shape_comb_para{tag}.root -m {Mass} --redefineSignalPOIs sigmaG --setParameters mean=5.1023,r=1,sigmaG=0.114 --setParameterRanges mean=5.0,5.3:sigmaG=0.05,0.5 --freezeParameters  r,mean,allConstrainedNuisances -n .scanforSigma.with_syst.statonly --algo grid --points 20 --setParameterRanges sigmaG=0.123,0.126 --setParameters mean=5.1023,r=1,sigmaG=0.114 --redefineSignalPOIs sigmaG  --X-rtd ADDNLL_CBNLL=0"
+        cmd_RunCombine = f"combine -M MultiDimFit workspace_top_Mass_{Mass}_shape_comb_para{tag}.root -m {Mass} --redefineSignalPOIs sigmaG --setParameters mean=5.1023,r=1,sigmaG=0.114 --setParameterRanges mean=5.0,5.3:sigmaG=0.05,0.7 --freezeParameters  r,mean,allConstrainedNuisances -n .scanforSigma.with_syst.statonly --algo grid --points 20 --setParameterRanges sigmaG=0.123,0.126 --setParameters mean=5.1023,r=1,sigmaG=0.114 --redefineSignalPOIs sigmaG  --X-rtd ADDNLL_CBNLL=0"
         #print("\n",cmd_RunCombine)
         #os.system(cmd_RunCombine)
 
         #MultiDimFit for syst with fix Sigma
-        cmd_RunCombine = f"combine -M MultiDimFit workspace_top_Mass_{Mass}_shape_comb_para{tag}.root  -m {Mass} --freezeParameters r,sigmaG -n .scanforSigma.with_syst --algo grid --points 20 --setParameterRanges mean=5.0,5.3:sigmaG=0.05,0.5 --setParameters mean=5.1023,r=1,sigmaG=0.114 --redefineSignalPOIs sigmaG  --X-rtd ADDNLL_CBNLL=0"
+        cmd_RunCombine = f"combine -M MultiDimFit workspace_top_Mass_{Mass}_shape_comb_para{tag}.root  -m {Mass} --freezeParameters r,sigmaG -n .scanforSigma.with_syst --algo grid --points 20 --setParameterRanges mean=5.0,5.3:sigmaG=0.05,0.7 --setParameters mean=5.1023,r=1,sigmaG=0.114 --redefineSignalPOIs sigmaG  --X-rtd ADDNLL_CBNLL=0"
         #print("\n",cmd_RunCombine)
         #os.system(cmd_RunCombine)
 
