@@ -2,6 +2,7 @@ import fileinput, string, sys, os, time, subprocess
 import argparse as arg
 import ROOT as rt
 import numpy
+from Read_and_print_fit_parameters import get_paramters
 from Add_sys_parameter_to_datacard import update_sys_parameters_to_datacard_simultanous_fit
 parser = arg.ArgumentParser(description='Run Higgs combine Tool')
 parser.add_argument('-m', '--mass', dest='mass_sample', default=[None], type=str, nargs=1, help="is Alternate MC top mass sample used ['data','1695', '1715', '1725', '1735', '1755']")
@@ -90,10 +91,15 @@ for Mass in mass_point:
     run_cmd(cmd_Runtext2workspace)
 
     #cmd_RunCombine = f"combine -M FitDiagnostics workspace_top_Mass_{Mass}_shape_comb_para{tag}.root -n _M{Mass}  --freezeParameters r --redefineSignalPOIs sigmaG,mean --setParameters mean=5.1,r=1,sigmaG=0.15  --X-rtd ADDNLL_CBNLL=0  --trackParameters mean,sigmaG --trackErrors mean,sigmaG --X-rtd TMCSO_AdaptivePseudoAsimov=0 --X-rtd TMCSO_PseudoAsimov=0 --plots  --saveShapes --saveWithUncertainties --saveWorkspace"# --expectSignal 1 -t -1 --saveToys" #--signalPdfNames='shapeSig_top_sig*' --backgroundPdfNames='shapeBkg_EWK_bkg*,shapeBkg_top_bkg*' 
-    cmd_RunCombine = f"combine -M FitDiagnostics workspace_top_Mass_{Mass}_shape_comb_para{tag}.root -n _M{Mass}  --redefineSignalPOIs mean,sigmaG  --setParameters mean=5.1,r=1,sigmaG=0.11 --setParameterRanges mean=5.0,5.3:sigmaG=0.05,0.7 --freezeParameters  r  --X-rtd ADDNLL_CBNLL=0  --trackParameters r,mean,sigmaG --trackErrors r,mean,sigmaG --X-rtd TMCSO_PseudoAsimov=0 --saveShapes --saveWithUncertainties --saveWorkspace --plots" #-t -1 --saveToys"# --plots"
+    cmd_RunCombine = f"combine -M FitDiagnostics workspace_top_Mass_{Mass}_shape_comb_para{tag}.root -n _M{Mass}{tag}  --redefineSignalPOIs mean,sigmaG  --setParameters mean=5.1,r=1,sigmaG=0.11 --setParameterRanges mean=5.0,5.3:sigmaG=0.05,0.7 --freezeParameters  r  --X-rtd ADDNLL_CBNLL=0  --trackParameters r,mean,sigmaG --trackErrors r,mean,sigmaG --X-rtd TMCSO_PseudoAsimov=0 --saveShapes --saveWithUncertainties --saveWorkspace" #--plots" #-t -1 --saveToys"# --plots"
     run_cmd(cmd_RunCombine)
-    
-    if(sys == "Nomi"):
+
+    mean_fit,sigmaG_fit = get_paramters(tag,mass,width)
+    print("\n=====================================")
+    print("Fit results : mean = %.5f +- %.5f GeV, sigmaG = %.5f +- %.5f GeV"%(mean_fit['mean'][0],mean_fit['mean'][1],sigmaG_fit['sigmaG'][0],sigmaG_fit['sigmaG'][1]))
+    print("=====================================\n")
+
+    if(sys != "Nomi"):
         #for likelihood scans when using robustFit 1
         cmd_doInitialFit = f"combineTool.py -M Impacts -d workspace_top_Mass_{Mass}_shape_comb_para{tag}.root -m {Mass}   -n _M{Mass}{tag}_Impacts --redefineSignalPOIs mean,sigmaG  --setParameters mean=5.1,r=1,sigmaG=0.11 --setParameterRanges mean=5.0,5.3:sigmaG=0.05,0.7 --freezeParameters r  --X-rtd ADDNLL_CBNLL=0 --robustFit 1 --doInitialFit" 
         print("\n =====  doInitialFit   ",cmd_doInitialFit,"    ====\n")

@@ -382,7 +382,7 @@ if __name__ == "__main__":
         # S a v e   w o r k s p a c e   i n   f i l e
         # -------------------------------------------
         # Save the workspace into a ROOT file
-        w.writeToFile("workspace"+tag+".root")
+        w.writeToFile("datacards/workspace"+tag+".root")
         # Workspace will remain in memory after macro finishes
         R.gDirectory.Add(w)
 

@@ -4,7 +4,15 @@ from ROOT import RooFit
 import sys, datetime
 import argparse as arg
 
-def get_paramters(tag,mass_or_decay_width):
+def get_paramters(tag,mass,width):
+    
+    if(mass and width):
+        print("Both mass and width should not provided")
+        exit(1)
+    mass_or_decay_width =f'{mass}'
+    if(width != None): mass_or_decay_width = f'{width}'
+    print(mass_or_decay_width)
+
     fitfile = R.TFile.Open(f"fitDiagnostics_M{mass_or_decay_width}{tag}.root")
     roofitResults = fitfile.Get("fit_s")
 
@@ -41,14 +49,8 @@ if __name__ == "__main__":
     year = args.Year[0]
     tag = Combine_year_tag[year]
     print(tag)
-    if(mass and width):
-        print("Both mass and width should not provided")
-        exit(0)
-    if(mass != None): mass_or_width = f'{mass}'
-    else: mass_or_width = f'{width}'
-    print(mass_or_width)
 
-    mean_fit,sigmaG_fit = get_paramters(tag,mass_or_width)
+    mean_fit,sigmaG_fit = get_paramters(tag,mass,width)
     print("\n=====================================")
     print("Fit results : mean = %.5f +- %.5f GeV, sigmaG = %.5f +- %.5f GeV"%(mean_fit['mean'][0],mean_fit['mean'][1],sigmaG_fit['sigmaG'][0],sigmaG_fit['sigmaG'][1]))
     print("=====================================\n")
