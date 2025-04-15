@@ -25,8 +25,10 @@ def get_paramters(tag,mass,width):
     sigmaG_fit = {}
 
     mean_fit["mean"] = [Mean.getVal(), Mean.getError()]
-    sigmaG_fit["sigmaG"] = [SigmaG.getVal(), SigmaG.getError()]
-
+    try:
+        sigmaG_fit["sigmaG"] = [SigmaG.getVal(), SigmaG.getError()]
+    except:
+        sigmaG_fit["sigmaG"] = [-999, -999]
     return mean_fit, sigmaG_fit
 
 if __name__ == "__main__":
@@ -50,6 +52,7 @@ if __name__ == "__main__":
     tag = Combine_year_tag[year]
     print(tag)
 
+    
     mean_fit,sigmaG_fit = get_paramters(tag,mass,width)
     print("\n=====================================")
     print("Fit results : mean = %.5f +- %.5f GeV, sigmaG = %.5f +- %.5f GeV"%(mean_fit['mean'][0],mean_fit['mean'][1],sigmaG_fit['sigmaG'][0],sigmaG_fit['sigmaG'][1]))

@@ -152,9 +152,14 @@ def update_sys_parameters_to_datacard_simultanous_fit(file_path, systematics,yea
     # Modify number of nuisance
     updated_lines = []
     for line in new_lines:
-        updated_lines.append(
-            line.replace("kmax 3 number of nuisance parameters", f"kmax {3+len(systematic_list_correlated)+len(systematic_list_decorrelated)+Num_weight_sys} number of nuisance parameters")
-        )
+        if(year in ["UL2018","UL2017"]): # 3 lumi sys
+            updated_lines.append(
+                line.replace("kmax 6 number of nuisance parameters", f"kmax {6+len(systematic_list_correlated)+len(systematic_list_decorrelated)+Num_weight_sys} number of nuisance parameters")
+            ) 
+        if(year in ["UL2016preVFP","UL2016postVFP","UL2016"]): # 3 lumi sys
+            updated_lines.append(
+                line.replace("kmax 5 number of nuisance parameters", f"kmax {5+len(systematic_list_correlated)+len(systematic_list_decorrelated)+Num_weight_sys} number of nuisance parameters")
+            ) 
     
     with open(file_path, "w") as file:
         file.writelines(updated_lines)

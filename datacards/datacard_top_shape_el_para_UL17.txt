@@ -18,5 +18,8 @@ rate                            1        1        1
 cons_EWK_bkg            lnN     -        1.1      -             
 cons_top_sig            lnN     1.136     -        -
 cons_top_bkg            lnN     -        -        1.090
+lumi                    lnN     1.0060   1.0060   1.0060
+lumi_UL17_UL18          lnN     1.0027   1.0027   1.0027
+lumi_UL16_UL17_UL18     lnN     1.0130   1.0130   1.0130
 
 # ===== sys  ====
