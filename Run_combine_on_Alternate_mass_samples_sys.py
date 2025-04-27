@@ -30,6 +30,7 @@ Combine_year_tag={
                 'UL2016postVFP' : "_ULpost16",
                 'UL2017' : "_UL17",
                 'UL2018' : "_UL18",
+                'UL2016' : "_UL16",
                 'Run2' : ""}
 
 mass  = args.mass_sample[0]
@@ -59,7 +60,7 @@ for Mass in mass_point:
     #os.system(scp_file)
     
     if(year=="Run2"):
-        for subyear in ['UL2016preVFP', 'UL2016postVFP','UL2017', 'UL2018']:
+        for subyear in ['UL2016','UL2017', 'UL2018']: #'UL2016preVFP', 'UL2016postVFP'
             subtag = Combine_year_tag[subyear]
             cmd_add_datacards = f"combineCards.py mujets{subtag}=datacards/datacard_top_shape_mu_para{subtag}.txt eljets{subtag}=datacards/datacard_top_shape_el_para{subtag}.txt > datacard_top_shape_comb_para{subtag}.txt"
             print("\n",cmd_add_datacards)
@@ -71,7 +72,8 @@ for Mass in mass_point:
             cmd_createWorkspace = f"python3 Create_Workspace_sys.py -m {Mass} -y  {subyear} -s {sys}"
             print(cmd_createWorkspace)
             run_cmd(cmd_createWorkspace)
-        cmd_add_datacards = f"combineCards.py _UL18=datacard_top_shape_comb_para_UL18.txt _UL17=datacard_top_shape_comb_para_UL17.txt _UL16preVFP=datacard_top_shape_comb_para_ULpre16.txt _UL16postVFP=datacard_top_shape_comb_para_ULpost16.txt > datacard_top_shape_comb_para.txt"
+        #cmd_add_datacards = f"combineCards.py _UL18=datacard_top_shape_comb_para_UL18.txt _UL17=datacard_top_shape_comb_para_UL17.txt _UL16preVFP=datacard_top_shape_comb_para_ULpre16.txt _UL16postVFP=datacard_top_shape_comb_para_ULpost16.txt > datacard_top_shape_comb_para.txt"
+        cmd_add_datacards = f"combineCards.py _UL18=datacard_top_shape_comb_para_UL18.txt _UL17=datacard_top_shape_comb_para_UL17.txt _UL16=datacard_top_shape_comb_para_UL16.txt > datacard_top_shape_comb_para.txt"
         print(cmd_add_datacards)
         run_cmd(cmd_add_datacards)
     else:

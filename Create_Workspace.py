@@ -57,7 +57,8 @@ Combine_year_tag={
                 'UL2016preVFP' :  "_ULpre16",
                 'UL2016postVFP' : "_ULpost16",
                 'UL2017' : "_UL17",
-                'UL2018' : "_UL18"}
+                'UL2018' : "_UL18",
+                'UL2016' : "_UL16"}
 
 tag = Combine_year_tag[dataYear]
 
@@ -79,13 +80,9 @@ if __name__ == "__main__":
     File_Dir ="/eos/home-m/mikumar/Higgs_Combine/CMSSW_14_1_0_pre4/src/HiggsAnalysis/Hist_for_workspace/"
     Filename_mu = File_Dir+"Combine_Input_lntopMass_histograms_"+dataYear+"_mu_gteq0p7_withoutDNNfit_rebin.root"
     Filename_el = File_Dir+"Combine_Input_lntopMass_histograms_"+dataYear+"_el_gteq0p7_withoutDNNfit_rebin.root"
-    Filename_mu_cont = File_Dir+"Combine_Input_lntopMass_histograms_"+dataYear+"_mu_gteq0p3_withoutDNNfit_rebin.root"
-    Filename_el_cont = File_Dir+"Combine_Input_lntopMass_histograms_"+dataYear+"_el_gteq0p3_withoutDNNfit_rebin.root"
 
     File_mu = R.TFile(Filename_mu,"Read")
     File_el = R.TFile(Filename_el,"Read")
-    File_mu_cont = R.TFile(Filename_mu_cont,"Read")
-    File_el_cont = R.TFile(Filename_el_cont,"Read")
     #Data Vs Mc Condition
 
     gt_or_lt_tag = ''
@@ -94,7 +91,6 @@ if __name__ == "__main__":
 
     #Get the file and director where historgrams are stored for muon final state
     dir_mu = File_mu.GetDirectory("mujets")
-    dir_mu_cont = File_mu_cont.GetDirectory("mujets")
     #Get Mc histograms for muon final state
     if(mass!= None):
         top_sig_mu = dir_mu.Get("top_sig_"+mass+tag+gt_or_lt_tag+sys)
@@ -103,19 +99,15 @@ if __name__ == "__main__":
         
     top_bkg_mu = dir_mu.Get("top_bkg_1725"+tag+gt_or_lt_tag+sys)
     EWK_bkg_mu = dir_mu.Get("EWK_bkg"+tag+gt_or_lt_tag)
-    EWK_bkg_mu_cont = dir_mu_cont.Get("EWK_bkg"+tag+"_gt")
     QCD_DD = dir_mu.Get("QCD_DD"+tag+gt_or_lt_tag)
 
     print( "top_sig_mu Integral : ",top_sig_mu.Integral() )
     print( " top_bkg_mu Integral : ",top_bkg_mu.Integral())
     print( " EWK_bkg_mu Integral : ",EWK_bkg_mu.Integral())
-    print( " EWK_bkg_mu_cont Integral : ",EWK_bkg_mu_cont.Integral())
     if(RealData==False):
         #Add all Mc histogram to creat full MC hisogram for muon final state
         histData_mu=top_sig_mu.Clone()
         histData_mu.Add(top_bkg_mu)  # for a cross check i have commented this line. i uncommented it before pushing the code. so !!warning!!
-        EWK_bkg_mu_cont.Scale(EWK_bkg_mu.Integral()/EWK_bkg_mu_cont.Integral())
-        EWK_bkg_mu=EWK_bkg_mu_cont #replace the sig region template with control region template
         histData_mu.Add(EWK_bkg_mu)
         print( "Total MC",histData_mu.Integral())
         #get real data
@@ -127,7 +119,6 @@ if __name__ == "__main__":
     print( R.TMath.Exp(histData_mu.GetBinLowEdge(15)+histData_mu.GetBinWidth(15)))
     #Get the file and director where historgrams are stored for electron final state
     dir_el = File_el.GetDirectory("eljets")
-    dir_el_cont = File_el_cont.GetDirectory("eljets")
     #Get Mc histograms for electron final state
     if(mass!= None):
         top_sig_el = dir_el.Get("top_sig_"+mass+tag+gt_or_lt_tag+sys)
@@ -136,19 +127,15 @@ if __name__ == "__main__":
 
     top_bkg_el = dir_el.Get("top_bkg_1725"+tag+gt_or_lt_tag+sys)
     EWK_bkg_el = dir_el.Get("EWK_bkg"+tag+gt_or_lt_tag)
-    EWK_bkg_el_cont = dir_el_cont.Get("EWK_bkg"+tag+"_gt")
     QCD_DD = dir_mu.Get("QCD_DD"+tag+gt_or_lt_tag)
 
     print( "top_sig_el Integral : ",top_sig_el.Integral() )
     print( " top_bkg_el Integral : ",top_bkg_el.Integral() )
     print( " EWK_bkg_el Integral : ",EWK_bkg_el.Integral())
-    print( " EWK_bkg_el_cont Integral : ",EWK_bkg_el_cont.Integral())
     if(RealData==False):
         #Add all Mc histogram to creat full MC hisogram for electron final state
         histData_el = top_sig_el.Clone()
         histData_el.Add(top_bkg_el) # for a cross check i have commented this line. i uncommented it before pushing the code. so !!warning!!
-        EWK_bkg_el_cont.Scale(EWK_bkg_el.Integral()/EWK_bkg_el_cont.Integral())
-        EWK_bkg_el=EWK_bkg_el_cont #replace the sig region template with control region template
         histData_el.Add(EWK_bkg_el)
         print("Totle MC : ",histData_el.Integral(), )
     #get real data
@@ -180,21 +167,27 @@ if __name__ == "__main__":
     
     Nuisance_values = {
             "BW_lf_m": {
-                "UL2016preVFP" : {"el": 0.00297, "mu": 0.00378},  "UL2016postVFP" : {"el": 0.00435, "mu": 0.00165}, "UL2017" : {"el": 0.00027, "mu": 0.00146}, "UL2018" :  {"el": 0.00173, "mu": 0.00137}
+                "UL2016preVFP" : {"el": 0.00297, "mu": 0.00378},  
+                "UL2016postVFP" : {"el": 0.00435, "mu": 0.00165}, 
+                "UL2017" : {"el": 0.00027, "mu": 0.00146}, 
+                "UL2018" :  {"el": 0.00173, "mu": 0.00137}
             },
             "BW_lf_S": {
-                "UL2016preVFP" : {"el": 0.02134, "mu": 0.03462},  "UL2016postVFP" : {"el": 0.01867, "mu": 0.03856}, "UL2017" : {"el": 0.07065, "mu": 0.01834}, "UL2018" :  {"el": 0.03252, "mu": 0.02598}
+                "UL2016preVFP" : {"el": 0.02134, "mu": 0.03462},  
+                "UL2016postVFP" : {"el": 0.01867, "mu": 0.03856}, 
+                "UL2017" : {"el": 0.07065, "mu": 0.01834}, 
+                "UL2018" :  {"el": 0.03252, "mu": 0.02598}
             },
     }
     # C r e a t e   m o d e l 
     # -----------------------------------------------
     # Declare observable mean and data
-    print(Nuisance_values["BW_lf_m"][dataYear]["mu"])
-    mean_formula_mu = R.RooFormulaVar("mean_form_mu", "mean_form_mu", f"@0*(1+@1*@2)", R.RooArgList(mean,BW_lf_m,R.RooFit.RooConst(Nuisance_values["BW_lf_m"][dataYear]["mu"])))
-    sigmaG_formula_mu = R.RooFormulaVar("sigmaG_form_mu", "sigmaG_form_mu", "@0*(1+@1*@2)", R.RooArgList(sigmaG,BW_lf_S,R.RooFit.RooConst(Nuisance_values["BW_lf_S"][dataYear]["mu"]))) 
+    # print(Nuisance_values["BW_lf_m"][dataYear]["mu"])
+    # mean_formula_mu = R.RooFormulaVar("mean_form_mu", "mean_form_mu", f"@0*(1+@1*@2)", R.RooArgList(mean,BW_lf_m,R.RooFit.RooConst(Nuisance_values["BW_lf_m"][dataYear]["mu"])))
+    # sigmaG_formula_mu = R.RooFormulaVar("sigmaG_form_mu", "sigmaG_form_mu", "@0*(1+@1*@2)", R.RooArgList(sigmaG,BW_lf_S,R.RooFit.RooConst(Nuisance_values["BW_lf_S"][dataYear]["mu"]))) 
 
-    mean_formula_el = R.RooFormulaVar("mean_form_el", "mean_form_el", "@0*(1+@1*@2)", R.RooArgList(mean,BW_lf_m,R.RooFit.RooConst(Nuisance_values["BW_lf_m"][dataYear]["el"])))
-    sigmaG_formula_el = R.RooFormulaVar("sigmaG_form_el", "sigmaG_form_el", "@0*(1+@1*@2)", R.RooArgList(sigmaG,BW_lf_S,R.RooFit.RooConst(Nuisance_values["BW_lf_S"][dataYear]["el"])))
+    # mean_formula_el = R.RooFormulaVar("mean_form_el", "mean_form_el", "@0*(1+@1*@2)", R.RooArgList(mean,BW_lf_m,R.RooFit.RooConst(Nuisance_values["BW_lf_m"][dataYear]["el"])))
+    # sigmaG_formula_el = R.RooFormulaVar("sigmaG_form_el", "sigmaG_form_el", "@0*(1+@1*@2)", R.RooArgList(sigmaG,BW_lf_S,R.RooFit.RooConst(Nuisance_values["BW_lf_S"][dataYear]["el"])))
 
 
     # Vaiable fit param
@@ -227,7 +220,7 @@ if __name__ == "__main__":
 
     # Vaiable fit param
     # ====================  #
-    çsigmaL_topbkg_mu = R.RooRealVar("sigmaL_topbkg_mu","sigmaL_topbkg_mu",0.15098,0.01,1)
+    sigmaL_topbkg_mu = R.RooRealVar("sigmaL_topbkg_mu","sigmaL_topbkg_mu",0.15098,0.01,1)
     sigmaL_topbkg_el = R.RooRealVar("sigmaL_topbkg_el","sigmaL_topbkg_el",0.15098,0.01,1)
     mean_top_bkg_mu = R.RooRealVar("mean_top_bkg_mu","mean_top_bkg_mu",5.1,4.5,5.5)
     mean_top_bkg_el = R.RooRealVar("mean_top_bkg_el","mean_top_bkg_el",5.1,4.5,5.5)    

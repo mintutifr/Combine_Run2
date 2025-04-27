@@ -8,6 +8,10 @@
                "sigmaG2Frac_mu": 0.885 , "sigmaG2Frac_mu_error": 0.015 ,
                "sigmaG2Frac_el": 0.940 , "sigmaG2Frac_el_error": 0.020
         },
+        "UL2016": {
+               "sigmaG2Frac_mu": 0.931 , "sigmaG2Frac_mu_error": 0.098 ,
+               "sigmaG2Frac_el": 0.864 , "sigmaG2Frac_el_error": 0.083
+        },
 	"UL2016preVFP": {
                "sigmaG2Frac_mu": 0.941 , "sigmaG2Frac_mu_error": 0.022 ,
                "sigmaG2Frac_el": 0.944 , "sigmaG2Frac_el_error": 0.028
@@ -25,6 +29,10 @@
 	"UL2017":{
                 "mean_top_bkg_mu": 5.108 , "mean_top_bkg_mu_error": 0.013 , "sigmaL_topbkg_mu" : 0.1635 , "sigmaL_topbkg_mu_error" : 0.0076 , "sigmaFracR_mu" : 0.920 , "sigmaFracR_mu_error" : 0.086 ,
                 "mean_top_bkg_el": 5.117 , "mean_top_bkg_el_error": 0.013 , "sigmaL_topbkg_el" : 0.1688 , "sigmaL_topbkg_el_error" : 0.0075 , "sigmaFracR_el" : 0.931 , "sigmaFracR_el_error" : 0.085
+        },
+        "UL2016":{
+                "mean_top_bkg_mu": 5.1146 , "mean_top_bkg_mu_error": 0.0089 , "sigmaL_topbkg_mu" : 0.1728 , "sigmaL_topbkg_mu_error" : 0.0054 , "sigmaFracR_mu" : 0.987 , "sigmaFracR_mu_error" : 0.064 ,
+                "mean_top_bkg_el": 5.112 , "mean_top_bkg_el_error": 0.013 , "sigmaL_topbkg_el" : 0.1835 , "sigmaL_topbkg_el_error" : 0.0081 , "sigmaFracR_el" : 0.911 , "sigmaFracR_el_error" : 0.081
         },
 	"UL2016preVFP":{
                 "mean_top_bkg_mu": 5.105 , "mean_top_bkg_mu_error": 0.013 , "sigmaL_topbkg_mu" : 0.1705 , "sigmaL_topbkg_mu_error" : 0.0078 , "sigmaFracR_mu" : 0.982 , "sigmaFracR_mu_error" : 0.091 ,
@@ -44,6 +52,10 @@
 	"UL2017": {
                 "peak_mu" : 5.054 , "peak_mu_error" : 0.012, "tail_mu" : -0.2116 , "tail_mu_error" : 0.039 , "width_Novo_mu" : 0.1826 , "width_Novo_mu_error" : 0.0019,
                 "peak_el" : 5.091 , "peak_el_error" : 0.011, "tail_el" : -0.0560 , "tail_el_error" : 0.032 , "width_Novo_el" : 0.1903 , "width_Novo_el_error" : 0.0012
+        },
+        "UL2016": {
+                "peak_mu" : 5.0776 , "peak_mu_error" : 0.0085, "tail_mu" : -0.1280 , "tail_mu_error" : 0.027 , "width_Novo_mu" : 0.1919 , "width_Novo_mu_error" : 0.0012,
+                "peak_el" : 5.064 , "peak_el_error" : 0.011, "tail_el" : -0.1360 , "tail_el_error" : 0.036 , "width_Novo_el" : 0.2046 , "width_Novo_el_error" : 0.0017
         },
 	"UL2016preVFP": {
                 "peak_mu" : 5.077 , "peak_mu_error" : 0.011, "tail_mu" : -0.1140 , "tail_mu_error" : 0.033 , "width_Novo_mu" : 0.1868 , "width_Novo_mu_error" : 0.0019,

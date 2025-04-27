@@ -62,7 +62,8 @@ Combine_year_tag={
                 'UL2016preVFP' :  "_ULpre16",
                 'UL2016postVFP' : "_ULpost16",
                 'UL2017' : "_UL17",
-                'UL2018' : "_UL18"}
+                'UL2018' : "_UL18",
+                'UL2016' : "_UL16"}
 
 tag = Combine_year_tag[dataYear]
 

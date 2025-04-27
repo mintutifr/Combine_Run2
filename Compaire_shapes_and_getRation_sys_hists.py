@@ -48,7 +48,8 @@ Combine_year_tag={
                 'UL2016preVFP' :  "_ULpre16",
                 'UL2016postVFP' : "_ULpost16",
                 'UL2017' : "_UL17",
-                'UL2018' : "_UL18"}
+                'UL2018' : "_UL18",
+                'UL2016' : "_UL16"}
 
 
 # Function to set histogram style based on systematic type and whether it's Up or Down
