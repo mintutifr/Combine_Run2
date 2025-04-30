@@ -124,8 +124,8 @@ def get_linearity_plot(M_true, M_fit, Ey1, Size, variable="S", BDTCUT="0p8"):
         variable = "fit_Mass"
     
     outfilename = "Plots/Linearity_" + variable + "_" + BDTCUT
-    c1.Print(outfilename + ".png")
-    c1.Print(outfilename + ".pdf")
+    c1.Print(outfilename + "_add_UL16.png")
+    c1.Print(outfilename + "_add_UL16.pdf")
     #c1.Print(outfilename + ".C")
     
 # Example usage:
@@ -283,8 +283,8 @@ def get_calib_hist(M_fit, detaM, EM_Fit, Size, variable="S", BDTCUT="0p8", poli=
         variable = "fit_Mass"
 
     outfilename = "Plots/Calibration_" + poli + "_" + variable + "_" + BDTCUT
-    c2.Print(outfilename + ".png")
-    c2.Print(outfilename + ".pdf")
+    c2.Print(outfilename + "_add_UL16.png")
+    c2.Print(outfilename + "_add_UL16.pdf")
     #c2.Print(outfilename + ".C")
     
     return hban,param_value
@@ -357,7 +357,7 @@ if __name__ == '__main__':
     Error_Reso_Run2_AltWidth_DNN_gt0p7 = [0.264,0.261,0.254,0.257,0.263,0.252,0.276,0.271]
 
 
-
+    # resutls 15/04/2025  (for detail look in the cernbox spreadsheet)
     M_AltMassfit_Run2_AltMass_DNN_gt0p7 = [163.601, 164.296, 164.774, 165.226, 165.601, 165.889, 166.533]
     Error_M_AltMassfit_Run2_AltMass_DNN_gt0p7 = [0.233, 0.191, 0.204, 0.188, 0.208, 0.188, 0.223]
     detaM_Run2_AltMass_DNN_gt0p7 = [5.899, 6.204, 6.726, 7.274, 7.899, 8.611, 8.967]
@@ -372,6 +372,23 @@ if __name__ == '__main__':
     deltaS_AltWidthfit_Run2_AltWidth_DNN_gt0p7 = [18.164, 18.037, 17.866, 17.692, 17.612, 17.516, 17.338, 17.162]
     Reso_Run2_AltWidth_DNN_gt0p7 = [18.899, 18.915, 18.934, 18.948, 18.961, 18.957, 18.962, 18.967]
     Error_Reso_Run2_AltWidth_DNN_gt0p7 = [0.184, 0.197, 0.297, 0.185, 0.165, 0.167, 0.187, 0.163]
+
+
+    # resutls 27/04/2025  (for detail look in the cernbox spreadsheet) (with only one fit for UL2016)
+    M_AltMassfit_Run2_AltMass_DNN_gt0p7 = [163.528, 164.233, 164.712, 165.165, 165.540, 165.827, 166.477]
+    Error_M_AltMassfit_Run2_AltMass_DNN_gt0p7 = [0.200, 0.204, 0.195, 0.228, 0.194, 0.187, 0.211]
+    detaM_Run2_AltMass_DNN_gt0p7 = [5.972, 6.267, 6.788, 7.335, 7.960, 8.673, 9.023]
+    gamma_AltMassfit_Run2_AltWidth_DNN_gt0p7 = [0.11556, 0.11295, 0.11367, 0.11413, 0.11450, 0.11555, 0.11493]
+    Error_detaM_2018_AltMass_DNN_gt0p7 = []
+
+    LnM_AltWidthfit_Run2_AltMass_DNN_gt0p7 = [5.09996, 5.10009, 5.10023, 5.10035, 5.10043, 5.10045, 5.10054, 5.10062]
+    gamma_AltWidthfit_Run2_AltWidth_DNN_gt0p7 = [0.11359, 0.11372, 0.11387, 0.11401, 0.11413, 0.11414, 0.11427, 0.11439]
+    Error_gamma_AltWidthfit_Run2_AltWidth_DNN_gt0p7 = [0.00087, 0.00100, 0.00120, 0.00101, 0.00134, 0.00095, 0.00118, 0.00125]
+    S_AltWidthfit_Run2_AltWidth_DNN_gt0p7 = [18.8117, 18.8361, 18.8641, 18.8900, 18.9118, 18.9139, 18.9375, 18.9593]
+    Error_S_AltWidthfit_Run2_AltWidth_DNN_gt0p7 = [0.153, 0.176, 0.209, 0.177, 0.233, 0.167, 0.206, 0.218]
+    deltaS_AltWidthfit_Run2_AltWidth_DNN_gt0p7 = [18.062, 17.936, 17.764, 17.590, 17.512, 17.414, 17.238, 17.059]
+    Reso_Run2_AltWidth_DNN_gt0p7 = [18.797, 18.815, 18.832, 18.845, 18.860, 18.854, 18.861, 18.864]
+    Error_Reso_Run2_AltWidth_DNN_gt0p7 = [0.153, 0.175, 0.209, 0.177, 0.233, 0.167, 0.205, 0.217]
 
 
     get_linearity_plot(M_true, M_AltMassfit_Run2_AltMass_DNN_gt0p7, Error_M_AltMassfit_Run2_AltMass_DNN_gt0p7,len(M_true), variable="M", BDTCUT="gt0p7_Run2")
@@ -397,7 +414,9 @@ if __name__ == '__main__':
     print(f'{calibrated_mass = }')
     print(f'{Error_calibrated_mass = }')
 
-    get_linearity_plot(M_true, calibrated_mass, Error_calibrated_mass,len(M_true), variable="M", BDTCUT="gt0p7_Run2_closer")
+    get_linearity_plot(M_true, np.array(calibrated_mass)-172.5, Error_calibrated_mass,len(M_true), variable="M", BDTCUT="gt0p7_Run2_closer")
+    print(f'{np.array(calibrated_mass).round(2) = }')
+    print(f'{M_true = }')
     print(f'{mass_cali_fitPar = }')
    # ======= closer width =======
 
@@ -406,12 +425,15 @@ if __name__ == '__main__':
         cali_width, Error_cali_width = get_calibrated_width(hband_width,mass,sigmaG,width_cali_fitPar[1],width_cali_fitPar[0])
         calibrated_width.append(cali_width)
         Error_calibrated_width.append(Error_cali_width)
-    print(f'{calibrated_width = }')
-    print(f'{Error_calibrated_width = }')
+    print(f'{np.array(calibrated_width).round(2) = }')
+    print(f'{np.array(Error_calibrated_width).round(2) = }')
    
     get_linearity_plot(Width_true, calibrated_width, Error_calibrated_width,len(Width_true), variable="S", BDTCUT="gt0p7_Run2_closer")
     
     mass = 5.10074
     sigmaG = 0.11469
+    mass = LnM_AltWidthfit_Run2_AltMass_DNN_gt0p7[3]
+    sigmaG = gamma_AltWidthfit_Run2_AltWidth_DNN_gt0p7[3]
+    
     print(get_calibrated_mass(hband_mass,mass,sigmaG,mass_cali_fitPar[1],mass_cali_fitPar[0]))
     print(get_calibrated_width(hband_width,mass,sigmaG,width_cali_fitPar[1],width_cali_fitPar[0]))
