@@ -1,0 +1,104 @@
+{
+    "topSig": {
+        "bWeight": {
+            "bWeight_lfUp": 1.016,
+            "bWeight_lfDown": 0.978,
+            "bWeight_hfUp": 0.998,
+            "bWeight_hfDown": 1.0,
+            "bWeight_cferr1Up": 1.007,
+            "bWeight_cferr1Down": 0.993,
+            "bWeight_cferr2Up": 1.004,
+            "bWeight_cferr2Down": 0.996,
+            "bWeight_lfstats1Up": 0.994,
+            "bWeight_lfstats1Down": 1.006,
+            "bWeight_lfstats2Up": 0.995,
+            "bWeight_lfstats2Down": 1.004,
+            "bWeight_hfstats1Up": 0.996,
+            "bWeight_hfstats1Down": 1.004,
+            "bWeight_hfstats2Up": 1.0,
+            "bWeight_hfstats2Down": 1.0,
+            "bWeight_jesUp": 1.003,
+            "bWeight_jesDown": 0.998
+        },
+        "puWeight": {
+            "puWeightUp": 0.982,
+            "puWeightDown": 1.018
+        },
+        "sf_iso": {
+            "IsoUp": 1.001,
+            "IsoDown": 0.999,
+            "IDUp": 1.0,
+            "IDDown": 1.0,
+            "TrigUp": 1.0,
+            "TrigDown": 1.0
+        }
+    },
+    "topBkg": {
+        "bWeight": {
+            "bWeight_lfUp": 1.015,
+            "bWeight_lfDown": 0.98,
+            "bWeight_hfUp": 0.998,
+            "bWeight_hfDown": 1.001,
+            "bWeight_cferr1Up": 1.003,
+            "bWeight_cferr1Down": 0.997,
+            "bWeight_cferr2Up": 1.002,
+            "bWeight_cferr2Down": 0.998,
+            "bWeight_lfstats1Up": 0.995,
+            "bWeight_lfstats1Down": 1.005,
+            "bWeight_lfstats2Up": 0.996,
+            "bWeight_lfstats2Down": 1.004,
+            "bWeight_hfstats1Up": 0.996,
+            "bWeight_hfstats1Down": 1.004,
+            "bWeight_hfstats2Up": 1.0,
+            "bWeight_hfstats2Down": 0.999,
+            "bWeight_jesUp": 1.003,
+            "bWeight_jesDown": 0.997
+        },
+        "puWeight": {
+            "puWeightUp": 0.981,
+            "puWeightDown": 1.019
+        },
+        "sf_iso": {
+            "IsoUp": 1.001,
+            "IsoDown": 0.999,
+            "IDUp": 1.0,
+            "IDDown": 1.0,
+            "TrigUp": 1.0,
+            "TrigDown": 1.0
+        }
+    },
+    "ewkBkg": {
+        "bWeight": {
+            "bWeight_lfUp": 1.004,
+            "bWeight_lfDown": 0.994,
+            "bWeight_hfUp": 0.952,
+            "bWeight_hfDown": 1.048,
+            "bWeight_cferr1Up": 0.979,
+            "bWeight_cferr1Down": 1.021,
+            "bWeight_cferr2Up": 1.007,
+            "bWeight_cferr2Down": 0.994,
+            "bWeight_lfstats1Up": 0.99,
+            "bWeight_lfstats1Down": 1.011,
+            "bWeight_lfstats2Up": 0.988,
+            "bWeight_lfstats2Down": 1.012,
+            "bWeight_hfstats1Up": 0.999,
+            "bWeight_hfstats1Down": 1.001,
+            "bWeight_hfstats2Up": 1.0,
+            "bWeight_hfstats2Down": 1.0,
+            "bWeight_jesUp": 0.999,
+            "bWeight_jesDown": 1.001
+        },
+        "puWeight": {
+            "puWeightUp": 1.001,
+            "puWeightDown": 1.004
+        },
+        "sf_iso": {
+            "IsoUp": 1.001,
+            "IsoDown": 0.999,
+            "IDUp": 1.001,
+            "IDDown": 0.999,
+            "TrigUp": 1.0,
+            "TrigDown": 1.0
+        }
+    }
+}

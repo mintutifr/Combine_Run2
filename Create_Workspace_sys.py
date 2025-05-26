@@ -259,8 +259,8 @@ if __name__ == "__main__":
     sigmaG2_mu = R.RooFormulaVar("sigmaG2_mu","sigmaG2_mu","@0/@1",R.RooArgList(sigmaG,	sigmaG2Frac_mu))
     sigmaG2_el = R.RooFormulaVar("sigmaG2_el","sigmaG2_el","@0/@1",R.RooArgList(sigmaG,sigmaG2Frac_el))
     #signal Bifrac gaussian pdf
-    sig_pdf_mu = R.RooBifurGauss("sig_pdf_mu","gauss_mu",logM,mean_formula_mu,sigmaG_formula_mu,sigmaG2_mu)
-    sig_pdf_el = R.RooBifurGauss("sig_pdf_el","gauss_el",logM,mean_formula_el,sigmaG_formula_el,sigmaG2_el)
+    sig_pdf_mu = R.RooBifurGauss("sig_pdf_mu","Bifurgauss_mu",logM,mean_formula_mu,sigmaG_formula_mu,sigmaG2_mu)
+    sig_pdf_el = R.RooBifurGauss("sig_pdf_el","Bifurgauss_el",logM,mean_formula_el,sigmaG_formula_el,sigmaG2_el)
 
     # print(f"{sig_pdf_mu.Print() = }")
     # print(f"{sig_pdf_el.Print() = }")
@@ -299,8 +299,8 @@ if __name__ == "__main__":
     sigmaR_mu = R.RooFormulaVar("sigmaR_mu","sigmaR_mu","@0/@1",R.RooArgList(sigmaL_topbkg_mu,sigmaFracR_mu))
     sigmaR_el = R.RooFormulaVar("sigmaR_el","sigmaR_el","@0/@1",R.RooArgList(sigmaL_topbkg_el,sigmaFracR_el))
 
-    topbkg_pdf_mu = R.RooBifurGauss("topbkg_pdf_mu","gauss_mu",logM,mean_top_bkg_mu,sigmaL_topbkg_mu,sigmaR_mu)
-    topbkg_pdf_el = R.RooBifurGauss("topbkg_pdf_el","gauss_el",logM,mean_top_bkg_el,sigmaL_topbkg_el,sigmaR_el)
+    topbkg_pdf_mu = R.RooBifurGauss("topbkg_pdf_mu","Bifurgauss_mu",logM,mean_top_bkg_mu,sigmaL_topbkg_mu,sigmaR_mu)
+    topbkg_pdf_el = R.RooBifurGauss("topbkg_pdf_el","Bifurgauss_el",logM,mean_top_bkg_el,sigmaL_topbkg_el,sigmaR_el)
     
 
 
@@ -342,8 +342,8 @@ if __name__ == "__main__":
     print( "Nsig_norm: ",nSig_mu,"\tNTop_norm: ",nTop_mu,"\tNEwk_norm: ",nEWK_mu,'\n')
 
     sig_pdf_mu_norm = R.RooRealVar("sig_pdf_mu_norm","sig_pdf_mu_norm",nSig_mu)
-    topbkg_pdf_mu_norm = R.RooRealVar("topbkg_pdf_mu_norm","topbkg_pdf_mu_norm",nTop_mu)#,0,10*nTop_mu)
-    EWKbkg_pdf_mu_norm = R.RooRealVar("EWKbkg_pdf_mu_norm","EWKbkg_pdf_mu_norm",nEWK_mu)#,0,10*nEWK_mu)
+    topbkg_pdf_mu_norm = R.RooRealVar("topbkg_pdf_mu_norm","topbkg_pdf_mu_norm",nTop_mu,0.5*nTop_mu,3*nTop_mu)
+    EWKbkg_pdf_mu_norm = R.RooRealVar("EWKbkg_pdf_mu_norm","EWKbkg_pdf_mu_norm",nEWK_mu,0.5*nEWK_mu,3*nEWK_mu)
 
     #yields of signal and the background
     nSig_el = top_sig_el.Integral()
@@ -353,8 +353,8 @@ if __name__ == "__main__":
     print( "Nsig_norm: ",nSig_el, "\tNTop_norm: ",nTop_el,"\tNEwk_norm: ",nEWK_el,"\n")
 
     sig_pdf_el_norm = R.RooRealVar("sig_pdf_el_norm","sig_pdf_el_norm",nSig_el)
-    topbkg_pdf_el_norm = R.RooRealVar("topbkg_pdf_el_norm","topbkg_pdf_el_norm",nTop_el)#,0,10*nTop_el)
-    EWKbkg_pdf_el_norm = R.RooRealVar("EWKbkg_pdf_el_norm","EWKbkg_pdf_el_norm",nEWK_el)#,0,10*nEWK_el)
+    topbkg_pdf_el_norm = R.RooRealVar("topbkg_pdf_el_norm","topbkg_pdf_el_norm",nTop_el,0.5*nTop_el,3*nTop_el)
+    EWKbkg_pdf_el_norm = R.RooRealVar("EWKbkg_pdf_el_norm","EWKbkg_pdf_el_norm",nEWK_el,0.5*nEWK_el,3*nEWK_el)
 
     if(local_fit == None):
         #Create a new empty workspace

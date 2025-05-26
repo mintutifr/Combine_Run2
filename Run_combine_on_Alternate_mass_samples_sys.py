@@ -93,7 +93,7 @@ for Mass in mass_point:
     run_cmd(cmd_Runtext2workspace)
 
     #cmd_RunCombine = f"combine -M FitDiagnostics workspace_top_Mass_{Mass}_shape_comb_para{tag}.root -n _M{Mass}  --freezeParameters r --redefineSignalPOIs sigmaG,mean --setParameters mean=5.1,r=1,sigmaG=0.15  --X-rtd ADDNLL_CBNLL=0  --trackParameters mean,sigmaG --trackErrors mean,sigmaG --X-rtd TMCSO_AdaptivePseudoAsimov=0 --X-rtd TMCSO_PseudoAsimov=0 --plots  --saveShapes --saveWithUncertainties --saveWorkspace"# --expectSignal 1 -t -1 --saveToys" #--signalPdfNames='shapeSig_top_sig*' --backgroundPdfNames='shapeBkg_EWK_bkg*,shapeBkg_top_bkg*' 
-    cmd_RunCombine = f"combine -M FitDiagnostics workspace_top_Mass_{Mass}_shape_comb_para{tag}.root -n _M{Mass}{tag}  --redefineSignalPOIs mean,sigmaG  --setParameters mean=5.1,r=1,sigmaG=0.11 --setParameterRanges mean=5.0,5.3:sigmaG=0.05,0.7  --X-rtd ADDNLL_CBNLL=0  --trackParameters r,mean,sigmaG --trackErrors r,mean,sigmaG --X-rtd TMCSO_PseudoAsimov=0 --saveShapes --saveWithUncertainties --saveWorkspace --freezeParameters  r" #--plots" #-t -1 --saveToys"# --plots"
+    cmd_RunCombine = f"combine -M FitDiagnostics workspace_top_Mass_{Mass}_shape_comb_para{tag}.root -n _M{Mass}{tag}  --redefineSignalPOIs mean,sigmaG  --setParameters mean=5.1,r=1,sigmaG=0.11 --setParameterRanges mean=5.0,5.3:sigmaG=0.05,0.7  --X-rtd ADDNLL_CBNLL=0  --trackParameters r,mean,sigmaG --trackErrors r,mean,sigmaG --X-rtd TMCSO_PseudoAsimov=0 --saveShapes --saveWithUncertainties --saveWorkspace --freezeParameters  r --plots" #-t -1 --saveToys"# --plots"
     run_cmd(cmd_RunCombine)
     print(cmd_RunCombine)
     

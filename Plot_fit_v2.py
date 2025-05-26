@@ -4,6 +4,9 @@ import ROOT as rt
 import argparse as arg
 from Hist_style import *
 
+rt.gSystem.Load("libRooFitCore")
+rt.gSystem.Load("libRooFit")
+
 parser = arg.ArgumentParser(description='Create workspace for higgs combine')
 parser.add_argument('-m', '--mass', dest='mass_sample', default=[None], type=str, nargs=1, help="MC top mass sample ['data','1695', '1715', '1725', '1735', '1755']")
 parser.add_argument('-w', '--width', dest='width_sample', default=[None], type=str, nargs=1, help="MC top width sample ['data','190','170','150','130','090','075']")
@@ -49,9 +52,7 @@ def getprefit_hist(mass,width,lep):
     File_Dir ="/eos/home-m/mikumar/Higgs_Combine/CMSSW_14_1_0_pre4/src/HiggsAnalysis/Hist_for_workspace/"
 
     Filename = File_Dir+"Combine_Input_lntopMass_histograms_"+dataYear+"_"+lep+"_gteq0p7_withoutDNNfit_rebin.root"
-    Filename_cont = File_Dir+"Combine_Input_lntopMass_histograms_"+dataYear+"_"+lep+"_gteq0p3_withoutDNNfit_rebin.root"
     File = rt.TFile(Filename,"Read")
-    File_cont = rt.TFile(Filename_cont,"Read")
     gt_or_lt_tag=''
     if('gteq' in Filename):gt_or_lt_tag = '_gt'
     if('lt' in Filename):gt_or_lt_tag = '_lt'   
@@ -59,8 +60,6 @@ def getprefit_hist(mass,width,lep):
     rt.gROOT.cd()
     #Get the file and director where historgrams are stored for muon final state
     Dir = File.GetDirectory(lep+"jets")
-    Dir_cont = File_cont.GetDirectory(lep+"jets")
-    #Get Mc histograms for muon final state
     if(mass!=None):
         if(mass == "data"): mass = "1725"
         top_sig = Dir.Get("top_sig_"+mass+tag+gt_or_lt_tag)
@@ -73,9 +72,6 @@ def getprefit_hist(mass,width,lep):
         
     top_bkg = Dir.Get("top_bkg_1725"+tag+gt_or_lt_tag)
     EWK_bkg = Dir.Get("EWK_bkg"+tag+gt_or_lt_tag)
-    EWK_bkg_cont = Dir_cont.Get("EWK_bkg"+tag+gt_or_lt_tag)
-    EWK_bkg_cont.Scale(EWK_bkg.Integral()/EWK_bkg_cont.Integral())
-    EWK_bkg = EWK_bkg_cont.Clone()
     QCD = Dir.Get("QCD_DD"+tag+gt_or_lt_tag)
     Data = Dir.Get("data_obs")
    
@@ -115,11 +111,14 @@ def Get_hist_from_Tgraph_asy_Error(Tgraph,Hist):
     return newHist
 
 def getthefit(mass,width,lep):
-    if(mass!=None):fitfile = rt.TFile.Open("fitDiagnostics_M"+mass+".root")
-    else : fitfile = rt.TFile.Open("fitDiagnostics_W"+width+".root")
+    pass
+    if(mass!=None):fitfile = rt.TFile.Open(f"fitDiagnostics_M{mass}{tag}.root")
+    else : fitfile = rt.TFile.Open(f"fitDiagnostics_W{width}{tag}.root")
     print(lep+"jets"+tag+"_logM_fit_s" + " if you dont find this dir in the fitDiagnostic file the check if you run the combine command with --plot option")
     fit = fitfile.Get(lep+"jets"+tag+"_logM_fit_s")
-    fit.Print()
+    #fit = fitfile.Get("fit_s")
+    #fit.Print()
+    
     prefit_hists = getprefit_hist(mass,width,lep) #return top_sig,topbkg,EWK_bkg
     rt.gROOT.cd()
     Data_prefit_from_input_file = prefit_hists[0].Clone()  
@@ -169,17 +168,17 @@ def getthefit(mass,width,lep):
     SigPDF = fit.findObject("pdf_bin"+lep+"jets"+tag+"_Norm[logM]_Comp[shapeSig*]")
     BkgPDF = fit.findObject("pdf_bin"+lep+"jets"+tag+"_Norm[logM]_Comp[shapeBkg*]")
     
-    """if(mass!=None):fitfile = rt.TFile.Open("fitDiagnostics_M"+mass+".root")
-    else : fitfile = rt.TFile.Open("fitDiagnostics_width"+width+".root")
-    fit = fitfile.Get(lep+"jets_logM_fit_s")
-    #fit.Print()
+    # if(mass!=None):fitfile = rt.TFile.Open("fitDiagnostics_M"+mass+".root")
+    # else : fitfile = rt.TFile.Open("fitDiagnostics_width"+width+".root")
+    # fit = fitfile.Get(lep+"jets_logM_fit_s")
+    # #fit.Print()
 
-    Data_postfit_roohist = fit.findObject("h_"+lep+"jets")
-    #Data_postfit_roohist.SetFillCOlor(R.kRed)
-    ResultPDF = fit.findObject("pdf_bin"+lep+"jets_Norm[logM]")
-    ResultPDF_error = fit.findObject("pdf_bin"+lep+"jets_Norm[logM]_errorband")
-    SigPDF = fit.findObject("pdf_bin"+lep+"jets_Norm[logM]_Comp[shapeSig*]")
-    BkgPDF = fit.findObject("pdf_bin"+lep+"jets_Norm[logM]_Comp[shapeBkg*]")"""
+    # Data_postfit_roohist = fit.findObject("h_"+lep+"jets")
+    # #Data_postfit_roohist.SetFillCOlor(R.kRed)
+    # ResultPDF = fit.findObject("pdf_bin"+lep+"jets_Norm[logM]")
+    # ResultPDF_error = fit.findObject("pdf_bin"+lep+"jets_Norm[logM]_errorband")
+    # SigPDF = fit.findObject("pdf_bin"+lep+"jets_Norm[logM]_Comp[shapeSig*]")
+    # BkgPDF = fit.findObject("pdf_bin"+lep+"jets_Norm[logM]_Comp[shapeBkg*]")
 
         
     legend = rt.TLegend(0.58, 0.55, 0.78, 0.79)
@@ -297,7 +296,7 @@ def getthefit(mass,width,lep):
         #print(pull," : ", pull_err, " : ",sigma_pull, " : ",  cont_prefit - cont_postfit)
         h_ratio.SetBinContent(iBin, pull)
         h_ratio.SetBinError(iBin, pull_err)
-        #Add QCD_DD for the syst band"""
+        #Add QCD_DD for the syst band
 
     h_ratio.SetFillColor(rt.kGray+3)
     h_ratio.SetFillStyle(3001)

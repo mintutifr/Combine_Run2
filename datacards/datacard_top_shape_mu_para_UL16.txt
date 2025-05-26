@@ -1,0 +1,25 @@
+imax 1 number of bins
+jmax 2 number of processes minus 1
+kmax * number of nuisance parameters
+----------------------------------------------------------------------------------------------------------------------------------
+shapes EWK_bkg   mujets    workspace_UL16.root w_UL16:EWKbkg_pdf_mu
+shapes data_obs  mujets    workspace_UL16.root w_UL16:data_mu
+shapes top_bkg   mujets    workspace_UL16.root w_UL16:topbkg_pdf_mu
+shapes top_sig   mujets    workspace_UL16.root w_UL16:sig_pdf_mu
+----------------------------------------------------------------------------------------------------------------------------------
+bin          mujets 
+observation  -1       
+----------------------------------------------------------------------------------------------------------------------------------
+bin                             mujets   mujets   mujets   
+process                         top_sig  EWK_bkg  top_bkg 
+process                         0        1        2          
+rate                            1        1        1           
+----------------------------------------------------------------------------------------------------------------------------------
+# cons_EWK_bkg            lnN     -        1.06      -             
+cons_top_sig            lnN     1.058     -        - 
+cons_top_bkg            lnN     -        -        1.053 
+lumi                    lnN     1.0026   1.0026   1.0026
+lumi_UL16_UL17_UL18     lnN     1.0130   1.0130   1.0130
+
+# ===== sys  ====
+
