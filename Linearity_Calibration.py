@@ -87,7 +87,7 @@ def get_linearity_plot(M_true, M_fit, Ey1, Size, variable="S", BDTCUT="0p8"):
     if variable == "M":
         grint.GetXaxis().SetTitle("m_{True}-172.5 (GeV)")
         if("closer" in BDTCUT):
-            grint.GetYaxis().SetTitle("m_{Calibrated} (GeV)")
+            grint.GetYaxis().SetTitle("m_{Calibrated} - 172.5 (GeV)")
         else:
             grint.GetYaxis().SetTitle("m_{Fit} (GeV)")
         grint.GetYaxis().SetTitleOffset(1.4)
@@ -96,7 +96,7 @@ def get_linearity_plot(M_true, M_fit, Ey1, Size, variable="S", BDTCUT="0p8"):
     elif variable == "S":
         grint.GetXaxis().SetTitle("#Gamma_{t}-1.4 (GeV)")
         if("closer" in BDTCUT):
-            grint.GetYaxis().SetTitle("#sigma_{Calibrated} (GeV)")
+            grint.GetYaxis().SetTitle("#sigma_{Calibrated} - 1.4 (GeV)")
         else:
             grint.GetYaxis().SetTitle("#sigma_{Fit} (GeV)")
         grint.GetYaxis().SetTitleOffset(1.7)
@@ -133,7 +133,6 @@ def get_linearity_plot(M_true, M_fit, Ey1, Size, variable="S", BDTCUT="0p8"):
 # M_fit = [...]   # Fill in your data
 # Ey1 = [...]     # Fill in your data
 # get_linearity_plot(M_true, M_fit, Ey1)
-
 
 """def get_realWidth(h1, fitvalue, par0, par1, par2, Variable="M",poli = "pol1"):
     offset = fitvalue*fitvalue*par2 + fitvalue*par1 + par0
@@ -174,6 +173,7 @@ def get_calibrated_mass(h1,mass,sigmaG,m,c): #linear for now
     lnmass = math.exp(mass+(sigmaG*sigmaG)/2)
     cali_error = h1.GetBinError(h1.FindBin(lnmass))
     deltaM = lnmass*m+c
+    print(mass,sigmaG,lnmass, deltaM )
     mass_calibrated = lnmass+deltaM
     #print(mass_calibrated)
     return [mass_calibrated,cali_error]
@@ -390,6 +390,38 @@ if __name__ == '__main__':
     Reso_Run2_AltWidth_DNN_gt0p7 = [18.797, 18.815, 18.832, 18.845, 18.860, 18.854, 18.861, 18.864]
     Error_Reso_Run2_AltWidth_DNN_gt0p7 = [0.153, 0.175, 0.209, 0.177, 0.233, 0.167, 0.205, 0.217]
 
+    # resutls 24/06/2025 (Combine UL2018 r = 1 freez) 30 bins + addiational systematics (with only fit for UL2016 )
+    M_AltMassfit_2018_AltMass_DNN_gt0p7 = [163.411,163.928,164.333,164.936,165.318,165.597,166.412]
+    Error_M_AltMassfit_2018_AltMass_DNN_gt0p7 = [0.298,0.352,0.348,0.353,0.354,0.340,1.437]
+    detaM_2018_AltMass_DNN_gt0p7 = [6.089,6.572,7.167,7.564,8.182,8.903,9.088]
+    gamma_AltMassfit_2018_AltWidth_DNN_gt0p7 = [0.109146,0.106588,0.107092,0.107646,0.107603,0.108608,0.106719]
+    Error_detaM_2018_AltMass_DNN_gt0p7 = []
+
+    LnM_AltWidthfit_2018_AltMass_DNN_gt0p7 = [5.0996055,5.0996432,5.0996749,5.0997235,5.0997650,5.0997530,5.0997916,5.0998371]
+    gamma_AltWidthfit_2018_AltWidth_DNN_gt0p7 = [0.107582,0.107586,0.107589,0.107615,0.107646,0.107635,0.107669,0.107710]
+    Error_gamma_AltWidthfit_2018_AltWidth_DNN_gt0p7 = [0.001865,0.001635,0.001670,0.001653,0.001625,0.001842,0.001642,0.001694]
+    S_AltWidthfit_2018_AltWidth_DNN_gt0p7 = [17.7927,17.7940,17.7951,17.8004,17.8064,17.8042,17.8105,17.8183]
+    Error_S_AltWidthfit_2018_AltWidth_DNN_gt0p7 = [0.330,0.287,0.293,0.291,0.286,0.326,0.289,0.299]
+    deltaS_AltWidthfit_2018_AltWidth_DNN_gt0p7 = [17.043,16.894,16.695,16.500,16.406,16.304,16.111,15.918  ]
+    Reso_2018_AltWidth_DNN_gt0p7 = [17.777,17.771,17.761,17.753,17.751,17.741,17.729,17.717]
+    Error_Reso_2018_AltWidth_DNN_gt0p7 = [0.330,0.286,0.293,0.290,0.285,0.325,0.288,0.298]
+
+     # resutls 25/06/2025 (Combine Run2 r = 1 freez) 30 bins + addiational systematics (with only fit for UL2016 )
+    LnM_AltMassfit_Run2_AltMass_DNN_gt0p7 = [5.089803, 5.093250, 5.095714, 5.098595, 5.100626, 5.102510, 5.106882]
+    M_AltMassfit_Run2_AltMass_DNN_gt0p7 = [163.326, 163.834, 164.242, 164.720, 165.054, 165.379, 166.092]
+    Error_M_AltMassfit_Run2_AltMass_DNN_gt0p7 = [0.257, 0.279, 0.279, 0.313, 0.233, 0.230, 0.241]
+    detaM_Run2_AltMass_DNN_gt0p7 = [6.174, 6.666, 7.258, 7.780, 8.446, 9.121, 9.408]
+    gamma_AltMassfit_Run2_AltWidth_DNN_gt0p7 = [0.109068, 0.105876, 0.106073, 0.106324, 0.106263, 0.107066, 0.106415]
+    Error_detaM_2018_AltMass_DNN_gt0p7 = []
+
+    LnM_AltWidthfit_Run2_AltMass_DNN_gt0p7 = [5.098349, 5.098409, 5.098484, 5.098546, 5.098595, 5.098609, 5.098668, 5.098724]
+    gamma_AltWidthfit_Run2_AltWidth_DNN_gt0p7 = [0.106142, 0.106174, 0.106224, 0.106270, 0.106324, 0.106323, 0.106379, 0.106436]
+    Error_gamma_AltWidthfit_Run2_AltWidth_DNN_gt0p7 = [0.001131, 0.001014, 0.001536, 0.001173, 0.001282, 0.001012, 0.001313, 0.001199]
+    S_AltWidthfit_Run2_AltWidth_DNN_gt0p7 = [17.5284, 17.5349, 17.5446, 17.5533, 17.5634, 17.5635, 17.5738, 17.5844]
+    Error_S_AltWidthfit_Run2_AltWidth_DNN_gt0p7 = [0.199, 0.178, 0.274, 0.208, 0.227, 0.178, 0.234, 0.212]
+    deltaS_AltWidthfit_Run2_AltWidth_DNN_gt0p7 = [16.778, 16.635, 16.445, 16.253, 16.163, 16.063, 15.874, 15.684]
+    Reso_Run2_AltWidth_DNN_gt0p7 = [17.512, 17.512, 17.510, 17.505, 17.507, 17.499, 17.491, 17.481]
+    Error_Reso_Run2_AltWidth_DNN_gt0p7 = [0.199, 0.178, 0.274, 0.207, 0.227, 0.178, 0.233, 0.211]
 
     get_linearity_plot(M_true, M_AltMassfit_Run2_AltMass_DNN_gt0p7, Error_M_AltMassfit_Run2_AltMass_DNN_gt0p7,len(M_true), variable="M", BDTCUT="gt0p7_Run2")
     hband_mass,mass_cali_fitPar = get_calib_hist(M_AltMassfit_Run2_AltMass_DNN_gt0p7, detaM_Run2_AltMass_DNN_gt0p7, Error_M_AltMassfit_Run2_AltMass_DNN_gt0p7,len(M_AltMassfit_Run2_AltMass_DNN_gt0p7), "M", "gt0p7_Run2", "pol1")
@@ -406,12 +438,16 @@ if __name__ == '__main__':
 
     # =====  Closer mass =========
 
+    print("======== Closer mass calibration ===================================================")
     for mass, sigmaG in zip(LnM_AltMassfit_Run2_AltMass_DNN_gt0p7,gamma_AltMassfit_Run2_AltWidth_DNN_gt0p7):
         #print(mass,sigmaG)
         cali_mass, Error_cali_mass = get_calibrated_mass(hband_mass,mass,sigmaG,mass_cali_fitPar[1],mass_cali_fitPar[0])
         calibrated_mass.append(cali_mass)
         Error_calibrated_mass.append(Error_cali_mass)
-    print(f'{calibrated_mass = }')
+    print("======== Closer mass calibration ========")
+    print(f'{np.array(calibrated_mass)-172.5 = }')
+    print(f'{np.array(calibrated_mass)-172.5 = }')
+    print(f'{np.array(M_true)-172.5 = }')
     print(f'{Error_calibrated_mass = }')
 
     get_linearity_plot(M_true, np.array(calibrated_mass)-172.5, Error_calibrated_mass,len(M_true), variable="M", BDTCUT="gt0p7_Run2_closer")
@@ -428,12 +464,12 @@ if __name__ == '__main__':
     print(f'{np.array(calibrated_width).round(2) = }')
     print(f'{np.array(Error_calibrated_width).round(2) = }')
    
-    get_linearity_plot(Width_true, calibrated_width, Error_calibrated_width,len(Width_true), variable="S", BDTCUT="gt0p7_Run2_closer")
+    get_linearity_plot(Width_true, np.array(calibrated_width)-1.4, Error_calibrated_width,len(Width_true), variable="S", BDTCUT="gt0p7_Run2_closer")
     
-    mass = 5.10074
-    sigmaG = 0.11469
     mass = LnM_AltWidthfit_Run2_AltMass_DNN_gt0p7[3]
     sigmaG = gamma_AltWidthfit_Run2_AltWidth_DNN_gt0p7[3]
+
+    print(f'fit {mass = } {sigmaG = }')
     
     print(get_calibrated_mass(hband_mass,mass,sigmaG,mass_cali_fitPar[1],mass_cali_fitPar[0]))
     print(get_calibrated_width(hband_width,mass,sigmaG,width_cali_fitPar[1],width_cali_fitPar[0]))

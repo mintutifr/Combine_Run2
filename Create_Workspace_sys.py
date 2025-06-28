@@ -10,8 +10,7 @@ from shape_Sys_variation_calculation import compute_variations
 
 #from TOY_local_fit import Toy_Mc 
 parser = arg.ArgumentParser(description='Create workspace for higgs combine')
-parser.add_argument('-m', '--mass', dest='mass_sample', default=[None], type=str, nargs=1, help="MC top mass sample [data , 1695, 1715, 1735, 1755]")
-parser.add_argument('-w', '--width', dest='width_sample', default=[None], type=str, nargs=1, help="MC top width sample ['data','190', '170', '150','130','090','075']")
+parser.add_argument('-mOw', '--massORwidth', dest='massORwidth_sample', default=[None], type=str, nargs=1, help="MC top massORwidth sample [data , 1695, 1715, 1735, 1755, '190', '170', '150','130','090','075']")
 #parser.add_argument('-d', '--isdata', dest='isRealData', default=[False], type=bool, nargs=1, help="run over real data ['True', 'False']")
 parser.add_argument('-y', '--year', dest='Year', default=['UL2017'], type=str, nargs=1, help="Year of Data collection [ UL2016preVFP  UL2016postVFP  UL2017  UL2018 ]")
 parser.add_argument('-f', '--localfit', dest='local_fit', default=[None], type=str, nargs=1, help="Local fit run for  ['sig','top_bkg','ewk_bkg','final', 'final_mu', 'final_el']")
@@ -20,8 +19,7 @@ parser.add_argument( '--DropFixParam', action="store_true", help=" call if you d
 args = parser.parse_args()
 
         
-mass  = args.mass_sample[0]
-width = args.width_sample[0]
+massORwidth  = args.massORwidth_sample[0]
 dataYear = args.Year[0]
 local_fit = args.local_fit[0]
 sys = args.sys[0]
@@ -29,14 +27,13 @@ print(f"{sys = }")
 date   = datetime.datetime.now()
 DropFixParam = args.DropFixParam
 
-if(mass=='data' or width =='data'):
+if(massORwidth=='data'):
 	RealData = True
-	mass = "1725"
+	massORwidth = "1725"
 else:
 	RealData = False
 
-print( "mass: ",mass)
-print( "width: ",width)
+print( "massORwidth: ",massORwidth)
 print( "RealData: ",RealData)
 print( "dataYear: ",dataYear)
 print( "localfit: ",local_fit)
@@ -98,10 +95,8 @@ if __name__ == "__main__":
     #Get the file and director where historgrams are stored for muon final state
     dir_mu = File_mu.GetDirectory("mujets")
     
-    if(mass!= None):
-        top_sig_mu = dir_mu.Get("top_sig_"+mass+tag+gt_or_lt_tag)
-    if(width!= None):
-        top_sig_mu = dir_mu.Get("top_sig_"+width+tag+gt_or_lt_tag)
+
+    top_sig_mu = dir_mu.Get("top_sig_"+massORwidth+tag+gt_or_lt_tag)
         
     top_bkg_mu = dir_mu.Get("top_bkg_1725"+tag+gt_or_lt_tag)
     EWK_bkg_mu = dir_mu.Get("EWK_bkg"+tag+gt_or_lt_tag)
@@ -126,10 +121,8 @@ if __name__ == "__main__":
     #Get the file and director where historgrams are stored for electron final state
     dir_el = File_el.GetDirectory("eljets")
     #Get Mc histograms for electron final state
-    if(mass!= None):
-        top_sig_el = dir_el.Get("top_sig_"+mass+tag+gt_or_lt_tag)
-    if(width!= None):
-        top_sig_el = dir_el.Get("top_sig_"+width+tag+gt_or_lt_tag)
+
+    top_sig_el = dir_el.Get("top_sig_"+massORwidth+tag+gt_or_lt_tag)
 
     top_bkg_el = dir_el.Get("top_bkg_1725"+tag+gt_or_lt_tag)
     EWK_bkg_el = dir_el.Get("EWK_bkg"+tag+gt_or_lt_tag)
@@ -341,9 +334,10 @@ if __name__ == "__main__":
     print("\nEvent Yield mu+jets\n=============================================")
     print( "Nsig_norm: ",nSig_mu,"\tNTop_norm: ",nTop_mu,"\tNEwk_norm: ",nEWK_mu,'\n')
 
-    sig_pdf_mu_norm = R.RooRealVar("sig_pdf_mu_norm","sig_pdf_mu_norm",nSig_mu)
-    topbkg_pdf_mu_norm = R.RooRealVar("topbkg_pdf_mu_norm","topbkg_pdf_mu_norm",nTop_mu,0.5*nTop_mu,3*nTop_mu)
-    EWKbkg_pdf_mu_norm = R.RooRealVar("EWKbkg_pdf_mu_norm","EWKbkg_pdf_mu_norm",nEWK_mu,0.5*nEWK_mu,3*nEWK_mu)
+    sig_pdf_mu_norm = R.RooRealVar("sig_pdf_mu_norm","sig_pdf_mu_norm",nSig_mu,0.5*nSig_mu,3*nSig_mu)
+    #sig_pdf_mu_norm.setConstant(True)
+    topbkg_pdf_mu_norm = R.RooRealVar("topbkg_pdf_mu_norm","topbkg_pdf_mu_norm",nTop_mu,0.5*nTop_mu,10*nTop_mu)
+    EWKbkg_pdf_mu_norm = R.RooRealVar("EWKbkg_pdf_mu_norm","EWKbkg_pdf_mu_norm",nEWK_mu,0.0*nEWK_mu,10*nEWK_mu)
 
     #yields of signal and the background
     nSig_el = top_sig_el.Integral()
@@ -352,9 +346,10 @@ if __name__ == "__main__":
     print("Event Yield el+jets\n=============================================")
     print( "Nsig_norm: ",nSig_el, "\tNTop_norm: ",nTop_el,"\tNEwk_norm: ",nEWK_el,"\n")
 
-    sig_pdf_el_norm = R.RooRealVar("sig_pdf_el_norm","sig_pdf_el_norm",nSig_el)
-    topbkg_pdf_el_norm = R.RooRealVar("topbkg_pdf_el_norm","topbkg_pdf_el_norm",nTop_el,0.5*nTop_el,3*nTop_el)
-    EWKbkg_pdf_el_norm = R.RooRealVar("EWKbkg_pdf_el_norm","EWKbkg_pdf_el_norm",nEWK_el,0.5*nEWK_el,3*nEWK_el)
+    sig_pdf_el_norm = R.RooRealVar("sig_pdf_el_norm","sig_pdf_el_norm",nSig_el,0.5*nSig_el,3*nSig_el)
+    #sig_pdf_el_norm.setConstant(True)
+    topbkg_pdf_el_norm = R.RooRealVar("topbkg_pdf_el_norm","topbkg_pdf_el_norm",nTop_el,0.5*nTop_el,10*nTop_el)
+    EWKbkg_pdf_el_norm = R.RooRealVar("EWKbkg_pdf_el_norm","EWKbkg_pdf_el_norm",nEWK_el,-0.1*nEWK_el,10*nEWK_el)
 
     if(local_fit == None):
         #Create a new empty workspace
@@ -457,7 +452,7 @@ if __name__ == "__main__":
         can_mu.Update()
         #raw_input()
         #write canvas in png image
-        can_mu.Print("Plots/Signal_only_local_fit"+mass+tag+gt_or_lt_tag+"_fix_par.png")
+        can_mu.Print("Plots/Signal_only_local_fit"+massORwidth+tag+gt_or_lt_tag+"_fix_par.png")
 
         
         
@@ -531,10 +526,8 @@ if __name__ == "__main__":
         #raw_input()
         #write canvas in png image
         
-        if(mass!=None):
-            can_mu_topbkg.Print("Plots/Topbkg_only_local_fit"+mass+tag+gt_or_lt_tag+"_fix_par.png")
-        if(width!=None):
-            can_mu_topbkg.Print("Plots/Topbkg_only_local_fit"+width+tag+gt_or_lt_tag+"_fix_par.png")
+
+        can_mu_topbkg.Print("Plots/Topbkg_only_local_fit"+massORwidth+tag+gt_or_lt_tag+"_fix_par.png")
 
         
         
@@ -604,16 +597,10 @@ if __name__ == "__main__":
         can_mu_ewkbkg.Update()
         #raw_input()
         #write canvas in png image
-        if(mass!=None):
-            can_mu_ewkbkg.Print("Plots/EWKbkg_only_local_fit_"+mass+tag+gt_or_lt_tag+"_fix_par.png")
-        if(width!=None):
-            can_mu_ewkbkg.Print("Plots/EWKbkg_only_local_fit_"+width+tag+gt_or_lt_tag+"_fix_par.png")
-        
-        
-        
-        
-        
-        
+
+        can_mu_ewkbkg.Print("Plots/EWKbkg_only_local_fit_"+massORwidth+tag+gt_or_lt_tag+"_fix_par.png")
+ 
+
 #########----------------------------------------------------###############------------------###########        
     if(local_fit == "final" or local_fit == "final_mu" or local_fit == "final_el"):
         print("locally fitting with full model")
@@ -821,8 +808,7 @@ if __name__ == "__main__":
             pad2.Update()
             can.Update()
             #raw_input()
-            if(mass!=None):can.Print("Plots/final_model_mu_"+mass+tag+gt_or_lt_tag+".png")
-            if(width!=None):can.Print("Plots/final_model_mu_"+width+tag+gt_or_lt_tag+".png")
+            can.Print("Plots/final_model_mu_"+massORwidth+tag+gt_or_lt_tag+".png")
             #raw_input()
             #Toy_Mc(model_mu_Final,logM,mean)		
 
@@ -956,8 +942,7 @@ if __name__ == "__main__":
 
             #raw_input()
 
-            if(mass!=None):can.Print("Plots/final_model_el_"+mass+tag+gt_or_lt_tag+".png")
-            if(width!=None):can.Print("Plots/final_model_el_"+width+tag+gt_or_lt_tag+".png")
+            can.Print("Plots/final_model_el_"+massORwidth+tag+gt_or_lt_tag+".png")
 
 
         
@@ -1013,5 +998,4 @@ if __name__ == "__main__":
             Frame_el.Draw() 
             
             leg.Draw()
-            if(mass!=None):can.Print("Plots/final_model_comb_"+mass+tag+gt_or_lt_tag+".png")
-            if(width!=None):can.Print("Plots/final_model_comb_"+width+tag+gt_or_lt_tag+".png")
+            can.Print("Plots/final_model_comb_"+massORwidth+tag+gt_or_lt_tag+".png")

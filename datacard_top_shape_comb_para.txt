@@ -1,0 +1,125 @@
+Combination of _UL18=datacard_top_shape_comb_para_UL18.txt  _UL17=datacard_top_shape_comb_para_UL17.txt  _UL16=datacard_top_shape_comb_para_UL16.txt
+imax 6 number of bins
+jmax 2 number of processes minus 1
+kmax 87 number of nuisance parameters
+----------------------------------------------------------------------------------------------------------------------------------
+shapes EWK_bkg            _UL16_eljets_UL16  datacards/workspace_UL16.root w_UL16:EWKbkg_pdf_el
+shapes data_obs           _UL16_eljets_UL16  datacards/workspace_UL16.root w_UL16:data_el
+shapes top_bkg            _UL16_eljets_UL16  datacards/workspace_UL16.root w_UL16:topbkg_pdf_el
+shapes top_sig            _UL16_eljets_UL16  datacards/workspace_UL16.root w_UL16:sig_pdf_el
+shapes EWK_bkg            _UL16_mujets_UL16  datacards/workspace_UL16.root w_UL16:EWKbkg_pdf_mu
+shapes data_obs           _UL16_mujets_UL16  datacards/workspace_UL16.root w_UL16:data_mu
+shapes top_bkg            _UL16_mujets_UL16  datacards/workspace_UL16.root w_UL16:topbkg_pdf_mu
+shapes top_sig            _UL16_mujets_UL16  datacards/workspace_UL16.root w_UL16:sig_pdf_mu
+shapes EWK_bkg            _UL17_eljets_UL17  datacards/workspace_UL17.root w_UL17:EWKbkg_pdf_el
+shapes data_obs           _UL17_eljets_UL17  datacards/workspace_UL17.root w_UL17:data_el
+shapes top_bkg            _UL17_eljets_UL17  datacards/workspace_UL17.root w_UL17:topbkg_pdf_el
+shapes top_sig            _UL17_eljets_UL17  datacards/workspace_UL17.root w_UL17:sig_pdf_el
+shapes EWK_bkg            _UL17_mujets_UL17  datacards/workspace_UL17.root w_UL17:EWKbkg_pdf_mu
+shapes data_obs           _UL17_mujets_UL17  datacards/workspace_UL17.root w_UL17:data_mu
+shapes top_bkg            _UL17_mujets_UL17  datacards/workspace_UL17.root w_UL17:topbkg_pdf_mu
+shapes top_sig            _UL17_mujets_UL17  datacards/workspace_UL17.root w_UL17:sig_pdf_mu
+shapes EWK_bkg            _UL18_eljets_UL18  datacards/workspace_UL18.root w_UL18:EWKbkg_pdf_el
+shapes data_obs           _UL18_eljets_UL18  datacards/workspace_UL18.root w_UL18:data_el
+shapes top_bkg            _UL18_eljets_UL18  datacards/workspace_UL18.root w_UL18:topbkg_pdf_el
+shapes top_sig            _UL18_eljets_UL18  datacards/workspace_UL18.root w_UL18:sig_pdf_el
+shapes EWK_bkg            _UL18_mujets_UL18  datacards/workspace_UL18.root w_UL18:EWKbkg_pdf_mu
+shapes data_obs           _UL18_mujets_UL18  datacards/workspace_UL18.root w_UL18:data_mu
+shapes top_bkg            _UL18_mujets_UL18  datacards/workspace_UL18.root w_UL18:topbkg_pdf_mu
+shapes top_sig            _UL18_mujets_UL18  datacards/workspace_UL18.root w_UL18:sig_pdf_mu
+----------------------------------------------------------------------------------------------------------------------------------
+bin          _UL18_mujets_UL18  _UL18_eljets_UL18  _UL17_mujets_UL17  _UL17_eljets_UL17  _UL16_mujets_UL16  _UL16_eljets_UL16
+observation  -1                 -1                 -1                 -1                 -1                 -1               
+----------------------------------------------------------------------------------------------------------------------------------
+bin                                            _UL18_mujets_UL18  _UL18_mujets_UL18  _UL18_mujets_UL18  _UL18_eljets_UL18  _UL18_eljets_UL18  _UL18_eljets_UL18  _UL17_mujets_UL17  _UL17_mujets_UL17  _UL17_mujets_UL17  _UL17_eljets_UL17  _UL17_eljets_UL17  _UL17_eljets_UL17  _UL16_mujets_UL16  _UL16_mujets_UL16  _UL16_mujets_UL16  _UL16_eljets_UL16  _UL16_eljets_UL16  _UL16_eljets_UL16
+process                                        top_sig            EWK_bkg            top_bkg            top_sig            EWK_bkg            top_bkg            top_sig            EWK_bkg            top_bkg            top_sig            EWK_bkg            top_bkg            top_sig            EWK_bkg            top_bkg            top_sig            EWK_bkg            top_bkg          
+process                                        0                  1                  2                  0                  1                  2                  0                  1                  2                  0                  1                  2                  0                  1                  2                  0                  1                  2                
+rate                                           1                  1                  1                  1                  1                  1                  1                  1                  1                  1                  1                  1                  1                  1                  1                  1                  1                  1                
+----------------------------------------------------------------------------------------------------------------------------------
+CMS_ID_el               lnN                    -                  -                  -                  0.993/1.007        0.993/1.007        0.993/1.007        -                  -                  -                  0.992/1.008        0.992/1.008        0.993/1.007        -                  -                  -                  0.993/1.007        0.993/1.007        0.993/1.007      
+CMS_ID_mu               lnN                    -                  -                  0.999/1.001        -                  -                  -                  0.999/1.001        0.999/1.001        0.999/1.001        -                  -                  -                  0.996/1.004        0.996/1.004        0.996/1.004        -                  -                  -                
+CMS_Iso_mu              lnN                    0.999/1.001        0.999/1.001        0.999/1.001        -                  -                  -                  0.999/1.001        0.999/1.001        0.999/1.001        -                  -                  -                  0.999/1.001        0.999/1.001        0.998/1.002        -                  -                  -                
+CMS_Trig_el             lnN                    -                  -                  -                  0.993/1.007        0.993/1.007        0.994/1.006        -                  -                  -                  0.992/1.008        0.992/1.008        0.993/1.007        -                  -                  -                  0.993/1.007        0.993/1.007        0.993/1.007      
+CMS_Trig_mu             lnN                    -                  -                  -                  -                  -                  -                  -                  -                  0.999/1.001        -                  -                  -                  -                  -                  -                  -                  -                  -                
+CMS_bWeight_cferr1      lnN                    0.993/1.007        0.997/1.003        0.979/1.021        0.994/1.006        0.998/1.002        0.979/1.021        0.992/1.007        0.997/1.003        0.974/1.024        0.992/1.008        0.998/1.002        0.968/1.03         0.994/1.006        0.998/1.002        0.979/1.019        0.994/1.006        0.998/1.002        0.977/1.02       
+CMS_bWeight_cferr2      lnN                    0.996/1.004        0.998/1.002        0.994/1.007        0.997/1.003        0.999/1.001        0.987/1.013        0.996/1.004        0.998/1.002        0.992/1.007        0.996/1.004        0.998/1.002        0.98/1.019         0.996/1.004        0.999/1.001        0.995/1.004        0.996/1.004        0.998/1.002        0.992/1.006      
+CMS_bWeight_hf          lnN                    0.998/1            0.998/1.001        0.952/1.048        0.998/1            0.998/1.001        0.933/1.066        0.998/1            0.997/1.001        0.948/1.051        0.999/1            0.998/1.001        0.997/1.002        0.999/1            0.998/1.001        0.937/1.062        0.999/1            0.998/1.001        0.942/1.057      
+CMS_bWeight_hfstats1_UL2016   lnN              -                  -                  -                  -                  -                  -                  -                  -                  -                  -                  -                  -                  0.99/1.009         0.991/1.008        0.999/1.001        0.99/1.009         0.991/1.009        0.998/1.002      
+CMS_bWeight_hfstats1_UL2017   lnN              -                  -                  -                  -                  -                  -                  0.995/1.004        0.996/1.004        0.999/1.001        0.995/1.004        0.995/1.004        0.998/1.002        -                  -                  -                  -                  -                  -                
+CMS_bWeight_hfstats1_UL2018   lnN              0.996/1.004        0.996/1.004        0.999/1.001        0.996/1.004        0.996/1.004        0.999/1.001        -                  -                  -                  -                  -                  -                  -                  -                  -                  -                  -                  -                
+CMS_bWeight_hfstats2_UL2016   lnN              -                  -                  -                  -                  -                  -                  -                  -                  -                  -                  -                  -                  0.999/1            -                  0.999/1            -                  -                  0.999/1.001      
+CMS_bWeight_hfstats2_UL2017   lnN              -                  -                  -                  -                  -                  -                  0.999/1            0.999/1.001        -                  0.999/1.001        0.999/1.001        -                  -                  -                  -                  -                  -                  -                
+CMS_bWeight_hfstats2_UL2018   lnN              -                  0.999/1            -                  0.999/1            0.999/1            -                  -                  -                  -                  -                  -                  -                  -                  -                  -                  -                  -                  -                
+CMS_bWeight_jes_UL2016   lnN                   -                  -                  -                  -                  -                  -                  -                  -                  -                  -                  -                  -                  1/1.004            0.999/1.004        0.997/1.002        0.999/1.004        0.999/1.005        0.994/1.005      
+CMS_bWeight_jes_UL2017   lnN                   -                  -                  -                  -                  -                  -                  1/1.001            0.999/1.002        0.999/1.004        0.999/1.001        0.999/1.002        0.996/1.002        -                  -                  -                  -                  -                  -                
+CMS_bWeight_jes_UL2018   lnN                   0.998/1.003        0.997/1.003        0.999/1.001        0.997/1.003        0.997/1.004        0.995/1.004        -                  -                  -                  -                  -                  -                  -                  -                  -                  -                  -                  -                
+CMS_bWeight_lf          lnN                    0.978/1.016        0.98/1.015         0.994/1.004        0.977/1.017        0.977/1.017        0.997/1.001        0.979/1.017        0.979/1.016        0.995/1.004        0.978/1.017        0.978/1.017        0.99/1.009         0.974/1.019        0.975/1.017        0.997/1.001        0.973/1.02         0.973/1.02         0.998/0.999      
+CMS_bWeight_lfstats1_UL2016   lnN              -                  -                  -                  -                  -                  -                  -                  -                  -                  -                  -                  -                  0.994/1.006        0.994/1.006        0.985/1.016        0.994/1.006        0.993/1.007        0.987/1.013      
+CMS_bWeight_lfstats1_UL2017   lnN              -                  -                  -                  -                  -                  -                  0.994/1.006        0.995/1.005        0.991/1.009        0.994/1.006        0.994/1.005        0.998/1.002        -                  -                  -                  -                  -                  -                
+CMS_bWeight_lfstats1_UL2018   lnN              0.994/1.006        0.995/1.005        0.99/1.011         0.995/1.005        0.995/1.005        0.991/1.009        -                  -                  -                  -                  -                  -                  -                  -                  -                  -                  -                  -                
+CMS_bWeight_lfstats2_UL2016   lnN              -                  -                  -                  -                  -                  -                  -                  -                  -                  -                  -                  -                  0.995/1.005        0.995/1.005        0.983/1.018        0.995/1.005        0.995/1.005        0.985/1.015      
+CMS_bWeight_lfstats2_UL2017   lnN              -                  -                  -                  -                  -                  -                  0.995/1.005        0.996/1.004        0.989/1.011        0.996/1.004        0.996/1.004        0.998/1.002        -                  -                  -                  -                  -                  -                
+CMS_bWeight_lfstats2_UL2018   lnN              0.995/1.004        0.996/1.004        0.988/1.012        0.996/1.004        0.996/1.004        0.988/1.013        -                  -                  -                  -                  -                  -                  -                  -                  -                  -                  -                  -                
+CMS_puWeight            lnN                    0.982/1.018        0.981/1.019        1.001/1.004        0.979/1.021        0.983/1.018        0.987/0.998        0.982/1.018        0.984/1.018        0.997/1.023        0.979/1.022        0.98/1.021         0.989/1.055        0.983/1.017        0.987/1.014        0.991/1.007        0.98/1.02          0.986/1.015        0.989/1.016      
+lumi                    lnN                    1.0065             1.0065             1.0065             1.0065             1.0065             1.0065             1.006              1.006              1.006              1.006              1.006              1.006              1.0026             1.0026             1.0026             1.0026             1.0026             1.0026           
+lumi_UL16_UL17_UL18     lnN                    1.013              1.013              1.013              1.013              1.013              1.013              1.013              1.013              1.013              1.013              1.013              1.013              1.013              1.013              1.013              1.013              1.013              1.013            
+lumi_UL17_UL18          lnN                    1.0027             1.0027             1.0027             1.0027             1.0027             1.0027             1.0027             1.0027             1.0027             1.0027             1.0027             1.0027             -                  -                  -                  -                  -                  -                
+x-sec_top_bkg_cons      lnN                    -                  -                  1.053              -                  -                  1.053              -                  -                  1.053              -                  -                  1.053              -                  -                  1.053              -                  -                  1.053            
+x_sec_EWK_cons          lnN                    -                  1.06               -                  -                  1.06               -                  -                  1.06               -                  -                  1.06               -                  -                  1.06               -                  -                  1.06               -                
+x_sec_sig_cons          lnN                    1.058              -                  -                  1.058              -                  -                  1.058              -                  -                  1.058              -                  -                  1.058              -                  -                  1.057              -                  -                
+nuisance_erdON  param  0.0 1.0
+nuisance_Gluonmove  param  0.0 1.0
+nuisance_QCDinspired  param  0.0 1.0
+nuisance_TuneCP5up  param  0.0 1.0
+nuisance_TuneCP5down  param  0.0 1.0
+nuisance_ISR  param  0.0 1.0
+nuisance_FSR  param  0.0 1.0
+nuisance_hdamp  param  0.0 1.0
+nuisance_jer  param  0.0 1.0
+nuisance_jesAbsoluteMPFBias  param  0.0 1.0
+nuisance_jesAbsoluteScale  param  0.0 1.0
+nuisance_jesFlavorQCD  param  0.0 1.0
+nuisance_jesFragmentation  param  0.0 1.0
+nuisance_jesPileUpDataMC  param  0.0 1.0
+nuisance_jesPileUpPtBB  param  0.0 1.0
+nuisance_jesPileUpPtEC1  param  0.0 1.0
+nuisance_jesPileUpPtEC2  param  0.0 1.0
+nuisance_jesPileUpPtHF  param  0.0 1.0
+nuisance_jesPileUpPtRef  param  0.0 1.0
+nuisance_jesRelativeFSR  param  0.0 1.0
+nuisance_jesRelativeJERHF  param  0.0 1.0
+nuisance_jesRelativePtBB  param  0.0 1.0
+nuisance_jesRelativePtHF  param  0.0 1.0
+nuisance_jesRelativeBal  param  0.0 1.0
+nuisance_jesSinglePionECAL  param  0.0 1.0
+nuisance_jesSinglePionHCAL  param  0.0 1.0
+nuisance_jesAbsoluteStat_UL2018  param  0.0 1.0
+nuisance_jesRelativeJEREC1_UL2018  param  0.0 1.0
+nuisance_jesRelativeJEREC2_UL2018  param  0.0 1.0
+nuisance_jesRelativePtEC1_UL2018  param  0.0 1.0
+nuisance_jesRelativePtEC2_UL2018  param  0.0 1.0
+nuisance_jesRelativeSample_UL2018  param  0.0 1.0
+nuisance_jesRelativeStatEC_UL2018  param  0.0 1.0
+nuisance_jesRelativeStatFSR_UL2018  param  0.0 1.0
+nuisance_jesRelativeStatHF_UL2018  param  0.0 1.0
+nuisance_jesTimePtEta_UL2018  param  0.0 1.0
+nuisance_jesAbsoluteStat_UL2017  param  0.0 1.0
+nuisance_jesRelativeJEREC1_UL2017  param  0.0 1.0
+nuisance_jesRelativeJEREC2_UL2017  param  0.0 1.0
+nuisance_jesRelativePtEC1_UL2017  param  0.0 1.0
+nuisance_jesRelativePtEC2_UL2017  param  0.0 1.0
+nuisance_jesRelativeSample_UL2017  param  0.0 1.0
+nuisance_jesRelativeStatEC_UL2017  param  0.0 1.0
+nuisance_jesRelativeStatFSR_UL2017  param  0.0 1.0
+nuisance_jesRelativeStatHF_UL2017  param  0.0 1.0
+nuisance_jesTimePtEta_UL2017  param  0.0 1.0
+nuisance_jesAbsoluteStat_UL2016  param  0.0 1.0
+nuisance_jesRelativeJEREC1_UL2016  param  0.0 1.0
+nuisance_jesRelativeJEREC2_UL2016  param  0.0 1.0
+nuisance_jesRelativePtEC1_UL2016  param  0.0 1.0
+nuisance_jesRelativePtEC2_UL2016  param  0.0 1.0
+nuisance_jesRelativeSample_UL2016  param  0.0 1.0
+nuisance_jesRelativeStatEC_UL2016  param  0.0 1.0
+nuisance_jesRelativeStatFSR_UL2016  param  0.0 1.0
+nuisance_jesRelativeStatHF_UL2016  param  0.0 1.0
+nuisance_jesTimePtEta_UL2016  param  0.0 1.0
