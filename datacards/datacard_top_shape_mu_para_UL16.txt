@@ -15,12 +15,12 @@ process                         top_sig  EWK_bkg  top_bkg
 process                         0        1        2          
 rate                            1        1        1           
 ----------------------------------------------------------------------------------------------------------------------------------
-x_sec_EWK_cons               lnN     -        1.06      -
-x_sec_sig_cons               lnN     1.058     -        -
-x-sec_top_bkg_cons               lnN      -        -        1.053
+#x_sec_EWK_cons               lnN     -        1.06      -
+#x_sec_sig_cons               lnN     1.058     -        -
+#x-sec_top_bkg_cons               lnN      -        -        1.053
 
-lumi                    lnN     1.0026   1.0026   1.0026
-lumi_UL16_UL17_UL18     lnN     1.0130   1.0130   1.0130
+#lumi                    lnN     1.0026   1.0026   1.0026
+#lumi_UL16_UL17_UL18     lnN     1.0130   1.0130   1.0130
 
 # ===== sys  ====
 
