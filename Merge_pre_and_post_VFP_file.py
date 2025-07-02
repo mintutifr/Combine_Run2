@@ -10,17 +10,24 @@ import argparse as arg
 #from TOY_local_fit import Toy_Mc 
 parser = arg.ArgumentParser(description='Create workspace for higgs combine')
 parser.add_argument('-l', '--lep', dest='Lep', default=['mu'], type=str, nargs=1, help="lepton flavour[ mu  el]")
+parser.add_argument('-io', '--inputoutputdirectory', dest='IO', default=['../Hist_for_workspace/'], type=str, nargs=1, help="input and output directory for the ROOT files")
+parser.add_argument('-dnncut', '--dnncut', dest='DNNcut', default=[0.7], type=float, nargs=1, help="DNN cut value for the histograms")
 args = parser.parse_args()
 
         
 
 lep = args.Lep[0]
+input_output_dir = args.IO[0]
+#dnn_cut = str(args.DNNcut[0]).replace('.', 'p')
+dnn_cut = "{:.2f}".format(float(args.DNNcut[0])).replace('.', 'p')
+print(dnn_cut)
+
 
 
 #--- User settings: update these file names as needed
-file_pre  = f"../Hist_for_workspace/Combine_Input_lntopMass_histograms_UL2016preVFP_{lep}_gteq0p7_withoutDNNfit_rebin.root"
-file_post = f"../Hist_for_workspace/Combine_Input_lntopMass_histograms_UL2016postVFP_{lep}_gteq0p7_withoutDNNfit_rebin.root"
-out_file  = f"../Hist_for_workspace/Combine_Input_lntopMass_histograms_UL2016_{lep}_gteq0p7_withoutDNNfit_rebin.root"
+file_pre  = f"{input_output_dir}Combine_Input_lntopMass_histograms_UL2016preVFP_{lep}_gteq{dnn_cut}_withoutDNNfit_rebin.root"
+file_post = f"{input_output_dir}Combine_Input_lntopMass_histograms_UL2016postVFP_{lep}_gteq{dnn_cut}_withoutDNNfit_rebin.root"
+out_file  = f"{input_output_dir}Combine_Input_lntopMass_histograms_UL2016_{lep}_gteq{dnn_cut}_withoutDNNfit_rebin.root"
 
 #--- Open input ROOT files
 f_pre  = ROOT.TFile.Open(file_pre,  "READ")
