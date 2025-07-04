@@ -1,6 +1,8 @@
 import ROOT as R
 import numpy as np
 import math
+import csv
+#import pandas as pd
 
 def text():
     lumitext = R.TPaveText(0.80555, 0.93, 0.89555, 0.95, "brNDC")
@@ -326,102 +328,56 @@ if __name__ == '__main__':
 
     M_true = [169.5, 170.5,171.5, 172.5, 173.5, 174.5,175.5]
     Width_true = [0.75, 0.9,1.1, 1.3, 1.4,1.5, 1.7, 1.9]
-    
-    M_fit_2018_AltMass_DNN_gt0p7 = []
-    Error_M_fit_2018_AltMass_DNN_gt0p7 = []
-    detaM_2018_AltMass_DNN_gt0p7 = []
-    Error_detaM_2018_AltMass_DNN_gt0p7 = []
 
-    gamma_fit_2018_AltWidth_DNN_gt0p7 = []
-    Error_gamma_fit_2018_AltWidth_DNN_gt0p7 = []
-    S_fit_2018_AltWidth_DNN_gt0p7 = []
-    deltaS_fit_2018_AltWidth_DNN_gt0p7 = []
-    Error_S_fit_2018_AltWidth_DNN_gt0p7 = []
-    Reso_2018_AltWidth_DNN_gt0p7 = []
-    Error_Reso_2018_AltWidth_DNN_gt0p7 = []
-    
-    LnM_AltMassfit_Run2_AltMass_DNN_gt0p7 = [5.093911,5.097217,5.098843,5.102156,5.104430,5.106490,5.110750]
-    M_AltMassfit_Run2_AltMass_DNN_gt0p7 = [164.170,164.652,164.918,165.484,165.869,166.237,166.940]
-    Error_M_AltMassfit_Run2_AltMass_DNN_gt0p7 = [0.381,0.386,0.389,0.401,0.405,0.402,0.413]
-    detaM_Run2_AltMass_DNN_gt0p7 = [5.330,5.848,6.582,7.016,7.631,8.263,8.560]
-    gamma_AltMassfit_Run2_AltWidth_DNN_gt0p7 = [0.118247,0.115034,0.114924,0.115910,0.116368,0.117685,0.117314]
-    Error_detaM_2018_AltMass_DNN_gt0p7 = []
+    with open("Fit_results1.CSV", newline='') as csvfile:
+        reader = csv.reader(csvfile)
+        data = list(reader)
 
-    LnM_AltWidthfit_Run2_AltMass_DNN_gt0p7 = [5.101839,5.101905,5.101990,5.102077,5.102156,5.102165,5.102252,5.102339]
-    gamma_AltWidthfit_Run2_AltWidth_DNN_gt0p7 = [0.115473,0.115559,0.115672, 0.115793,0.115910,0.115917,0.116041,0.116167]
-    Error_gamma_AltWidthfit_Run2_AltWidth_DNN_gt0p7 = [0.001455,0.001440,0.001401,0.001419,0.001451,0.001387,0.001528,0.001501]
-    S_AltWidthfit_Run2_AltWidth_DNN_gt0p7 = [19.1657,19.1815,19.2024,19.2245,19.2458,19.2471,19.2698,19.2929]
-    Error_S_AltWidthfit_Run2_AltWidth_DNN_gt0p7 = [0.264,0.261,0.255,0.258,0.264,0.253,0.277,0.272]
-    deltaS_AltWidthfit_Run2_AltWidth_DNN_gt0p7 = [18.416,18.282,18.102,17.925,17.936,17.747,17.570,17.393]
-    Reso_Run2_AltWidth_DNN_gt0p7 = [19.151,19.160,19.171,19.181,19.195,19.189,19.195,19.199]
-    Error_Reso_Run2_AltWidth_DNN_gt0p7 = [0.264,0.261,0.254,0.257,0.263,0.252,0.276,0.271]
+    header = data[0]
+    rows = data[1:]
+
+    # this is equivalent to df.iloc[:7]
+    df_mass_rows = rows[16:23] # CSV file [line number - 2 : CSV file line number - 2 + 7]
+    df_width_rows = rows[23:33]
 
 
-    # resutls 15/04/2025  (for detail look in the cernbox spreadsheet)
-    M_AltMassfit_Run2_AltMass_DNN_gt0p7 = [163.601, 164.296, 164.774, 165.226, 165.601, 165.889, 166.533]
-    Error_M_AltMassfit_Run2_AltMass_DNN_gt0p7 = [0.233, 0.191, 0.204, 0.188, 0.208, 0.188, 0.223]
-    detaM_Run2_AltMass_DNN_gt0p7 = [5.899, 6.204, 6.726, 7.274, 7.899, 8.611, 8.967]
-    gamma_AltMassfit_Run2_AltWidth_DNN_gt0p7 = [0.11609, 0.11349, 0.11415, 0.11469, 0.1151, 0.11611, 0.11544]
-    Error_detaM_2018_AltMass_DNN_gt0p7 = []
+    LnM_AltMassfit_Run2_AltMass_DNN_gt0p7        = [float(row[header.index("Mean(GeV)")]) for row in df_mass_rows]
+    M_AltMassfit_Run2_AltMass_DNN_gt0p7          = [float(row[header.index("lognormalmean")]) for row in df_mass_rows]
+    Error_M_AltMassfit_Run2_AltMass_DNN_gt0p7    = [float(row[header.index("error_lognormalmean")]) for row in df_mass_rows]
+    detaM_Run2_AltMass_DNN_gt0p7                 = [float(row[header.index("deltaM")]) for row in df_mass_rows]
+    gamma_AltMassfit_Run2_AltWidth_DNN_gt0p7     = [float(row[header.index("SigmaG(GeV)")]) for row in df_mass_rows]
 
-    LnM_AltWidthfit_Run2_AltMass_DNN_gt0p7 = [5.10028, 5.1004, 5.10054, 5.10066, 5.10074, 5.10076, 5.10085, 5.10093]
-    gamma_AltWidthfit_Run2_AltWidth_DNN_gt0p7 = [0.11416, 0.11428, 0.11444, 0.11458, 0.11469, 0.11471, 0.11483, 0.11496]
-    Error_gamma_AltWidthfit_Run2_AltWidth_DNN_gt0p7 = [0.00105, 0.00113, 0.00172, 0.00106, 0.00094, 0.00095, 0.00107, 0.00093]
-    S_AltWidthfit_Run2_AltWidth_DNN_gt0p7 = [18.9140, 18.9366, 18.9663, 18.9922, 19.0123, 19.0161, 19.0381, 19.0616]
-    Error_S_AltWidthfit_Run2_AltWidth_DNN_gt0p7 = [0.184, 0.198, 0.297, 0.186, 0.166, 0.167, 0.188, 0.164]
-    deltaS_AltWidthfit_Run2_AltWidth_DNN_gt0p7 = [18.164, 18.037, 17.866, 17.692, 17.612, 17.516, 17.338, 17.162]
-    Reso_Run2_AltWidth_DNN_gt0p7 = [18.899, 18.915, 18.934, 18.948, 18.961, 18.957, 18.962, 18.967]
-    Error_Reso_Run2_AltWidth_DNN_gt0p7 = [0.184, 0.197, 0.297, 0.185, 0.165, 0.167, 0.187, 0.163]
+    LnM_AltWidthfit_Run2_AltMass_DNN_gt0p7       = [float(row[header.index("Mean(GeV)")]) for row in df_width_rows]
+    gamma_AltWidthfit_Run2_AltWidth_DNN_gt0p7    = [float(row[header.index("SigmaG(GeV)")]) for row in df_width_rows]
+    Error_gamma_AltWidthfit_Run2_AltWidth_DNN_gt0p7 = [float(row[header.index("Uncertainty(GeV)_sigma")]) for row in df_width_rows]
+    S_AltWidthfit_Run2_AltWidth_DNN_gt0p7        = [float(row[header.index("lognormalsigma")]) for row in df_width_rows]
+    Error_S_AltWidthfit_Run2_AltWidth_DNN_gt0p7  = [float(row[header.index("error_lognormalsigma")]) for row in df_width_rows]
+    deltaS_AltWidthfit_Run2_AltWidth_DNN_gt0p7   = [float(row[header.index("deltaS")]) for row in df_width_rows]
+    Reso_Run2_AltWidth_DNN_gt0p7                 = [float(row[header.index("Reso")]) for row in df_width_rows]
+    Error_Reso_Run2_AltWidth_DNN_gt0p7           = [float(row[header.index("error_Reso")]) for row in df_width_rows]
 
 
-    # resutls 27/04/2025  (for detail look in the cernbox spreadsheet) (with only one fit for UL2016)
-    M_AltMassfit_Run2_AltMass_DNN_gt0p7 = [163.528, 164.233, 164.712, 165.165, 165.540, 165.827, 166.477]
-    Error_M_AltMassfit_Run2_AltMass_DNN_gt0p7 = [0.200, 0.204, 0.195, 0.228, 0.194, 0.187, 0.211]
-    detaM_Run2_AltMass_DNN_gt0p7 = [5.972, 6.267, 6.788, 7.335, 7.960, 8.673, 9.023]
-    gamma_AltMassfit_Run2_AltWidth_DNN_gt0p7 = [0.11556, 0.11295, 0.11367, 0.11413, 0.11450, 0.11555, 0.11493]
-    Error_detaM_2018_AltMass_DNN_gt0p7 = []
 
-    LnM_AltWidthfit_Run2_AltMass_DNN_gt0p7 = [5.09996, 5.10009, 5.10023, 5.10035, 5.10043, 5.10045, 5.10054, 5.10062]
-    gamma_AltWidthfit_Run2_AltWidth_DNN_gt0p7 = [0.11359, 0.11372, 0.11387, 0.11401, 0.11413, 0.11414, 0.11427, 0.11439]
-    Error_gamma_AltWidthfit_Run2_AltWidth_DNN_gt0p7 = [0.00087, 0.00100, 0.00120, 0.00101, 0.00134, 0.00095, 0.00118, 0.00125]
-    S_AltWidthfit_Run2_AltWidth_DNN_gt0p7 = [18.8117, 18.8361, 18.8641, 18.8900, 18.9118, 18.9139, 18.9375, 18.9593]
-    Error_S_AltWidthfit_Run2_AltWidth_DNN_gt0p7 = [0.153, 0.176, 0.209, 0.177, 0.233, 0.167, 0.206, 0.218]
-    deltaS_AltWidthfit_Run2_AltWidth_DNN_gt0p7 = [18.062, 17.936, 17.764, 17.590, 17.512, 17.414, 17.238, 17.059]
-    Reso_Run2_AltWidth_DNN_gt0p7 = [18.797, 18.815, 18.832, 18.845, 18.860, 18.854, 18.861, 18.864]
-    Error_Reso_Run2_AltWidth_DNN_gt0p7 = [0.153, 0.175, 0.209, 0.177, 0.233, 0.167, 0.205, 0.217]
+    print("\n========== AltMassfit Variables ==========")
+    input_mOw        = [float(row[header.index("True_massORwidth")]) for row in df_mass_rows]
+    print("input_mOw:", input_mOw)
+    print("LnM_AltMassfit_Run2_AltMass_DNN_gt0p7:", LnM_AltMassfit_Run2_AltMass_DNN_gt0p7)
+    print("M_AltMassfit_Run2_AltMass_DNN_gt0p7:",  M_AltMassfit_Run2_AltMass_DNN_gt0p7)
+    print("Error_M_AltMassfit_Run2_AltMass_DNN_gt0p7:", Error_M_AltMassfit_Run2_AltMass_DNN_gt0p7)
+    print("detaM_Run2_AltMass_DNN_gt0p7:", detaM_Run2_AltMass_DNN_gt0p7)
+    print("gamma_AltMassfit_Run2_AltWidth_DNN_gt0p7:", gamma_AltMassfit_Run2_AltWidth_DNN_gt0p7)
 
-    # resutls 24/06/2025 (Combine UL2018 r = 1 freez) 30 bins + addiational systematics (with only fit for UL2016 )
-    M_AltMassfit_2018_AltMass_DNN_gt0p7 = [163.411,163.928,164.333,164.936,165.318,165.597,166.412]
-    Error_M_AltMassfit_2018_AltMass_DNN_gt0p7 = [0.298,0.352,0.348,0.353,0.354,0.340,1.437]
-    detaM_2018_AltMass_DNN_gt0p7 = [6.089,6.572,7.167,7.564,8.182,8.903,9.088]
-    gamma_AltMassfit_2018_AltWidth_DNN_gt0p7 = [0.109146,0.106588,0.107092,0.107646,0.107603,0.108608,0.106719]
-    Error_detaM_2018_AltMass_DNN_gt0p7 = []
-
-    LnM_AltWidthfit_2018_AltMass_DNN_gt0p7 = [5.0996055,5.0996432,5.0996749,5.0997235,5.0997650,5.0997530,5.0997916,5.0998371]
-    gamma_AltWidthfit_2018_AltWidth_DNN_gt0p7 = [0.107582,0.107586,0.107589,0.107615,0.107646,0.107635,0.107669,0.107710]
-    Error_gamma_AltWidthfit_2018_AltWidth_DNN_gt0p7 = [0.001865,0.001635,0.001670,0.001653,0.001625,0.001842,0.001642,0.001694]
-    S_AltWidthfit_2018_AltWidth_DNN_gt0p7 = [17.7927,17.7940,17.7951,17.8004,17.8064,17.8042,17.8105,17.8183]
-    Error_S_AltWidthfit_2018_AltWidth_DNN_gt0p7 = [0.330,0.287,0.293,0.291,0.286,0.326,0.289,0.299]
-    deltaS_AltWidthfit_2018_AltWidth_DNN_gt0p7 = [17.043,16.894,16.695,16.500,16.406,16.304,16.111,15.918  ]
-    Reso_2018_AltWidth_DNN_gt0p7 = [17.777,17.771,17.761,17.753,17.751,17.741,17.729,17.717]
-    Error_Reso_2018_AltWidth_DNN_gt0p7 = [0.330,0.286,0.293,0.290,0.285,0.325,0.288,0.298]
-
-     # resutls 25/06/2025 (Combine Run2 r = 1 freez) 30 bins + addiational systematics (with only fit for UL2016 )
-    LnM_AltMassfit_Run2_AltMass_DNN_gt0p7 = [5.089803, 5.093250, 5.095714, 5.098595, 5.100626, 5.102510, 5.106882]
-    M_AltMassfit_Run2_AltMass_DNN_gt0p7 = [163.326, 163.834, 164.242, 164.720, 165.054, 165.379, 166.092]
-    Error_M_AltMassfit_Run2_AltMass_DNN_gt0p7 = [0.257, 0.279, 0.279, 0.313, 0.233, 0.230, 0.241]
-    detaM_Run2_AltMass_DNN_gt0p7 = [6.174, 6.666, 7.258, 7.780, 8.446, 9.121, 9.408]
-    gamma_AltMassfit_Run2_AltWidth_DNN_gt0p7 = [0.109068, 0.105876, 0.106073, 0.106324, 0.106263, 0.107066, 0.106415]
-    Error_detaM_2018_AltMass_DNN_gt0p7 = []
-
-    LnM_AltWidthfit_Run2_AltMass_DNN_gt0p7 = [5.098349, 5.098409, 5.098484, 5.098546, 5.098595, 5.098609, 5.098668, 5.098724]
-    gamma_AltWidthfit_Run2_AltWidth_DNN_gt0p7 = [0.106142, 0.106174, 0.106224, 0.106270, 0.106324, 0.106323, 0.106379, 0.106436]
-    Error_gamma_AltWidthfit_Run2_AltWidth_DNN_gt0p7 = [0.001131, 0.001014, 0.001536, 0.001173, 0.001282, 0.001012, 0.001313, 0.001199]
-    S_AltWidthfit_Run2_AltWidth_DNN_gt0p7 = [17.5284, 17.5349, 17.5446, 17.5533, 17.5634, 17.5635, 17.5738, 17.5844]
-    Error_S_AltWidthfit_Run2_AltWidth_DNN_gt0p7 = [0.199, 0.178, 0.274, 0.208, 0.227, 0.178, 0.234, 0.212]
-    deltaS_AltWidthfit_Run2_AltWidth_DNN_gt0p7 = [16.778, 16.635, 16.445, 16.253, 16.163, 16.063, 15.874, 15.684]
-    Reso_Run2_AltWidth_DNN_gt0p7 = [17.512, 17.512, 17.510, 17.505, 17.507, 17.499, 17.491, 17.481]
-    Error_Reso_Run2_AltWidth_DNN_gt0p7 = [0.199, 0.178, 0.274, 0.207, 0.227, 0.178, 0.233, 0.211]
+    print("\n========== AltWidthfit Variables ==========")
+    input_mOw        = [float(row[header.index("True_massORwidth")]) for row in df_width_rows]
+    print("input_mOw:", input_mOw)
+    print("LnM_AltWidthfit_Run2_AltMass_DNN_gt0p7:", LnM_AltWidthfit_Run2_AltMass_DNN_gt0p7)
+    print("gamma_AltWidthfit_Run2_AltWidth_DNN_gt0p7:",gamma_AltWidthfit_Run2_AltWidth_DNN_gt0p7)
+    print("Error_gamma_AltWidthfit_Run2_AltWidth_DNN_gt0p7:", Error_gamma_AltWidthfit_Run2_AltWidth_DNN_gt0p7)
+    print("S_AltWidthfit_Run2_AltWidth_DNN_gt0p7:", S_AltWidthfit_Run2_AltWidth_DNN_gt0p7)
+    print("Error_S_AltWidthfit_Run2_AltWidth_DNN_gt0p7:", Error_S_AltWidthfit_Run2_AltWidth_DNN_gt0p7)
+    print("deltaS_AltWidthfit_Run2_AltWidth_DNN_gt0p7:", deltaS_AltWidthfit_Run2_AltWidth_DNN_gt0p7)
+    print("Reso_Run2_AltWidth_DNN_gt0p7:", Reso_Run2_AltWidth_DNN_gt0p7)
+    print("Error_Reso_Run2_AltWidth_DNN_gt0p7:", Error_Reso_Run2_AltWidth_DNN_gt0p7)
 
     get_linearity_plot(M_true, M_AltMassfit_Run2_AltMass_DNN_gt0p7, Error_M_AltMassfit_Run2_AltMass_DNN_gt0p7,len(M_true), variable="M", BDTCUT="gt0p7_Run2")
     hband_mass,mass_cali_fitPar = get_calib_hist(M_AltMassfit_Run2_AltMass_DNN_gt0p7, detaM_Run2_AltMass_DNN_gt0p7, Error_M_AltMassfit_Run2_AltMass_DNN_gt0p7,len(M_AltMassfit_Run2_AltMass_DNN_gt0p7), "M", "gt0p7_Run2", "pol1")

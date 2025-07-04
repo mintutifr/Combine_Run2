@@ -3,6 +3,7 @@ import argparse as arg
 import ROOT as rt
 import numpy
 import time
+import math
 from Read_and_print_fit_parameters import get_paramters
 from Add_sys_parameter_to_datacard import update_sys_parameters_to_datacard_simultanous_fit
 parser = arg.ArgumentParser(description='Run Higgs combine Tool')
@@ -31,6 +32,48 @@ def write_fit_results_to_csv(filename, Datayear, True_massORwidth, mean_fit_list
     import csv
 
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    mean_val = mean_fit_list[0]
+    mean_err = mean_fit_list[1]
+    sigma_val = sigmaG_fit_list[0]
+    sigma_err = sigmaG_fit_list[1]
+
+    lognormalmean = math.exp(mean_val + (sigma_val ** 2) / 2)
+
+    error_lognormalmean = lognormalmean * math.sqrt(
+        (mean_err ** 2) +
+        (sigma_err ** 2) / 4 +
+        (mean_err * sigma_err)
+    )
+
+    deltaM = (float(True_massORwidth) / 10.0) - lognormalmean
+
+    lognormalsigma = math.sqrt(
+        math.exp(2 * mean_val + sigma_val ** 2) * (math.exp(sigma_val ** 2)-1)
+    )
+
+    exp_sigma2 = math.exp(sigma_val ** 2)
+    R = (2 * exp_sigma2 - 1) / (exp_sigma2 - 1)
+
+    error_lognormalsigma = lognormalsigma * math.sqrt(
+        (mean_err ** 2) +
+        (sigma_err ** 2) * (sigma_val ** 2) * (R ** 2) +
+        mean_err * sigma_err * sigma_val * R
+    )
+
+    fixed_masses = {1695, 1705, 1715, 1725, 1735, 1745, 1755}
+
+    mass_value = float(True_massORwidth)
+
+    if mass_value in fixed_masses:
+        reference_value = 1.4
+    else:
+        reference_value = mass_value / 100.0
+
+    deltaS = lognormalsigma - reference_value
+    
+    Reso = math.sqrt(lognormalsigma**2 - reference_value**2)
+ 
+    error_Reso = error_lognormalsigma * (Reso / lognormalsigma)
 
     row = [
         timestamp,
@@ -39,7 +82,15 @@ def write_fit_results_to_csv(filename, Datayear, True_massORwidth, mean_fit_list
         mean_fit_list[0],
         mean_fit_list[1],
         sigmaG_fit_list[0],
-        sigmaG_fit_list[1]
+        sigmaG_fit_list[1],
+        lognormalmean,
+        error_lognormalmean,
+        deltaM,
+        lognormalsigma,
+        error_lognormalsigma,
+        deltaS,
+        Reso,
+        error_Reso
     ]
 
     file_exists = os.path.isfile(filename)
@@ -47,7 +98,7 @@ def write_fit_results_to_csv(filename, Datayear, True_massORwidth, mean_fit_list
     with open(filename, mode='a', newline='') as f:
         writer = csv.writer(f)
         if not file_exists:
-            writer.writerow(["Date", "Datayear", "True_massORwidth","Mean(GeV)", "Uncertainty(GeV)", "SigmaG(GeV)", "Uncertainty(GeV)"])
+            writer.writerow(["Date", "Datayear", "True_massORwidth","Mean(GeV)", "Uncertainty(GeV)_mean", "SigmaG(GeV)", "Uncertainty(GeV)_sigma", "lognormalmean", "error_lognormalmean", "deltaM", "lognormalsigma",  "error_lognormalsigma", "deltaS", "Reso", "error_Reso"])
         writer.writerow(row)
 
     print(f"Appended result to {filename}")
@@ -137,7 +188,7 @@ for MoW in massORwidth_points:
     print("Fit results : mean = %.5f +- %.5f GeV, sigmaG = %.5f +- %.5f GeV"%(mean_fit['mean'][0],mean_fit['mean'][1],sigmaG_fit['sigmaG'][0],sigmaG_fit['sigmaG'][1]))
     print("=====================================\n")
 
-    write_fit_results_to_csv("Fit_results.CSV",year,MoW, mean_fit['mean'], sigmaG_fit['sigmaG'])
+    write_fit_results_to_csv("Fit_results1.CSV",year,MoW, mean_fit['mean'], sigmaG_fit['sigmaG'])
 
     if(sys != "Nomi"):
         #for likelihood scans when using robustFit 1
